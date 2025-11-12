@@ -1,4 +1,4 @@
-/*using Eventos.Aplicacion.DTOs;
+using Eventos.Aplicacion.DTOs;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -6,100 +6,100 @@ using Xunit;
 
 namespace Eventos.Pruebas.Aplicacion.DTOs;
 
-public class EventoDtoTests
+public class EventoDtoPruebas
 {
     [Fact]
-    public void EventoDto_ShouldInitializeAllProperties()
+    public void EventoDto_DebeInicializarTodasLasPropiedades()
     {
-        // Arrange
+        // Preparar
         var id = Guid.NewGuid();
-        var title = "Tech Conference";
-        var description = "Annual evento";
-        var startDate = DateTime.UtcNow.AddDays(30);
-        var endDate = startDate.AddHours(8);
-        var maxAsistentes = 100;
-        var status = "Publicado";
+        var titulo = "Concierto musica";
+        var descripcion = "Concierto de musica navideña";
+        var fechaInicio = DateTime.UtcNow.AddDays(30);
+        var fechaFin = fechaInicio.AddHours(8);
+        var maximoAsistentes =100;
+        var estado = "Publicado";
 
-        // Act
+        // Ejecutar
         var dto = new EventoDto
         {
             Id = id,
-            Title = title,
-            Description = description,
-            StartDate = startDate,
-            EndDate = endDate,
-            MaxAsistentes = maxAsistentes,
-            Status = status
+            Titulo = titulo,
+            Descripcion = descripcion,
+            FechaInicio = fechaInicio,
+            FechaFin = fechaFin,
+            MaximoAsistentes = maximoAsistentes,
+            Estado = estado
         };
 
-        // Assert
+        // Comprobar
         dto.Id.Should().Be(id);
-        dto.Title.Should().Be(title);
-        dto.Description.Should().Be(description);
-        dto.StartDate.Should().Be(startDate);
-        dto.EndDate.Should().Be(endDate);
-        dto.MaxAsistentes.Should().Be(maxAsistentes);
-        dto.Status.Should().Be(status);
+        dto.Titulo.Should().Be(titulo);
+        dto.Descripcion.Should().Be(descripcion);
+        dto.FechaInicio.Should().Be(fechaInicio);
+        dto.FechaFin.Should().Be(fechaFin);
+        dto.MaximoAsistentes.Should().Be(maximoAsistentes);
+        dto.Estado.Should().Be(estado);
     }
 
     [Fact]
-    public void EventoDto_Location_ShouldBeSettable()
+    public void EventoDto_Ubicacion_DebeSerAsignable()
     {
-        // Arrange
+        // Preparar
         var dto = new EventoDto();
-        var locationDto = new LocationDto
+        var ubicacionDto = new UbicacionDto
         {
-            VenueNombre = "Convention Center",
-            Direccion = "123 Main St",
-            Ciudad = "Tech Ciudad",
-            State = "TC",
-            ZipCode = "12345"
+            NombreLugar = "CCCT",
+            Direccion = "Av la Estancia, Chuao",
+            Ciudad = "Caracas",
+            Region = "DF",
+            CodigoPostal = "1090",
+            Pais = "Venezuela"
         };
 
-        // Act
-        dto.Location = locationDto;
+        // Ejecutar
+        dto.Ubicacion = ubicacionDto;
 
-        // Assert
-        dto.Location.Should().NotBeNull();
-        dto.Location.VenueNombre.Should().Be("Convention Center");
-        dto.Location.Ciudad.Should().Be("Tech Ciudad");
+        // Comprobar
+        dto.Ubicacion.Should().NotBeNull();
+        dto.Ubicacion!.NombreLugar.Should().Be("CCCT");
+        dto.Ubicacion.Ciudad.Should().Be("Caracas");
     }
 
     [Fact]
-    public void EventoDto_Asistentes_ShouldBeSettableAndEnumerable()
+    public void EventoDto_Asistentes_DebeSerAsignableYEvaluable()
     {
-        // Arrange
+        // Preparar
         var dto = new EventoDto();
         var asistentes = new List<AsistenteDto>
         {
-            new AsistenteDto { Id = Guid.NewGuid(), Nombre = "John Doe", Email = "john@prueba.com" },
-            new AsistenteDto { Id = Guid.NewGuid(), Nombre = "Jane Smith", Email = "jane@prueba.com" }
+            new AsistenteDto { Id = Guid.NewGuid(), Nombre = "Creonte Lara", Correo = "cdlara@est.ucab.edu.ve" },
+            new AsistenteDto { Id = Guid.NewGuid(), Nombre = "Electra Wilson", Correo = "eywilson@est.ucab.edu.ve" }
         };
 
-        // Act
+        // Ejecutar
         dto.Asistentes = asistentes;
 
-        // Assert
+        // Comprobar
         dto.Asistentes.Should().HaveCount(2);
-        dto.Asistentes.Should().Contain(a => a.Nombre == "John Doe");
-        dto.Asistentes.Should().Contain(a => a.Nombre == "Jane Smith");
+        dto.Asistentes.Should().Contain(a => a.Nombre == "Creonte Lara");
+        dto.Asistentes.Should().Contain(a => a.Nombre == "Electra Wilson");
     }
 
     [Fact]
-    public void EventoDto_ShouldAllowNullValues()
+    public void EventoDto_DebePermitirValoresNulos()
     {
-        // Arrange & Act
+        // Preparar y ejecutar
         var dto = new EventoDto
         {
-            Description = null,
-            Location = null,
+            Descripcion = null,
+            Ubicacion = null,
             Asistentes = null
         };
 
-        // Assert
-        dto.Description.Should().BeNull();
-        dto.Location.Should().BeNull();
+        // Comprobar
+        dto.Descripcion.Should().BeNull();
+        dto.Ubicacion.Should().BeNull();
         dto.Asistentes.Should().BeNull();
     }
 }
-*/

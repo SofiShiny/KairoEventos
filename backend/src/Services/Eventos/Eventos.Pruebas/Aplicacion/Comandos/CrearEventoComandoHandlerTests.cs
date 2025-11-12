@@ -72,10 +72,10 @@ public class CrearEventoComandoHandlerTests
         // Assert
         result.IsExito.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Titulo.Should().Be(comando.Titulo);
-        result.Value.Descripcion.Should().Be(comando.Descripcion);
-        result.Value.Ubicacion.Should().NotBeNull();
-        result.Value.Ubicacion.Ciudad.Should().Be("Caracas");
+        result.Value!.Titulo.Should().Be(comando.Titulo);
+        result.Value!.Descripcion.Should().Be(comando.Descripcion);
+        result.Value!.Ubicacion.Should().NotBeNull();
+        result.Value!.Ubicacion!.Ciudad.Should().Be("Caracas");
 
         _repositorioEventoMock.Verify(x => x.AgregarAsync(It.IsAny<Evento>(), It.IsAny<CancellationToken>()), Times.Once);
     }

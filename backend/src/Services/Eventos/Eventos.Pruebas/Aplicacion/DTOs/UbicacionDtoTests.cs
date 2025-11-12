@@ -1,51 +1,54 @@
-/*using Eventos.Aplicacion.DTOs;
+using Eventos.Aplicacion.DTOs;
 using FluentAssertions;
 using Xunit;
 
 namespace Eventos.Pruebas.Aplicacion.DTOs;
 
-public class LocationDtoTests
+public class UbicacionDtoTests
 {
     [Fact]
-    public void LocationDto_ShouldInitializeAllProperties()
+    public void UbicacionDto_DebeInicializarTodasLasPropiedades()
     {
-        // Arrange & Act
-        var dto = new LocationDto
+        // Preparar & Ejecutar
+        var dto = new UbicacionDto
         {
-            VenueNombre = "Conference Center",
-            Direccion = "123 Main Street",
-            Ciudad = "San Francisco",
-            State = "CA",
-            ZipCode = "94105"
+            NombreLugar = "Centro de Convenciones",
+            Direccion = "Av Principal123",
+            Ciudad = "Caracas",
+            Region = "Distrito Capital",
+            CodigoPostal = "1010",
+            Pais = "Venezuela"
         };
 
-        // Assert
-        dto.VenueNombre.Should().Be("Conference Center");
-        dto.Direccion.Should().Be("123 Main Street");
-        dto.Ciudad.Should().Be("San Francisco");
-        dto.State.Should().Be("CA");
-        dto.ZipCode.Should().Be("94105");
+        // Comprobar
+        dto.NombreLugar.Should().Be("Centro de Convenciones");
+        dto.Direccion.Should().Be("Av Principal123");
+        dto.Ciudad.Should().Be("Caracas");
+        dto.Region.Should().Be("Distrito Capital");
+        dto.CodigoPostal.Should().Be("1010");
+        dto.Pais.Should().Be("Venezuela");
     }
 
     [Fact]
-    public void LocationDto_ShouldAllowEmptyStrings()
+    public void UbicacionDto_DebePermitirCadenasVacias()
     {
-        // Arrange & Act
-        var dto = new LocationDto
+        // Preparar & Ejecutar
+        var dto = new UbicacionDto
         {
-            VenueNombre = string.Empty,
+            NombreLugar = string.Empty,
             Direccion = string.Empty,
             Ciudad = string.Empty,
-            State = string.Empty,
-            ZipCode = string.Empty
+            Region = string.Empty,
+            CodigoPostal = string.Empty,
+            Pais = string.Empty
         };
 
-        // Assert
-        dto.VenueNombre.Should().BeEmpty();
+        // Comprobar
+        dto.NombreLugar.Should().BeEmpty();
         dto.Direccion.Should().BeEmpty();
         dto.Ciudad.Should().BeEmpty();
-        dto.State.Should().BeEmpty();
-        dto.ZipCode.Should().BeEmpty();
+        dto.Region.Should().BeEmpty();
+        dto.CodigoPostal.Should().BeEmpty();
+        dto.Pais.Should().BeEmpty();
     }
 }
-*/

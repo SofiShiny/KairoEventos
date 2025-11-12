@@ -1,4 +1,4 @@
-/*using Eventos.Dominio.Entidades;
+using Eventos.Dominio.Entidades;
 using FluentAssertions;
 using Xunit;
 
@@ -7,70 +7,70 @@ namespace Eventos.Pruebas.Dominio;
 public class AsistenteTests
 {
     [Fact]
-    public void CreateAsistente_WithValidData_ShouldSucceed()
+    public void CrearAsistente_ConDatosValidos_DeberiaTenerExito()
     {
-        // Arrange
+        // Preparar
         var eventId = Guid.NewGuid();
-        var userId = "user-123";
-        var nombreUsuario = "John Doe";
-        var email = "user@example.com";
+        var userId = "usuario-001";
+        var nombreUsuario = "Marcus Wilson";
+        var email = "marcuswilson0929@gmail.com";
 
         // Act
         var asistente = new Asistente(eventId, userId, nombreUsuario, email);
 
-        // Assert
+        // Comprobar
         asistente.Should().NotBeNull();
         asistente.EventoId.Should().Be(eventId);
-        asistente.UserId.Should().Be(userId);
+        asistente.UsuarioId.Should().Be(userId);
         asistente.NombreUsuario.Should().Be(nombreUsuario);
-        asistente.Email.Should().Be(email);
+        asistente.Correo.Should().Be(email);
         asistente.RegistradoEn.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
     [Fact]
-    public void CreateAsistente_WithEmptyEventoId_ShouldThrowException()
+    public void CrearAsistente_ConEventoIdVacio_DeberiaLanzarExcepcion()
     {
-        // Arrange
-        var userId = "user-123";
-        var nombreUsuario = "John Doe";
-        var email = "user@example.com";
+        // Preparar
+        var userId = "usuario-002";
+        var nombreUsuario = "Lilia Lara";
+        var email = "lilia.lara0531@gmail.com";
 
         // Act
         Action act = () => new Asistente(Guid.Empty, userId, nombreUsuario, email);
 
-        // Assert
+        // Comprobar
         act.Should().Throw<ArgumentException>()
             .WithMessage("*EventoId*");
     }
 
     [Fact]
-    public void CreateAsistente_WithEmptyUserId_ShouldThrowException()
+    public void CrearAsistente_ConUserIdVacio_DeberiaLanzarExcepcion()
     {
-        // Arrange
+        // Preparar
         var eventId = Guid.NewGuid();
-        var nombreUsuario = "John Doe";
-        var email = "user@example.com";
+        var nombreUsuario = "Lilia Lara";
+        var email = "lilialara@gmail.com";
 
         // Act
         Action act = () => new Asistente(eventId, string.Empty, nombreUsuario, email);
 
-        // Assert
+        // Comprobar
         act.Should().Throw<ArgumentException>()
-            .WithMessage("*UserId*");
+            .WithMessage("*usuarioId*");
     }
 
     [Fact]
-    public void CreateAsistente_WithInvalidEmail_ShouldThrowException()
+    public void CrearAsistente_ConEmailInvalido_DeberiaLanzarExcepcion()
     {
-        // Arrange
+        // Preparar
         var eventId = Guid.NewGuid();
-        var userId = "user-123";
-        var nombreUsuario = "John Doe";
+        var userId = "usuario-002";
+        var nombreUsuario = "LiliaLara";
 
         // Act
         Action act = () => new Asistente(eventId, userId, nombreUsuario, "invalid-email");
 
-        // Assert
+        // Comprobar
         act.Should().Throw<ArgumentException>()
             .WithMessage("*email*");
     }
@@ -79,18 +79,17 @@ public class AsistenteTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void CreateAsistente_WithNullOrEmptyEmail_ShouldThrowException(string email)
+    public void CrearAsistente_ConEmailNuloOVacio_DeberiaLanzarExcepcion(string? email)
     {
-        // Arrange
+        // Preparar
         var eventId = Guid.NewGuid();
-        var userId = "user-123";
-        var nombreUsuario = "John Doe";
+        var userId = "usuario-002";
+        var nombreUsuario = "Lilia Lara";
 
         // Act
         Action act = () => new Asistente(eventId, userId, nombreUsuario, email);
 
-        // Assert
+        // Comprobar
         act.Should().Throw<ArgumentException>();
     }
 }
-*/

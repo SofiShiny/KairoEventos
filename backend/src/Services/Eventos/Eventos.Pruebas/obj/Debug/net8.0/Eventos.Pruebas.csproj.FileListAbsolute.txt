@@ -1,10 +1,4 @@
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\bin\Debug\net8.0\CoverletSourceRootsMapping_Eventos.Pruebas
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.csproj.AssemblyReference.cache
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.AssemblyInfoInputs.cache
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.AssemblyInfo.cs
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.csproj.CoreCompileInputs.cache
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.sourcelink.json
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\bin\Debug\net8.0\testhost.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\bin\Debug\net8.0\testhost.exe
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\bin\Debug\net8.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
@@ -132,6 +126,12 @@ C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Even
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\bin\Debug\net8.0\Eventos.Infraestructura.pdb
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\bin\Debug\net8.0\BloquesConstruccion.Aplicacion.pdb
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\bin\Debug\net8.0\BloquesConstruccion.Dominio.pdb
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.csproj.AssemblyReference.cache
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.AssemblyInfoInputs.cache
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.AssemblyInfo.cs
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.csproj.CoreCompileInputs.cache
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.sourcelink.json
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos..10B8E8B5.Up2Date
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\Eventos.Pruebas.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.Pruebas\obj\Debug\net8.0\refint\Eventos.Pruebas.dll
