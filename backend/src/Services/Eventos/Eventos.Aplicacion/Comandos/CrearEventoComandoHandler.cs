@@ -65,7 +65,6 @@ public class CrearEventoComandoHandler : IRequestHandler<CrearEventoComando, Res
             Ubicacion = new UbicacionDto
             {
                 NombreLugar = evento.Ubicacion?.NombreLugar ?? string.Empty,
-                Lugar = evento.Ubicacion?.NombreLugar ?? string.Empty,
                 Direccion = evento.Ubicacion?.Direccion ?? string.Empty,
                 Ciudad = evento.Ubicacion?.Ciudad ?? string.Empty,
                 Region = evento.Ubicacion?.Region ?? string.Empty,

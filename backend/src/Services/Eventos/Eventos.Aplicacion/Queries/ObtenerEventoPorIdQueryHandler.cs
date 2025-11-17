@@ -32,7 +32,6 @@ public class ObtenerEventoPorIdQueryHandler : IRequestHandler<ObtenerEventoPorId
             Ubicacion = new UbicacionDto
             {
                 NombreLugar = evento.Ubicacion.NombreLugar,
-                Lugar = evento.Ubicacion.NombreLugar,
                 Direccion = evento.Ubicacion.Direccion,
                 Ciudad = evento.Ubicacion.Ciudad,
                 Region = evento.Ubicacion.Region,
