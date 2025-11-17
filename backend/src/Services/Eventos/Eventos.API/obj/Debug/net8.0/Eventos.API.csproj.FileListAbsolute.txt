@@ -9,8 +9,8 @@ C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Even
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\obj\Debug\net8.0\Eventos.API.sourcelink.json
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\appsettings.json
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Eventos.API.staticwebassets.endpoints.json
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Propiedades\launchSettings.json
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Eventos.API.staticwebassets.endpoints.json
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Eventos.API.exe
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Eventos.API.deps.json
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Eventos.API.runtimeconfig.json
@@ -21,7 +21,6 @@ C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Even
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Humanizer.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\MediatR.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\MediatR.Contracts.dll
-C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
@@ -30,12 +29,16 @@ C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Even
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.InMemory.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Microsoft.OpenApi.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Mono.TextTemplating.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Npgsql.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Scrutor.dll
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\sofia\Source\Repos\ProyectoDesarrollo\backend\src\Services\Eventos\Eventos.API\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
