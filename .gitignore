@@ -75,3 +75,4 @@ coverage.cobertura.xml
 
 # Archivos HTML 
 *.html
+*.htm
