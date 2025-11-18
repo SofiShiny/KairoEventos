@@ -58,3 +58,17 @@ dkms.conf
 .vs/
 *.suo
 *.user
+
+# Reportes de cobertura y resultados de pruebas (HTML, CSS, JS generados)
+# Ignora cualquier carpeta de reportes de cobertura en cualquier nivel
+coverage-report/
+**/coverage-report/
+**/coverage-report/**
+
+# Resultados de pruebas de .NET
+TestResults/
+**/TestResults/
+
+# Archivos de cobertura comunes
+coverage.cobertura.xml
+**/coverage.cobertura.xml
