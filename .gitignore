@@ -72,3 +72,6 @@ TestResults/
 # Archivos de cobertura comunes
 coverage.cobertura.xml
 **/coverage.cobertura.xml
+
+# Archivos HTML 
+*.html
