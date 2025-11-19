@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "qnkSGJ0J2s3D12zM2k1lJt0vD6I5Ti5Zv7u1+j0DLu0E1e4yvYjAUD6nWm+HiQiQZ/BQYk2rsBkj61BwqIQkEA==",
+  "dgSpecHash": "WKwlXI3FKpg=",
   "success": true,
-  "projectFilePath": "/mnt/c/Users/sofia/Source/Repos/ProyectoDesarrollo/backend/src/Shared/BloquesConstruccion/Dominio/BloquesConstruccion.Dominio.csproj",
+  "projectFilePath": "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Dominio\\BloquesConstruccion.Dominio.csproj",
   "expectedPackageFiles": [
-    "/home/sofia/.nuget/packages/mediatr/12.0.1/mediatr.12.0.1.nupkg.sha512",
-    "/home/sofia/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",
-    "/home/sofia/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/6.0.0/microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
+    "C:\\Users\\sofia\\.nuget\\packages\\mediatr\\12.0.1\\mediatr.12.0.1.nupkg.sha512",
+    "C:\\Users\\sofia\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\sofia\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }

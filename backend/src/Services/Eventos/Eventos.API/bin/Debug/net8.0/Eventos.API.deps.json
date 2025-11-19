@@ -13,7 +13,6 @@
           "MediatR": "12.2.0",
           "Microsoft.EntityFrameworkCore.Design": "8.0.0",
           "Microsoft.EntityFrameworkCore.InMemory": "8.0.0",
-          "Microsoft.OpenApi": "2.3.0",
           "Swashbuckle.AspNetCore": "6.6.2",
           "Swashbuckle.AspNetCore.Filters": "10.0.0"
         },

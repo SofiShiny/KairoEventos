@@ -1,5 +1,3 @@
-File: backend\src\Services\Eventos\Eventos.API\Controladores\EventosController.cs
-````````csharp
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Eventos.Dominio.Repositorios;
@@ -7,6 +5,9 @@ using Eventos.Dominio.Entidades;
 using Eventos.Dominio.ObjetosDeValor;
 using Eventos.Aplicacion.DTOs;
 using Swashbuckle.AspNetCore.Filters;
+using Eventos.Aplicacion.Comandos;
+using Eventos.Aplicacion.Queries;
+using BloquesConstruccion.Aplicacion.Comun;
 
 namespace Eventos.API.Controladores;
 
@@ -15,49 +16,48 @@ namespace Eventos.API.Controladores;
 public class EventosController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IRepositorioEvento _repositorio;
     private readonly ILogger<EventosController> _logger;
 
-    public EventosController(IMediator mediator, IRepositorioEvento repositorio, ILogger<EventosController> logger)
+    public EventosController(IMediator mediator, ILogger<EventosController> logger)
     {
         _mediator = mediator;
-        _repositorio = repositorio;
         _logger = logger;
     }
 
-    // v1 - solo GETs
+    // v1 - solo GETs usando queries
     [HttpGet]
     public async Task<IActionResult> ObtenerTodos()
     {
-        var eventos = await _repositorio.ObtenerTodosAsync();
-        var dtos = eventos.Select(MapToDto);
-        return Ok(dtos);
+        var resultado = await _mediator.Send(new ObtenerEventosQuery());
+        if (resultado.EsFallido) return Problem(resultado.Error);
+        return Ok(resultado.Valor);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> ObtenerPorId(Guid id)
     {
-        var evento = await _repositorio.ObtenerPorIdAsync(id);
-        if (evento == null)
-            return NotFound();
-        return Ok(MapToDto(evento));
+        var resultado = await _mediator.Send(new ObtenerEventoPorIdQuery(id));
+        if (resultado.EsFallido) return NotFound(resultado.Error);
+        return Ok(resultado.Valor);
     }
 
     [HttpGet("organizador/{organizadorId}")]
     public async Task<IActionResult> ObtenerPorOrganizador(string organizadorId)
     {
-        var eventos = await _repositorio.ObtenerEventosPorOrganizadorAsync(organizadorId);
-        return Ok(eventos.Select(MapToDto));
+        var resultado = await _mediator.Send(new ObtenerEventosPorOrganizadorQuery(organizadorId));
+        if (resultado.EsFallido) return Problem(resultado.Error);
+        return Ok(resultado.Valor);
     }
 
     [HttpGet("publicados")]
     public async Task<IActionResult> ObtenerPublicados()
     {
-        var eventos = await _repositorio.ObtenerEventosPublicadosAsync();
-        return Ok(eventos.Select(MapToDto));
+        var resultado = await _mediator.Send(new ObtenerEventosPublicadosQuery());
+        if (resultado.EsFallido) return Problem(resultado.Error);
+        return Ok(resultado.Valor);
     }
 
-    // v2 - CRUD y acciones
+    // v2 - CRUD y acciones via comandos
     [HttpPost("v2")]
     [SwaggerRequestExample(typeof(EventoCreateDto), typeof(Eventos.API.Swagger.Examples.EventoCrearEjemploOperacion))]
     [ProducesResponseType(typeof(EventoDto), StatusCodes.Status201Created)]
@@ -71,16 +71,18 @@ public class EventosController : ControllerBase
             if (dto.Ubicacion == null) return BadRequest("Ubicacion requerida");
             if (dto.FechaFin <= dto.FechaInicio) return BadRequest("FechaFin debe ser posterior a FechaInicio");
 
-            var ubic = new Ubicacion(dto.Ubicacion.NombreLugar ?? string.Empty,
-                dto.Ubicacion.Direccion ?? string.Empty,
-                dto.Ubicacion.Ciudad ?? string.Empty,
-                dto.Ubicacion.Region ?? string.Empty,
-                dto.Ubicacion.CodigoPostal ?? string.Empty,
-                dto.Ubicacion.Pais ?? string.Empty);
+            var comando = new CrearEventoComando(
+                dto.Titulo,
+                dto.Descripcion ?? string.Empty,
+                dto.Ubicacion,
+                dto.FechaInicio,
+                dto.FechaFin,
+                dto.MaximoAsistentes,
+                "organizador-001");
 
-            var evento = new Evento(dto.Titulo, dto.Descripcion ?? string.Empty, ubic, dto.FechaInicio, dto.FechaFin, dto.MaximoAsistentes, "organizador-001");
-            await _repositorio.AgregarAsync(evento);
-            return CreatedAtAction(nameof(ObtenerPorId), new { id = evento.Id }, MapToDto(evento));
+            var resultado = await _mediator.Send(comando);
+            if (resultado.EsFallido) return BadRequest(resultado.Error);
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Valor!.Id }, resultado.Valor);
         }
         catch (Exception ex)
         {
@@ -94,27 +96,18 @@ public class EventosController : ControllerBase
     {
         try
         {
-            var evento = await _repositorio.ObtenerPorIdAsync(id);
-            if (evento == null) return NotFound();
+            var comando = new ActualizarEventoComando(
+                id,
+                dto.Titulo,
+                dto.Descripcion,
+                dto.Ubicacion,
+                dto.FechaInicio,
+                dto.FechaFin,
+                dto.MaximoAsistentes);
 
-            var nuevaUbic = dto.Ubicacion is null ? evento.Ubicacion : new Ubicacion(
-                dto.Ubicacion!.NombreLugar ?? evento.Ubicacion.NombreLugar,
-                dto.Ubicacion!.Direccion ?? evento.Ubicacion.Direccion,
-                dto.Ubicacion!.Ciudad ?? evento.Ubicacion.Ciudad,
-                dto.Ubicacion!.Region ?? evento.Ubicacion.Region,
-                dto.Ubicacion!.CodigoPostal ?? evento.Ubicacion.CodigoPostal,
-                dto.Ubicacion!.Pais ?? evento.Ubicacion.Pais);
-
-            evento.Actualizar(
-                dto.Titulo ?? evento.Titulo,
-                dto.Descripcion ?? evento.Descripcion,
-                nuevaUbic,
-                dto.FechaInicio ?? evento.FechaInicio,
-                dto.FechaFin ?? evento.FechaFin,
-                dto.MaximoAsistentes ?? evento.MaximoAsistentes);
-
-            await _repositorio.ActualizarAsync(evento);
-            return Ok(MapToDto(evento));
+            var resultado = await _mediator.Send(comando);
+            if (resultado.EsFallido) return NotFound(resultado.Error);
+            return Ok(resultado.Valor);
         }
         catch (Exception ex)
         {
@@ -128,11 +121,9 @@ public class EventosController : ControllerBase
     {
         try
         {
-            var evento = await _repositorio.ObtenerPorIdAsync(id);
-            if (evento == null) return NotFound();
-            evento.Publicar();
-            await _repositorio.ActualizarAsync(evento);
-            return Ok(MapToDto(evento));
+            var resultado = await _mediator.Send(new PublicarEventoComando(id));
+            if (resultado.EsFallido) return NotFound(resultado.Error);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -147,19 +138,14 @@ public class EventosController : ControllerBase
         try
         {
             if (dto == null) return BadRequest("Body requerido");
-
-            var evento = await _repositorio.ObtenerPorIdAsync(id);
-            if (evento == null) return NotFound();
-            evento.RegistrarAsistente(dto.UsuarioId, dto.Nombre, dto.Correo);
-            await _repositorio.ActualizarAsync(evento);
-            var asistente = evento.Asistentes.Last();
-            return Ok(new AsistenteDto
-            {
-                Id = asistente.Id,
-                NombreUsuario = asistente.NombreUsuario,
-                Correo = asistente.Correo,
-                RegistradoEn = asistente.RegistradoEn
-            });
+            var comando = new RegistrarAsistenteComando(id, dto.UsuarioId, dto.Nombre, dto.Correo);
+            var resultado = await _mediator.Send(comando);
+            if (resultado.EsFallido) return BadRequest(resultado.Error);
+            // Recuperar el evento actualizado para retornar el asistente recién agregado
+            var eventoRes = await _mediator.Send(new ObtenerEventoPorIdQuery(id));
+            if (eventoRes.EsFallido) return NotFound(eventoRes.Error);
+            var asistente = eventoRes.Valor!.Asistentes!.Last();
+            return Ok(asistente);
         }
         catch (Exception ex)
         {
@@ -173,9 +159,8 @@ public class EventosController : ControllerBase
     {
         try
         {
-            var evento = await _repositorio.ObtenerPorIdAsync(id);
-            if (evento == null) return NotFound();
-            await _repositorio.EliminarAsync(id);
+            var resultado = await _mediator.Send(new EliminarEventoComando(id));
+            if (resultado.EsFallido) return NotFound(resultado.Error);
             return NoContent();
         }
         catch (Exception ex)
@@ -184,34 +169,4 @@ public class EventosController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-
-    private static EventoDto MapToDto(Evento evento) => new()
-    {
-        Id = evento.Id,
-        Titulo = evento.Titulo,
-        Descripcion = evento.Descripcion,
-        Ubicacion = new UbicacionDto
-        {
-            NombreLugar = evento.Ubicacion.NombreLugar,
-            Direccion = evento.Ubicacion.Direccion,
-            Ciudad = evento.Ubicacion.Ciudad,
-            Region = evento.Ubicacion.Region,
-            CodigoPostal = evento.Ubicacion.CodigoPostal,
-            Pais = evento.Ubicacion.Pais
-        },
-        FechaInicio = evento.FechaInicio,
-        FechaFin = evento.FechaFin,
-        MaximoAsistentes = evento.MaximoAsistentes,
-        ConteoAsistentesActual = evento.ConteoAsistentesActual,
-        Estado = evento.Estado.ToString(),
-        OrganizadorId = evento.OrganizadorId,
-        CreadoEn = evento.CreadoEn,
-        Asistentes = evento.Asistentes.Select(a => new AsistenteDto
-        {
-            Id = a.Id,
-            NombreUsuario = a.NombreUsuario,
-            Correo = a.Correo,
-            RegistradoEn = a.RegistradoEn
-        })
-    };
 }

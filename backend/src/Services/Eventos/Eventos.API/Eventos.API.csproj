@@ -8,8 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="10.0.0" />
-    <PackageReference Include="Microsoft.OpenApi" Version="2.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Eventos.Aplicacion/Eventos.Aplicacion.csproj" />
-    <ProjectReference Include="../Eventos.Infraestructura/Eventos.Infraestructura.csproj" />
+    <ProjectReference Include="..\Eventos.Aplicacion\Eventos.Aplicacion.csproj" />
+    <ProjectReference Include="..\Eventos.Infraestructura\Eventos.Infraestructura.csproj" />
   </ItemGroup>
 </Project>

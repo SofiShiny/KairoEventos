@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Eventos.Infraestructura")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6aa863a777adf2b295a3ae1060c2cb9a49602431")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf880706cd228d9224cf9dfe752fb8428cd1ba73")]
 [assembly: System.Reflection.AssemblyProductAttribute("Eventos.Infraestructura")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Eventos.Infraestructura")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

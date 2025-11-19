@@ -3030,7 +3030,6 @@
       "MediatR >= 12.2.0",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.0",
       "Microsoft.EntityFrameworkCore.InMemory >= 8.0.0",
-      "Microsoft.OpenApi >= 2.3.0",
       "Swashbuckle.AspNetCore >= 6.6.2",
       "Swashbuckle.AspNetCore.Filters >= 10.0.0"
     ]
@@ -3042,11 +3041,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\sofia\\Source\\Repos\\ProyectoDesarrollo\\backend\\src\\Services\\Eventos\\Eventos.API\\Eventos.API.csproj",
+      "projectUniqueName": "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Services\\Eventos\\Eventos.API\\Eventos.API.csproj",
       "projectName": "Eventos.API",
-      "projectPath": "C:\\Users\\sofia\\Source\\Repos\\ProyectoDesarrollo\\backend\\src\\Services\\Eventos\\Eventos.API\\Eventos.API.csproj",
+      "projectPath": "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Services\\Eventos\\Eventos.API\\Eventos.API.csproj",
       "packagesPath": "C:\\Users\\sofia\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\sofia\\Source\\Repos\\ProyectoDesarrollo\\backend\\src\\Services\\Eventos\\Eventos.API\\obj\\",
+      "outputPath": "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Services\\Eventos\\Eventos.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3068,16 +3067,19 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\sofia\\Source\\Repos\\ProyectoDesarrollo\\backend\\src\\Services\\Eventos\\Eventos.Aplicacion\\Eventos.Aplicacion.csproj": {
-              "projectPath": "C:\\Users\\sofia\\Source\\Repos\\ProyectoDesarrollo\\backend\\src\\Services\\Eventos\\Eventos.Aplicacion\\Eventos.Aplicacion.csproj"
+            "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Services\\Eventos\\Eventos.Aplicacion\\Eventos.Aplicacion.csproj": {
+              "projectPath": "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Services\\Eventos\\Eventos.Aplicacion\\Eventos.Aplicacion.csproj"
             },
-            "C:\\Users\\sofia\\Source\\Repos\\ProyectoDesarrollo\\backend\\src\\Services\\Eventos\\Eventos.Infraestructura\\Eventos.Infraestructura.csproj": {
-              "projectPath": "C:\\Users\\sofia\\Source\\Repos\\ProyectoDesarrollo\\backend\\src\\Services\\Eventos\\Eventos.Infraestructura\\Eventos.Infraestructura.csproj"
+            "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Services\\Eventos\\Eventos.Infraestructura\\Eventos.Infraestructura.csproj": {
+              "projectPath": "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Services\\Eventos\\Eventos.Infraestructura\\Eventos.Infraestructura.csproj"
             }
           }
         }
       },
       "warningProperties": {
+        "noWarn": [
+          "NU1900"
+        ],
         "warnAsError": [
           "NU1605"
         ]
@@ -3106,10 +3108,6 @@
           "Microsoft.EntityFrameworkCore.InMemory": {
             "target": "Package",
             "version": "[8.0.0, )"
-          },
-          "Microsoft.OpenApi": {
-            "target": "Package",
-            "version": "[2.3.0, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
