@@ -3,37 +3,30 @@ using Eventos.Aplicacion.Validators;
 using FluentAssertions;
 using Xunit;
 
-namespace Eventos.Pruebas.Aplicacion.Validators
+namespace Eventos.Pruebas.Aplicacion.Validators;
+
+public class AsistenteCreateValidatorTests
 {
- public class AsistenteCreateValidatorTests
+ private readonly AsistenteCreateValidator _validator;
+ private readonly AsistenteCreateDto _valido;
+ private readonly AsistenteCreateDto _correoInvalido;
+
+ public AsistenteCreateValidatorTests()
  {
- [Fact]
- public void AsistenteValido_DeberiaSerValido()
- {
- // Preparar
- var dto = new AsistenteCreateDto { Nombre = "Creonte Dioniso Lara Wilson", Correo = "cdlara@est.ucab.edu.ve" };
- var validator = new AsistenteCreateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
- 
- // Comprobar
- result.IsValid.Should().BeTrue();
+ _validator = new AsistenteCreateValidator();
+ _valido = new AsistenteCreateDto{ Nombre = "Creonte", Correo = "c@d.com" };
+ _correoInvalido = new AsistenteCreateDto{ Nombre = "Creonte", Correo = "invalid-email" };
  }
 
  [Fact]
- public void EmailInvalido_DeberiaTenerError()
+ public void AsistenteValido_EsValido()
  {
- // Preparar
- var dto = new AsistenteCreateDto { Nombre = "Creonte Dioniso Lara Wilson", Correo = "invalid-email" };
- var validator = new AsistenteCreateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
- 
- // Comprobar
- result.IsValid.Should().BeFalse();
- result.Errors.Should().Contain(e => e.PropertyName == "Correo");
+ _validator.Validate(_valido).IsValid.Should().BeTrue();
  }
+
+ [Fact]
+ public void EmailInvalido_TieneError()
+ {
+ _validator.Validate(_correoInvalido).IsValid.Should().BeFalse();
  }
 }

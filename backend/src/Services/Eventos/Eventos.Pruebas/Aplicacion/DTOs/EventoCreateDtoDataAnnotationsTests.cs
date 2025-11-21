@@ -3,11 +3,15 @@ using Eventos.Aplicacion.DTOs;
 using FluentAssertions;
 using Xunit;
 
-namespace Eventos.Pruebas.Aplicacion.Validators;
+namespace Eventos.Pruebas.Aplicacion.DTOs;
 
-public class EventoCreateDataAnnotationsTests
+public class EventoCreateDtoDataAnnotationsTests
 {
- private EventoCreateDto CrearValido() => new()
+ private readonly EventoCreateDto _valido;
+
+ public EventoCreateDtoDataAnnotationsTests()
+ {
+ _valido = new EventoCreateDto
  {
  Titulo = "Titulo",
  Descripcion = "Desc",
@@ -16,6 +20,7 @@ public class EventoCreateDataAnnotationsTests
  FechaFin = DateTime.UtcNow.AddDays(2),
  MaximoAsistentes =10
  };
+ }
 
  private static IList<ValidationResult> Validar(object obj)
  {
@@ -26,37 +31,33 @@ public class EventoCreateDataAnnotationsTests
  }
 
  [Fact]
- public void DataAnnotations_ObjetoValido_SinErrores()
+ public void ObjetoValido_SinErrores()
  {
- var dto = CrearValido();
- var results = Validar(dto);
+ var results = Validar(_valido);
  results.Should().BeEmpty();
  }
 
  [Fact]
- public void DataAnnotations_FaltaTitulo_RegistraError()
+ public void FaltaTitulo_RegistraError()
  {
- var dto = CrearValido();
- dto.Titulo = null!;
- var results = Validar(dto);
+ _valido.Titulo = null!;
+ var results = Validar(_valido);
  results.Should().Contain(r => r.MemberNames.Contains(nameof(EventoCreateDto.Titulo)));
  }
 
  [Fact]
- public void DataAnnotations_FaltaUbicacion_RegistraError()
+ public void FaltaUbicacion_RegistraError()
  {
- var dto = CrearValido();
- dto.Ubicacion = null;
- var results = Validar(dto);
+ _valido.Ubicacion = null;
+ var results = Validar(_valido);
  results.Should().Contain(r => r.MemberNames.Contains(nameof(EventoCreateDto.Ubicacion)));
  }
 
  [Fact]
- public void DataAnnotations_MaximoAsistentesCero_RegistraError()
+ public void MaximoAsistentesCero_RegistraError()
  {
- var dto = CrearValido();
- dto.MaximoAsistentes =0;
- var results = Validar(dto);
+ _valido.MaximoAsistentes =0;
+ var results = Validar(_valido);
  results.Should().Contain(r => r.MemberNames.Contains(nameof(EventoCreateDto.MaximoAsistentes)));
  }
 }

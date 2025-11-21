@@ -3,10 +3,19 @@ using Eventos.Aplicacion.DTOs;
 using FluentAssertions;
 using Xunit;
 
-namespace Eventos.Pruebas.Aplicacion.Validators;
+namespace Eventos.Pruebas.Aplicacion.DTOs;
 
 public class UbicacionDtoDataAnnotationsTests
 {
+ private readonly UbicacionDto _valido;
+ private readonly UbicacionDto _invalido;
+
+ public UbicacionDtoDataAnnotationsTests()
+ {
+ _valido = new UbicacionDto{ NombreLugar="Lugar", Direccion="Dir", Ciudad="Ciudad", Pais="Pais" };
+ _invalido = new UbicacionDto();
+ }
+
  private static IList<ValidationResult> Validar(object obj)
  {
  var ctx = new ValidationContext(obj, null, null);
@@ -16,24 +25,16 @@ public class UbicacionDtoDataAnnotationsTests
  }
 
  [Fact]
- public void UbicacionDto_Valida_SinErrores()
+ public void Valida_SinErrores()
  {
- var dto = new UbicacionDto
- {
- NombreLugar = "Lugar",
- Direccion = "Dir",
- Ciudad = "Ciudad",
- Pais = "Pais"
- };
- var resultados = Validar(dto);
+ var resultados = Validar(_valido);
  resultados.Should().BeEmpty();
  }
 
  [Fact]
- public void UbicacionDto_FaltanRequeridos_RegistraErrores()
+ public void FaltanRequeridos_RegistraErrores()
  {
- var dto = new UbicacionDto();
- var resultados = Validar(dto);
+ var resultados = Validar(_invalido);
  resultados.Should().Contain(r => r.MemberNames.Contains(nameof(UbicacionDto.NombreLugar)));
  resultados.Should().Contain(r => r.MemberNames.Contains(nameof(UbicacionDto.Direccion)));
  resultados.Should().Contain(r => r.MemberNames.Contains(nameof(UbicacionDto.Ciudad)));

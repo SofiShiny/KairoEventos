@@ -95,11 +95,12 @@ public class Evento : RaizAgregada<Guid>
 
  public void RegistrarAsistente(string usuarioId, string nombreUsuario, string correo)
  {
- if (!EstaPublicado)
- throw new InvalidOperationException("No se puede registrar en un evento no publicado");
- 
+ // Reordenado para permitir distinguir evento cancelado
  if (EstaCancelado)
  throw new InvalidOperationException("No se puede registrar en un evento cancelado");
+ 
+ if (!EstaPublicado)
+ throw new InvalidOperationException("No se puede registrar en un evento no publicado");
  
  if (EstaCompleto)
  throw new InvalidOperationException("El evento está completo");

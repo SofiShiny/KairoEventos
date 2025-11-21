@@ -6,67 +6,74 @@ using Eventos.Dominio.ObjetosDeValor;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Eventos.Pruebas.Shared;
 
 namespace Eventos.Pruebas.Aplicacion.Comandos;
 
 public class PublicarEventoComandoHandlerTests
 {
-    private readonly Mock<IRepositorioEvento> _eventRepositoryMock;
+    private readonly Mock<IRepositorioEvento> _repo;
     private readonly PublicarEventoComandoHandler _handler;
+    private readonly Evento _evento;
+    private readonly Guid _eventId;
+    private readonly Evento _eventoPublicado;
 
     public PublicarEventoComandoHandlerTests()
     {
-        _eventRepositoryMock = new Mock<IRepositorioEvento>();
-        _handler = new PublicarEventoComandoHandler(_eventRepositoryMock.Object);
+        _repo = new Mock<IRepositorioEvento>(MockBehavior.Strict);
+        _handler = new PublicarEventoComandoHandler(_repo.Object);
+        _evento = TestHelpers.BuildEvento("Evento Peliculas", "Mejores peliculas",500, "organizador-001",30,48);
+        _eventId = Guid.NewGuid();
+        typeof(Evento).GetProperty("Id")!.SetValue(_evento, _eventId);
+        _eventoPublicado = TestHelpers.BuildEvento("YaPublicado", "Desc",10, "org",5,2);
+        _eventoPublicado.Publicar();
+    }
+
+    private PublicarEventoComando Cmd(Guid id) => new(id);
+
+    [Fact]
+    public async Task Handle_Valido_PublicaEvento()
+    {
+        // Arrange
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventId, It.IsAny<CancellationToken>())).ReturnsAsync(_evento);
+        _repo.Setup(r=>r.ActualizarAsync(_evento, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        // Act
+        var res = await _handler.Handle(Cmd(_eventId), CancellationToken.None);
+
+        // Assert
+        res.EsExitoso.Should().BeTrue();
+        _evento.Estado.Should().Be(EstadoEvento.Publicado);
+        _evento.EventosDominio.Should().ContainSingle().Which.GetType().Name.Should().Contain("Publicado");
+        _repo.VerifyAll();
     }
 
     [Fact]
-    public async Task Handle_ConEventIdValido_DeberiaPublicarEvento()
+    public async Task Handle_EventoNoExiste_Falla()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
-        var comando = new PublicarEventoComando(eventId);
-        var startDate = DateTime.UtcNow.AddDays(30);
-        var endDate = startDate.AddDays(2);
-        var direccion = new Ubicacion("Av Principal", "La California", "Caracas", "DF", "1089", "Venezuela");
-        var eventEntity = new Evento("Evento Peliculas", "Mejores peliculas del 2025", direccion, startDate, endDate, 500, "organizador-001");
-        typeof(Evento).GetProperty("Id")!.SetValue(eventEntity, eventId);
-
-        _eventRepositoryMock
-            .Setup(x => x.ObtenerPorIdAsync(eventId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(eventEntity);
-
-        _eventRepositoryMock
-            .Setup(x => x.ActualizarAsync(It.IsAny<Evento>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventId, It.IsAny<CancellationToken>())).ReturnsAsync((Evento?)null);
 
         // Act
-        var result = await _handler.Handle(comando, CancellationToken.None);
+        var res = await _handler.Handle(Cmd(_eventId), CancellationToken.None);
 
         // Assert
-        result.EsExitoso.Should().BeTrue();
-        eventEntity.Estado.Should().Be(EstadoEvento.Publicado);
-        _eventRepositoryMock.Verify(
-            x => x.ActualizarAsync(It.Is<Evento>(e => e.Estado == EstadoEvento.Publicado), It.IsAny<CancellationToken>()), 
-            Times.Once);
+        res.EsExitoso.Should().BeFalse();
+        res.Error.Should().Contain("no encontrado");
+        _repo.Verify(r=>r.ObtenerPorIdAsync(_eventId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task Handle_ConEventoInexistente_DeberiaRetornarFalla()
+    public async Task Handle_EventoYaPublicado_Falla()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
-        var comando = new PublicarEventoComando(eventId);
-
-        _eventRepositoryMock
-            .Setup(x => x.ObtenerPorIdAsync(eventId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Evento?)null);
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventoPublicado.Id, It.IsAny<CancellationToken>())).ReturnsAsync(_eventoPublicado);
 
         // Act
-        var result = await _handler.Handle(comando, CancellationToken.None);
+        var res = await _handler.Handle(Cmd(_eventoPublicado.Id), CancellationToken.None);
 
         // Assert
-        result.EsExitoso.Should().BeFalse();
-        result.Error.Should().Be("Evento no encontrado");
+        res.EsExitoso.Should().BeFalse();
+        res.Error.Should().Contain("No se puede publicar");
     }
 }

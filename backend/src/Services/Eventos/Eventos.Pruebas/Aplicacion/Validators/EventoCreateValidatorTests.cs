@@ -1,167 +1,81 @@
 using Eventos.Aplicacion.DTOs;
 using Eventos.Aplicacion.Validators;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
-namespace Eventos.Pruebas.Aplicacion.Validators
+namespace Eventos.Pruebas.Aplicacion.Validators;
+
+public class EventoCreateValidatorTests
 {
- public class EventoCreateValidatorTests
+ private readonly EventoCreateValidator _validator;
+ private readonly EventoCreateDto _valido;
+
+ public EventoCreateValidatorTests()
  {
- [Fact]
- public void DatosValidos_DeberiaSerValido()
- {
- // Preparar
- var dto = new EventoCreateDto
+ _validator = new EventoCreateValidator();
+ _valido = new EventoCreateDto
  {
  Titulo = "Taller de Arte",
  FechaInicio = DateTime.UtcNow.AddDays(1),
  FechaFin = DateTime.UtcNow.AddDays(1).AddHours(2),
  MaximoAsistentes =10,
  Ubicacion = new UbicacionDto{ NombreLugar="L", Direccion="D", Ciudad="C", Pais="P"},
- Asistentes = new List<AsistenteCreateDto>
- {
- new AsistenteCreateDto { Nombre = "Creonte Dioniso Lara Wilson", Correo = "cdlara@est.ucab.edu.ve" }
- }
+ Asistentes = new List<AsistenteCreateDto>{ new(){ Nombre="Creonte", Correo="c@d.com" } }
  };
-
- var validator = new EventoCreateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
-
- // Comprobar
- result.IsValid.Should().BeTrue();
  }
 
  [Fact]
- public void TituloFaltante_DeberiaTenerError()
+ public void DatosValidos_EsValido()
  {
- // Preparar
- var dto = new EventoCreateDto
+ _validator.Validate(_valido).IsValid.Should().BeTrue();
+ }
+
+ [Fact]
+ public void TituloFaltante_Error()
  {
- Titulo = string.Empty,
- FechaInicio = DateTime.UtcNow.AddDays(1),
- FechaFin = DateTime.UtcNow.AddDays(1).AddHours(2),
- MaximoAsistentes =5,
- Ubicacion = new UbicacionDto{ NombreLugar="L", Direccion="D", Ciudad="C", Pais="P"}
- };
-
- var validator = new EventoCreateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
-
- // Comprobar
+ _valido.Titulo = string.Empty;
+ var result = _validator.Validate(_valido);
  result.IsValid.Should().BeFalse();
  result.Errors.Should().Contain(e => e.PropertyName == "Titulo");
  }
 
  [Fact]
- public void FechaInicioMayorQueFechaFin_DeberiaTenerError()
+ public void FechaInicioMayorQueFin_Error()
  {
- // Preparar
- var dto = new EventoCreateDto
- {
- Titulo = "Taller de Arte",
- FechaInicio = DateTime.UtcNow.AddDays(2),
- FechaFin = DateTime.UtcNow.AddDays(1),
- MaximoAsistentes =5,
- Ubicacion = new UbicacionDto{ NombreLugar="L", Direccion="D", Ciudad="C", Pais="P"}
- };
-
- var validator = new EventoCreateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
-
- // Comprobar
- result.IsValid.Should().BeFalse();
+ _valido.FechaInicio = DateTime.UtcNow.AddDays(2);
+ _valido.FechaFin = DateTime.UtcNow.AddDays(1);
+ _validator.Validate(_valido).IsValid.Should().BeFalse();
  }
 
  [Fact]
- public void MaximoAsistentesInvalido_DeberiaTenerError()
+ public void MaximoInvalido_Error()
  {
- // Preparar
- var dto = new EventoCreateDto
- {
- Titulo = "Taller de Arte",
- FechaInicio = DateTime.UtcNow.AddDays(1),
- FechaFin = DateTime.UtcNow.AddDays(1).AddHours(1),
- MaximoAsistentes =0,
- Ubicacion = new UbicacionDto{ NombreLugar="L", Direccion="D", Ciudad="C", Pais="P"}
- };
-
- var validator = new EventoCreateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
-
- // Comprobar
+ _valido.MaximoAsistentes =0;
+ var result = _validator.Validate(_valido);
  result.IsValid.Should().BeFalse();
  result.Errors.Should().Contain(e => e.PropertyName == "MaximoAsistentes");
  }
 
  [Fact]
- public void EmailDeAsistenteInvalido_DeberiaTenerError()
+ public void EmailAsistenteInvalido_Error()
  {
- // Preparar
- var dto = new EventoCreateDto
- {
- Titulo = "Taller de Arte",
- FechaInicio = DateTime.UtcNow.AddDays(1),
- FechaFin = DateTime.UtcNow.AddDays(1).AddHours(1),
- MaximoAsistentes =5,
- Ubicacion = new UbicacionDto{ NombreLugar="L", Direccion="D", Ciudad="C", Pais="P"},
- Asistentes = new List<AsistenteCreateDto>
- {
- new AsistenteCreateDto { Nombre = "Creonte Dioniso Lara Wilson", Correo = "not-an-email" }
- }
- };
-
- var validator = new EventoCreateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
-
- // Comprobar
- result.IsValid.Should().BeFalse();
+ _valido.Asistentes = new(){ new AsistenteCreateDto{ Nombre="Creonte", Correo="not-an-email" } };
+ _validator.Validate(_valido).IsValid.Should().BeFalse();
  }
 
  [Fact]
- public void MaximoAsistentesUno_Valido()
+ public void MaximoUno_Valido()
  {
- // Preparar
- var dto = new EventoCreateDto
- {
- Titulo = "T",
- FechaInicio = DateTime.UtcNow.AddDays(1),
- FechaFin = DateTime.UtcNow.AddDays(2),
- MaximoAsistentes =1,
- Ubicacion = new UbicacionDto{ NombreLugar="L", Direccion="D", Ciudad="C", Pais="P"}
- };
-
- // Comprobar
- new EventoCreateValidator().Validate(dto).IsValid.Should().BeTrue();
+ _valido.MaximoAsistentes =1;
+ _validator.Validate(_valido).IsValid.Should().BeTrue();
  }
 
  [Fact]
  public void FechasIguales_Invalido()
  {
- // Preparar
  var inicio = DateTime.UtcNow.AddDays(2);
- var dto = new EventoCreateDto
- {
- Titulo = "T",
- FechaInicio = inicio,
- FechaFin = inicio,
- MaximoAsistentes =5,
- Ubicacion = new UbicacionDto{ NombreLugar="L", Direccion="D", Ciudad="C", Pais="P"}
- };
-
- // Comprobar
- new EventoCreateValidator().Validate(dto).IsValid.Should().BeFalse();
- }
+ _valido.FechaInicio = inicio;
+ _valido.FechaFin = inicio;
+ _validator.Validate(_valido).IsValid.Should().BeFalse();
  }
 }

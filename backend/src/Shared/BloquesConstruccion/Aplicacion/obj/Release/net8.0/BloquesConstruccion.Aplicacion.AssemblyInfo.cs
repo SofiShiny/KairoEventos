@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BloquesConstruccion.Aplicacion")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf880706cd228d9224cf9dfe752fb8428cd1ba73")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8997465928e208cc8e0df1a1d8b5036d79e828a0")]
 [assembly: System.Reflection.AssemblyProductAttribute("BloquesConstruccion.Aplicacion")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BloquesConstruccion.Aplicacion")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

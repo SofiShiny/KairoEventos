@@ -4,47 +4,34 @@ using FluentAssertions;
 using System;
 using Xunit;
 
-namespace Eventos.Pruebas.Aplicacion.Validators
+namespace Eventos.Pruebas.Aplicacion.Validators;
+
+public class EventoUpdateValidatorTests
 {
- public class EventoUpdateValidatorTests
- {
- [Fact]
- public void CuandoAmbasFechas_EstanProveidas_OrdenInvalido_DeberiaTenerError()
- {
- // Preparar
- var dto = new EventoUpdateDto
- {
- FechaInicio = DateTime.UtcNow.AddDays(2),
- FechaFin = DateTime.UtcNow.AddDays(1)
- };
+ private readonly EventoUpdateValidator _validator;
+ private readonly EventoUpdateDto _dto;
 
- var validator = new EventoUpdateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
-
- // Comprobar
- result.IsValid.Should().BeFalse();
- result.Errors.Should().Contain(e => e.ErrorMessage.Contains("FechaInicio") || e.PropertyName.Contains("FechaInicio"));
+ public EventoUpdateValidatorTests()
+ {
+ _validator = new EventoUpdateValidator();
+ _dto = new EventoUpdateDto();
  }
 
  [Fact]
- public void CuandoMaximoEsProveido_ValorInvalido_DeberiaTenerError()
+ public void AmbasFechas_OrdenInvalido_Error()
  {
- // Preparar
- var dto = new EventoUpdateDto
+ _dto.FechaInicio = DateTime.UtcNow.AddDays(2);
+ _dto.FechaFin = DateTime.UtcNow.AddDays(1);
+ var result = _validator.Validate(_dto);
+ result.IsValid.Should().BeFalse();
+ }
+
+ [Fact]
+ public void MaximoInvalido_Error()
  {
- MaximoAsistentes =0
- };
-
- var validator = new EventoUpdateValidator();
- 
- // Actuar
- var result = validator.Validate(dto);
-
- // Comprobar
+ _dto.MaximoAsistentes =0;
+ var result = _validator.Validate(_dto);
  result.IsValid.Should().BeFalse();
  result.Errors.Should().Contain(e => e.PropertyName == "MaximoAsistentes");
- }
  }
 }

@@ -1,6 +1,7 @@
-using BloquesConstruccion.Aplicacion.Comun;
-using Eventos.Aplicacion.DTOs;
 using Eventos.Aplicacion.Queries;
+using Eventos.Aplicacion.DTOs;
+using BloquesConstruccion.Aplicacion.Queries;
+using BloquesConstruccion.Aplicacion.Comun;
 using FluentAssertions;
 using Xunit;
 
@@ -8,20 +9,24 @@ namespace Eventos.Pruebas.Aplicacion.Queries;
 
 public class ObtenerEventoPorIdQueryTests
 {
- [Fact]
- public void Query_DeberiaGuardarEventoId()
- {
- var id = Guid.NewGuid();
- var query = new ObtenerEventoPorIdQuery(id);
+ private readonly Guid _id;
+ private readonly ObtenerEventoPorIdQuery _query;
 
- query.EventoId.Should().Be(id);
+ public ObtenerEventoPorIdQueryTests()
+ {
+ _id = Guid.NewGuid();
+ _query = new ObtenerEventoPorIdQuery(_id);
  }
 
  [Fact]
- public void Query_DeberiaImplementarIQueryResultadoEventoDto()
+ public void GuardaId()
  {
- var query = new ObtenerEventoPorIdQuery(Guid.Empty);
+ _query.EventoId.Should().Be(_id);
+ }
 
- (query is BloquesConstruccion.Aplicacion.Queries.IQuery<Resultado<EventoDto>>).Should().BeTrue();
+ [Fact]
+ public void ImplementaIQueryResultadoEventoDto()
+ {
+ (_query is IQuery<Resultado<EventoDto>>).Should().BeTrue();
  }
 }

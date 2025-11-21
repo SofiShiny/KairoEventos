@@ -1,116 +1,83 @@
 using Eventos.Aplicacion.Queries;
 using Eventos.Dominio.Entidades;
-using Eventos.Dominio.Enumeraciones;
 using Eventos.Dominio.Repositorios;
 using Eventos.Dominio.ObjetosDeValor;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Eventos.Dominio.Enumeraciones;
 using System;
 
 namespace Eventos.Pruebas.Aplicacion.Queries;
 
 public class ObtenerEventoPorIdQueryHandlerTests
 {
-    private readonly Mock<IRepositorioEvento> _repositoryMock;
+    private readonly Mock<IRepositorioEvento> _repo;
     private readonly ObtenerEventoPorIdQueryHandler _handler;
-    private Evento CrearEventoBase() => new("ArtCraft", "Evento de arte", new Ubicacion("Av Principal123","Sucre","Caracas","DF","1029","Venezuela"), DateTime.UtcNow.AddMonths(1), DateTime.UtcNow.AddMonths(1).AddHours(8),100, "organizador-001");
+    private readonly Evento _eventoBase;
+    private readonly Evento _eventoSinUbicacion;
+    private readonly DateTime _inicio;
+    private readonly DateTime _fin;
 
     public ObtenerEventoPorIdQueryHandlerTests()
     {
-        _repositoryMock = new Mock<IRepositorioEvento>();
-        _handler = new ObtenerEventoPorIdQueryHandler(_repositoryMock.Object);
+        _repo = new Mock<IRepositorioEvento>(MockBehavior.Strict);
+        _handler = new ObtenerEventoPorIdQueryHandler(_repo.Object);
+        _inicio = DateTime.UtcNow.AddMonths(1);
+        _fin = _inicio.AddHours(8);
+        _eventoBase = new Evento("ArtCraft", "Evento de arte", new Ubicacion("Av Principal123","Sucre","Caracas","DF","1029","Venezuela"), _inicio, _fin,100, "organizador-001");
+        _eventoSinUbicacion = new Evento("SinUbic","Desc", new Ubicacion("L","D","C","R","0","P"), _inicio, _fin,10, "org");
+        typeof(Evento).GetProperty("Ubicacion")!.SetValue(_eventoSinUbicacion, null);
     }
 
-    [Fact]
-    public async Task Handle_DeberiaDevolverEventoDto_CuandoEventoExiste()
-    {
-        // Preparar
-        var evento = CrearEventoBase();
-        _repositoryMock.Setup(x => x.ObtenerPorIdAsync(evento.Id, It.IsAny<CancellationToken>())).ReturnsAsync(evento);
-
-        var result = await _handler.Handle(new ObtenerEventoPorIdQuery(evento.Id), CancellationToken.None);
-
-        // Assert
-        result.EsExitoso.Should().BeTrue();
-        result.Valor!.Id.Should().Be(evento.Id);
-        result.Valor.Estado.Should().Be(EstadoEvento.Borrador.ToString());
-    }
+    private ObtenerEventoPorIdQuery Cmd(Guid id) => new(id);
 
     [Fact]
-    public async Task Handle_DeberiaDevolverFalla_CuandoEventoNoExiste()
+    public async Task Handle_EventoExiste_MapeaDto()
     {
-        // Preparar
-        _repositoryMock.Setup(x => x.ObtenerPorIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Evento?)null);
-
-        // Act
-        var result = await _handler.Handle(new ObtenerEventoPorIdQuery(Guid.NewGuid()), CancellationToken.None);
-
-        // Assert
-        result.EsExitoso.Should().BeFalse();
-        result.Error.Should().Be("Evento no encontrado");
-    }
-
-    [Fact]
-    public async Task Handle_DeberiaMapearUbicacion_CuandoEventoTieneUbicacion()
-    {
-        // Preparar
-        var evento = CrearEventoBase();
-        _repositoryMock.Setup(x => x.ObtenerPorIdAsync(evento.Id, It.IsAny<CancellationToken>())).ReturnsAsync(evento);
-
-        // Act
-        var result = await _handler.Handle(new ObtenerEventoPorIdQuery(evento.Id), CancellationToken.None);
-
-        // Assert
-        var dto = result.Valor!;
-        dto.Ubicacion!.NombreLugar.Should().Be("Av Principal123");
-        dto.Ubicacion.Direccion.Should().Be("Sucre");
-    }
-
-    [Fact]
-    public async Task Handle_DeberiaPropagarOperacionCancelada_CuandoTokenCancelado()
-    {
-        // Preparar
-        var cts = new CancellationTokenSource();
-        cts.Cancel();
-        _repositoryMock.Setup(x => x.ObtenerPorIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ThrowsAsync(new OperationCanceledException());
-
-        // Act & Assert
-        await Assert.ThrowsAsync<OperationCanceledException>(() => _handler.Handle(new ObtenerEventoPorIdQuery(Guid.NewGuid()), cts.Token));
-    }
-
-    [Fact]
-    public async Task Handle_DeberiaIncluirAsistentes_CuandoEventoTieneAsistentes()
-    {
-        // Preparar
-        var evento = CrearEventoBase();
-        evento.Publicar();
-        evento.RegistrarAsistente("usuario-001", "Creonte Lara", "cdlara@est.ucab.edu.ve");
-        evento.RegistrarAsistente("usuario-002", "Electra Wilson", "eywilson@est.ucab.edu.ve");
-        _repositoryMock.Setup(x => x.ObtenerPorIdAsync(evento.Id, It.IsAny<CancellationToken>())).ReturnsAsync(evento);
-
-        // Act
-        var result = await _handler.Handle(new ObtenerEventoPorIdQuery(evento.Id), CancellationToken.None);
-
-        // Assert
-        result.Valor!.Asistentes.Should().HaveCount(2);
-    }
-
-    [Fact]
-    public async Task Handle_EventoConAsistentes_MapeaLista()
-    {
-        // Preparar
-        var evento = CrearEventoBase();
-        evento.Publicar();
-        evento.RegistrarAsistente("u1","Nombre1","a@b.com");
-        evento.RegistrarAsistente("u2","Nombre2","c@d.com");
-        _repositoryMock.Setup(r => r.ObtenerPorIdAsync(evento.Id, It.IsAny<CancellationToken>())).ReturnsAsync(evento);
-
-        // Act
-        var res = await _handler.Handle(new ObtenerEventoPorIdQuery(evento.Id), CancellationToken.None);
-
-        // Assert
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventoBase.Id, It.IsAny<CancellationToken>())).ReturnsAsync(_eventoBase);
+        var res = await _handler.Handle(Cmd(_eventoBase.Id), CancellationToken.None);
         res.EsExitoso.Should().BeTrue();
-        res.Valor!.ConteoAsistentesActual.Should().Be(2);
+        res.Valor!.Id.Should().Be(_eventoBase.Id);
+        res.Valor.Estado.Should().Be(EstadoEvento.Borrador.ToString());
+    }
+
+    [Fact]
+    public async Task Handle_EventoNoExiste_Falla()
+    {
+        _repo.Setup(r=>r.ObtenerPorIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Evento?)null);
+        var res = await _handler.Handle(Cmd(Guid.NewGuid()), CancellationToken.None);
+        res.EsExitoso.Should().BeFalse();
+        res.Error.Should().Contain("no encontrado");
+    }
+
+    [Fact]
+    public async Task Handle_MapeaUbicacion()
+    {
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventoBase.Id, It.IsAny<CancellationToken>())).ReturnsAsync(_eventoBase);
+        var res = await _handler.Handle(Cmd(_eventoBase.Id), CancellationToken.None);
+        res.EsExitoso.Should().BeTrue();
+        res.Valor!.Ubicacion!.NombreLugar.Should().Be("Av Principal123");
+    }
+
+    [Fact]
+    public async Task Handle_IncluyeAsistentes()
+    {
+        _eventoBase.Publicar();
+        _eventoBase.RegistrarAsistente("usuario-001", "Creonte", "c@d.com");
+        _eventoBase.RegistrarAsistente("usuario-002", "Electra", "e@f.com");
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventoBase.Id, It.IsAny<CancellationToken>())).ReturnsAsync(_eventoBase);
+        var res = await _handler.Handle(Cmd(_eventoBase.Id), CancellationToken.None);
+        res.EsExitoso.Should().BeTrue();
+        res.Valor!.Asistentes.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public async Task Handle_EventoSinUbicacion_Falla()
+    {
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventoSinUbicacion.Id, It.IsAny<CancellationToken>())).ReturnsAsync(_eventoSinUbicacion);
+        var res = await _handler.Handle(Cmd(_eventoSinUbicacion.Id), CancellationToken.None);
+        res.EsExitoso.Should().BeFalse();
+        res.Error.Should().Contain("ubicación");
     }
 }

@@ -1,8 +1,7 @@
-using Eventos.Aplicacion.DTOs;
 using Eventos.Aplicacion.Queries;
 using Eventos.Dominio.Entidades;
-using Eventos.Dominio.Repositorios;
 using Eventos.Dominio.ObjetosDeValor;
+using Eventos.Dominio.Repositorios;
 using FluentAssertions;
 using Moq;
 using Xunit;
@@ -11,32 +10,32 @@ namespace Eventos.Pruebas.Aplicacion.Queries;
 
 public class ObtenerEventosQueryHandlerTests
 {
- private readonly Mock<IRepositorioEvento> _repoMock = new();
+ private readonly Mock<IRepositorioEvento> _repoMock;
  private readonly ObtenerEventosQueryHandler _handler;
+ private readonly DateTime _inicioBase;
+ private readonly DateTime _finBase;
+ private readonly Ubicacion _ubicacionBase;
 
  public ObtenerEventosQueryHandlerTests()
  {
+ _repoMock = new Mock<IRepositorioEvento>();
  _handler = new ObtenerEventosQueryHandler(_repoMock.Object);
+ _inicioBase = DateTime.UtcNow.AddDays(10);
+ _finBase = _inicioBase.AddHours(5);
+ _ubicacionBase = new Ubicacion("Lugar", "Dir", "Ciudad", "Region", "0000", "Pais");
  }
 
- private Evento CrearEvento(string titulo)
- {
- var inicio = DateTime.UtcNow.AddDays(10);
- var fin = inicio.AddHours(5);
- var ubic = new Ubicacion("Lugar", "Dir", "Ciudad", "Region", "0000", "Pais");
- return new Evento(titulo, "Desc", ubic, inicio, fin,50, "org-001");
- }
+ private Evento BuildEvento(string titulo) => new(titulo, "Desc", _ubicacionBase, _inicioBase, _finBase,50, "org-001");
+ private ObtenerEventosQuery BuildQuery() => new();
 
  [Fact]
  public async Task Handle_CuandoHayEventos_RegresaListaMapeada()
  {
- var e1 = CrearEvento("Evento1");
- var e2 = CrearEvento("Evento2");
+ var e1 = BuildEvento("Evento1");
+ var e2 = BuildEvento("Evento2");
  _repoMock.Setup(r => r.ObtenerTodosAsync(It.IsAny<CancellationToken>()))
  .ReturnsAsync(new[] { e1, e2 });
-
- var res = await _handler.Handle(new ObtenerEventosQuery(), CancellationToken.None);
-
+ var res = await _handler.Handle(BuildQuery(), CancellationToken.None);
  res.EsExitoso.Should().BeTrue();
  res.Valor!.Should().HaveCount(2);
  res.Valor.Should().Contain(x => x.Titulo == "Evento1");
@@ -48,8 +47,7 @@ public class ObtenerEventosQueryHandlerTests
  {
  _repoMock.Setup(r => r.ObtenerTodosAsync(It.IsAny<CancellationToken>()))
  .ReturnsAsync(Array.Empty<Evento>());
-
- var res = await _handler.Handle(new ObtenerEventosQuery(), CancellationToken.None);
+ var res = await _handler.Handle(BuildQuery(), CancellationToken.None);
  res.EsExitoso.Should().BeTrue();
  res.Valor!.Should().BeEmpty();
  }

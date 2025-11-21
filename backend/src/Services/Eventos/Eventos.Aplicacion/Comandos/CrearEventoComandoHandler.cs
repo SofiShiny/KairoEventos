@@ -18,45 +18,15 @@ public class CrearEventoComandoHandler : IRequestHandler<CrearEventoComando, Res
 
     public async Task<Resultado<EventoDto>> Handle(CrearEventoComando request, CancellationToken cancellationToken)
     {
+        var validacion = Validar(request);
+        if (validacion.EsFallido) return Resultado<EventoDto>.Falla(validacion.Error);
+
         try
         {
-            if (request.Ubicacion == null)
-            {
-                return Resultado<EventoDto>.Falla("La ubicacion es obligatoria");
-            }
-
-            if (request.FechaFin <= request.FechaInicio)
-            {
-                return Resultado<EventoDto>.Falla("La fecha fin debe ser posterior a la fecha inicio");
-            }
-
-            if (request.MaximoAsistentes <= 0)
-            {
-                return Resultado<EventoDto>.Falla("El maximo de asistentes debe ser mayor que cero");
-            }
-
-            var ubicacion = new Ubicacion(
-                request.Ubicacion.NombreLugar ?? string.Empty,
-                request.Ubicacion.Direccion ?? string.Empty,
-                request.Ubicacion.Ciudad ?? string.Empty,
-                request.Ubicacion.Region ?? string.Empty,
-                request.Ubicacion.CodigoPostal ?? string.Empty,
-                request.Ubicacion.Pais ?? string.Empty
-            );
-
-            var evento = new Evento(
-                request.Titulo,
-                request.Descripcion,
-                ubicacion,
-                request.FechaInicio,
-                request.FechaFin,
-                request.MaximoAsistentes,
-                request.OrganizadorId
-            );
-
+            var ubicacion = MapUbicacion(request.Ubicacion!);
+            var evento = new Evento(request.Titulo, request.Descripcion, ubicacion, request.FechaInicio, request.FechaFin, request.MaximoAsistentes, request.OrganizadorId);
             await _repositorioEvento.AgregarAsync(evento, cancellationToken);
-
-            return Resultado<EventoDto>.Exito(MapToDto(evento));
+            return Resultado<EventoDto>.Exito(MapEvento(evento));
         }
         catch (ArgumentException ex)
         {
@@ -64,26 +34,50 @@ public class CrearEventoComandoHandler : IRequestHandler<CrearEventoComando, Res
         }
     }
 
-    private EventoDto MapToDto(Evento evento) => new()
+    private Resultado Validar(CrearEventoComando request)
     {
-        Id = evento.Id,
-        Titulo = evento.Titulo,
-        Descripcion = evento.Descripcion,
-        Ubicacion = new UbicacionDto
-        {
-            NombreLugar = evento.Ubicacion?.NombreLugar ?? string.Empty,
-            Direccion = evento.Ubicacion?.Direccion ?? string.Empty,
-            Ciudad = evento.Ubicacion?.Ciudad ?? string.Empty,
-            Region = evento.Ubicacion?.Region ?? string.Empty,
-            CodigoPostal = evento.Ubicacion?.CodigoPostal ?? string.Empty,
-            Pais = evento.Ubicacion?.Pais ?? string.Empty
-        },
-        FechaInicio = evento.FechaInicio,
-        FechaFin = evento.FechaFin,
-        MaximoAsistentes = evento.MaximoAsistentes,
-        ConteoAsistentesActual = evento.ConteoAsistentesActual,
-        Estado = evento.Estado.ToString(),
-        OrganizadorId = evento.OrganizadorId,
-        CreadoEn = evento.CreadoEn
+        if (request.Ubicacion is null) return Resultado.Falla("La ubicacion es obligatoria");
+        if (request.FechaFin <= request.FechaInicio) return Resultado.Falla("La fecha fin debe ser posterior a la fecha inicio");
+        if (request.MaximoAsistentes <= 0) return Resultado.Falla("El maximo de asistentes debe ser mayor que cero");
+        return Resultado.Exito();
+    }
+
+    private Ubicacion MapUbicacion(UbicacionDto dto) => new(
+        dto.NombreLugar ?? string.Empty,
+        dto.Direccion ?? string.Empty,
+        dto.Ciudad ?? string.Empty,
+        dto.Region ?? string.Empty,
+        dto.CodigoPostal ?? string.Empty,
+        dto.Pais ?? string.Empty
+    );
+
+    private static UbicacionDto MapUbicacionDto(Ubicacion u) => new()
+    {
+        NombreLugar = u.NombreLugar,
+        Direccion = u.Direccion,
+        Ciudad = u.Ciudad,
+        Region = u.Region,
+        CodigoPostal = u.CodigoPostal,
+        Pais = u.Pais
     };
+
+    private EventoDto MapEvento(Evento e)
+    {
+        // Dominio garantiza que Ubicacion nunca sea null
+        var ubicacionDto = MapUbicacionDto(e.Ubicacion);
+        return new EventoDto
+        {
+            Id = e.Id,
+            Titulo = e.Titulo,
+            Descripcion = e.Descripcion,
+            Ubicacion = ubicacionDto,
+            FechaInicio = e.FechaInicio,
+            FechaFin = e.FechaFin,
+            MaximoAsistentes = e.MaximoAsistentes,
+            ConteoAsistentesActual = e.ConteoAsistentesActual,
+            Estado = e.Estado.ToString(),
+            OrganizadorId = e.OrganizadorId,
+            CreadoEn = e.CreadoEn
+        };
+    }
 }
