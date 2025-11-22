@@ -4,10 +4,11 @@ using Eventos.Infraestructura.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
+using Eventos.Aplicacion;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configuración de servicios
+// 1. Configuracion de servicios
 var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://0.0.0.0:5000";
 builder.WebHost.UseUrls(urls);
 
@@ -18,7 +19,7 @@ builder.Services.AddControllers().AddJsonOptions(o =>
     o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 builder.Services.AddEndpointsApiExplorer();
-// Añadir ejemplos
+// Aadir ejemplos
 builder.Services.AddSwaggerExamplesFromAssemblies(typeof(Program).Assembly);
 builder.Services.AddSwaggerGen(o =>
 {
@@ -50,8 +51,8 @@ builder.Services.AddDbContext<EventosDbContext>(options =>
     }
 });
 
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Eventos.Aplicacion.AssemblyReference).Assembly));
+// Registrar servicios de la capa de Aplicación
+builder.Services.AddEventAplicacionServices();
 
 builder.Services.AddScoped<IRepositorioEvento, EventoRepository>();
 
@@ -63,7 +64,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 2. Construcción y configuración del pipeline
+// 2. Construccion y configuracion del pipeline
 var app = builder.Build();
 
 if (!string.IsNullOrWhiteSpace(pathBase))
@@ -102,7 +103,11 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+app.MapGet("/health", (EventosDbContext db) => Results.Ok(new { 
+    status = "healthy",
+    database = db.Database.IsNpgsql() ? "PostgreSQL" : "InMemory"
+}));
+
 app.MapGet("/health/db", async (EventosDbContext db) =>
 {
     try
