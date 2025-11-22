@@ -1,8 +1,12 @@
-using Eventos.Dominio.Entidades;
+ï»¿using Eventos.Dominio.Entidades;
 using FluentAssertions;
+using System.Reflection;
+using System;
 using Xunit;
 
-namespace Eventos.Pruebas.Dominio;
+namespace Eventos.Pruebas.Dominio.Entidades;
+
+// ========== Pruebas de AsistenteTests.cs ==========
 
 public class AsistenteTests
 {
@@ -72,7 +76,7 @@ public class AsistenteTests
 
         // Comprobar
         act.Should().Throw<ArgumentException>()
-            .WithMessage("*correo*"); // ajusta al nombre real del parámetro
+            .WithMessage("*correo*"); // ajusta al nombre real del parï¿½metro
     }
 
     [Theory]
@@ -91,4 +95,63 @@ public class AsistenteTests
         // Comprobar
         act.Should().Throw<ArgumentException>();
     }
+}
+
+// ========== Pruebas de AsistenteExtraValidationTests.cs ==========
+
+public class AsistenteValidationTests
+{
+ [Fact]
+ public void Constructor_EventoIdVacio_LanzaExcepcion()
+ {
+ Action act = () => new Asistente(Guid.Empty, "u1", "Nombre", "a@b.com");
+ act.Should().Throw<ArgumentException>().WithMessage("*evento*");
+ }
+
+ [Fact]
+ public void Constructor_UsuarioIdVacio_LanzaExcepcion()
+ {
+ Action act = () => new Asistente(Guid.NewGuid(), " ", "Nombre", "a@b.com");
+ act.Should().Throw<ArgumentException>().WithMessage("*usuario*");
+ }
+
+ [Fact]
+ public void Constructor_NombreVacio_LanzaExcepcion()
+ {
+ Action act = () => new Asistente(Guid.NewGuid(), "u1", "", "a@b.com");
+ act.Should().Throw<ArgumentException>().WithMessage("*nombre*");
+ }
+
+ [Fact]
+ public void Constructor_CorreoVacio_LanzaExcepcion()
+ {
+ Action act = () => new Asistente(Guid.NewGuid(), "u1", "Nombre", " ");
+ act.Should().Throw<ArgumentException>().WithMessage("*correo*");
+ }
+
+ [Fact]
+ public void Constructor_EmailInvalido_LanzaExcepcion()
+ {
+ Action act = () => new Asistente(Guid.NewGuid(), "u1", "Nombre", "not-an-email");
+ act.Should().Throw<ArgumentException>().WithMessage("*email*");
+ }
+}
+
+// ========== Pruebas de AsistentePrivateCtorTests.cs ==========
+
+public class AsistentePrivateCtorTests
+{
+ [Fact]
+ public void PrivateParameterlessConstructor_UsadoPorReflection_CubreLinea15()
+ {
+ var ctor = typeof(Asistente).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+ ctor.Should().NotBeNull();
+ var inst = (Asistente)ctor!.Invoke(null);
+ inst.Should().NotBeNull();
+ inst.EventoId.Should().Be(Guid.Empty); // default
+ inst.UsuarioId.Should().Be(string.Empty);
+ inst.NombreUsuario.Should().Be(string.Empty);
+ inst.Correo.Should().Be(string.Empty);
+ inst.RegistradoEn.Should().Be(default);
+ }
 }

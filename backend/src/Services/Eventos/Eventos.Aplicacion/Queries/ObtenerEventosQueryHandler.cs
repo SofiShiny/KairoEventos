@@ -2,43 +2,25 @@ using BloquesConstruccion.Aplicacion.Comun;
 using BloquesConstruccion.Aplicacion.Queries;
 using Eventos.Aplicacion.DTOs;
 using Eventos.Dominio.Repositorios;
+using AutoMapper;
 
 namespace Eventos.Aplicacion.Queries;
 
 public class ObtenerEventosQueryHandler : IQueryHandler<ObtenerEventosQuery, Resultado<IEnumerable<EventoDto>>>
 {
  private readonly IRepositorioEvento _repositorioEvento;
+ private readonly IMapper _mapper;
 
- public ObtenerEventosQueryHandler(IRepositorioEvento repositorioEvento)
+ public ObtenerEventosQueryHandler(IRepositorioEvento repositorioEvento, IMapper mapper)
  {
  _repositorioEvento = repositorioEvento;
+ _mapper = mapper;
  }
 
  public async Task<Resultado<IEnumerable<EventoDto>>> Handle(ObtenerEventosQuery request, CancellationToken cancellationToken)
  {
  var eventos = await _repositorioEvento.ObtenerTodosAsync(cancellationToken);
- var lista = eventos.Select(e => new EventoDto
- {
- Id = e.Id,
- Titulo = e.Titulo,
- Descripcion = e.Descripcion,
- Ubicacion = new UbicacionDto
- {
- NombreLugar = e.Ubicacion.NombreLugar,
- Direccion = e.Ubicacion.Direccion,
- Ciudad = e.Ubicacion.Ciudad,
- Region = e.Ubicacion.Region,
- CodigoPostal = e.Ubicacion.CodigoPostal,
- Pais = e.Ubicacion.Pais
- },
- FechaInicio = e.FechaInicio,
- FechaFin = e.FechaFin,
- MaximoAsistentes = e.MaximoAsistentes,
- ConteoAsistentesActual = e.ConteoAsistentesActual,
- Estado = e.Estado.ToString(),
- OrganizadorId = e.OrganizadorId,
- CreadoEn = e.CreadoEn
- });
+ var lista = _mapper.Map<IEnumerable<EventoDto>>(eventos);
  return Resultado<IEnumerable<EventoDto>>.Exito(lista);
  }
 }

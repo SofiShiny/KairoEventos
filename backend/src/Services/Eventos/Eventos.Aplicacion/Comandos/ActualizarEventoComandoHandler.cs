@@ -16,9 +16,7 @@ public class ActualizarEventoComandoHandler : IRequestHandler<ActualizarEventoCo
  {
  var evento = await _repositorioEvento.ObtenerPorIdAsync(request.EventoId, cancellationToken);
  if (evento == null) return Resultado<EventoDto>.Falla("Evento no encontrado");
-
  var nuevaUbicacion = ConstruirUbicacion(evento, request.Ubicacion);
-
  evento.Actualizar(
  request.Titulo ?? evento.Titulo,
  request.Descripcion ?? evento.Descripcion,
@@ -26,9 +24,8 @@ public class ActualizarEventoComandoHandler : IRequestHandler<ActualizarEventoCo
  request.FechaInicio ?? evento.FechaInicio,
  request.FechaFin ?? evento.FechaFin,
  request.MaximoAsistentes ?? evento.MaximoAsistentes);
-
  await _repositorioEvento.ActualizarAsync(evento, cancellationToken);
- return Resultado<EventoDto>.Exito(Mapear(evento));
+ return Resultado<EventoDto>.Exito(EventoDtoMapper.Map(evento));
  }
 
  private static Ubicacion ConstruirUbicacion(Dominio.Entidades.Evento original, UbicacionDto? cambio) => cambio is null
@@ -40,34 +37,4 @@ public class ActualizarEventoComandoHandler : IRequestHandler<ActualizarEventoCo
  cambio.Region ?? original.Ubicacion.Region,
  cambio.CodigoPostal ?? original.Ubicacion.CodigoPostal,
  cambio.Pais ?? original.Ubicacion.Pais);
-
- private static EventoDto Mapear(Dominio.Entidades.Evento e) => new()
- {
- Id = e.Id,
- Titulo = e.Titulo,
- Descripcion = e.Descripcion,
- Ubicacion = new UbicacionDto
- {
- NombreLugar = e.Ubicacion.NombreLugar,
- Direccion = e.Ubicacion.Direccion,
- Ciudad = e.Ubicacion.Ciudad,
- Region = e.Ubicacion.Region,
- CodigoPostal = e.Ubicacion.CodigoPostal,
- Pais = e.Ubicacion.Pais
- },
- FechaInicio = e.FechaInicio,
- FechaFin = e.FechaFin,
- MaximoAsistentes = e.MaximoAsistentes,
- ConteoAsistentesActual = e.ConteoAsistentesActual,
- Estado = e.Estado.ToString(),
- OrganizadorId = e.OrganizadorId,
- CreadoEn = e.CreadoEn,
- Asistentes = e.Asistentes.Select(a => new AsistenteDto
- {
- Id = a.Id,
- NombreUsuario = a.NombreUsuario,
- Correo = a.Correo,
- RegistradoEn = a.RegistradoEn
- })
- };
 }

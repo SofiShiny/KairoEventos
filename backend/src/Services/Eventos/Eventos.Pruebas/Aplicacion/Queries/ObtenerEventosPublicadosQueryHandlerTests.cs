@@ -1,4 +1,5 @@
 using Eventos.Aplicacion.Queries;
+using Eventos.Aplicacion;
 using Eventos.Dominio.Entidades;
 using Eventos.Dominio.ObjetosDeValor;
 using Eventos.Dominio.Repositorios;
@@ -6,6 +7,7 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 using Eventos.Dominio.Enumeraciones;
+using AutoMapper;
 
 namespace Eventos.Pruebas.Aplicacion.Queries;
 
@@ -13,6 +15,7 @@ public class ObtenerEventosPublicadosQueryHandlerTests
 {
  private readonly Mock<IRepositorioEvento> _repoMock;
  private readonly ObtenerEventosPublicadosQueryHandler _handler;
+ private readonly IMapper _mapper;
  private readonly DateTime _inicio;
  private readonly DateTime _fin;
  private readonly Ubicacion _ubic;
@@ -20,7 +23,9 @@ public class ObtenerEventosPublicadosQueryHandlerTests
  public ObtenerEventosPublicadosQueryHandlerTests()
  {
  _repoMock = new Mock<IRepositorioEvento>();
- _handler = new ObtenerEventosPublicadosQueryHandler(_repoMock.Object);
+ var cfg = new MapperConfiguration(c => c.AddProfile(new EventoMappingProfile()));
+ _mapper = cfg.CreateMapper();
+ _handler = new ObtenerEventosPublicadosQueryHandler(_repoMock.Object, _mapper);
  _inicio = DateTime.UtcNow.AddDays(5);
  _fin = _inicio.AddHours(2);
  _ubic = new Ubicacion("Lugar", "Dir", "Ciudad", "Region", "0000", "Pais");
@@ -43,7 +48,7 @@ public class ObtenerEventosPublicadosQueryHandlerTests
  var res = await _handler.Handle(BuildQuery(), CancellationToken.None);
  res.EsExitoso.Should().BeTrue();
  res.Valor!.Should().HaveCount(1);
- res.Valor.First().Estado.Should().Be(EstadoEvento.Publicado.ToString());
+ res.Valor.First(). Estado.Should().Be(EstadoEvento.Publicado.ToString());
  }
 
  [Fact]

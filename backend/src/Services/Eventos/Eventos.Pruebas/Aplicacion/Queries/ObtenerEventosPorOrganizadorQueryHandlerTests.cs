@@ -1,10 +1,12 @@
 using Eventos.Aplicacion.Queries;
+using Eventos.Aplicacion;
 using Eventos.Dominio.Entidades;
 using Eventos.Dominio.ObjetosDeValor;
 using Eventos.Dominio.Repositorios;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using AutoMapper;
 
 namespace Eventos.Pruebas.Aplicacion.Queries;
 
@@ -12,13 +14,16 @@ public class ObtenerEventosPorOrganizadorQueryHandlerTests
 {
  private readonly Mock<IRepositorioEvento> _repoMock;
  private readonly ObtenerEventosPorOrganizadorQueryHandler _handler;
+ private readonly IMapper _mapper;
  private readonly DateTime _inicio;
  private readonly Ubicacion _ubic;
 
  public ObtenerEventosPorOrganizadorQueryHandlerTests()
  {
  _repoMock = new Mock<IRepositorioEvento>();
- _handler = new ObtenerEventosPorOrganizadorQueryHandler(_repoMock.Object);
+ var cfg = new MapperConfiguration(c => c.AddProfile(new EventoMappingProfile()));
+ _mapper = cfg.CreateMapper();
+ _handler = new ObtenerEventosPorOrganizadorQueryHandler(_repoMock.Object, _mapper);
  _inicio = DateTime.UtcNow.AddDays(3);
  _ubic = new Ubicacion("Lugar", "Dir", "Ciudad", "Region", "0000", "Pais");
  }

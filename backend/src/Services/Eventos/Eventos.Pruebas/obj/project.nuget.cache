@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "CwhDjhGmNm6wlwj91GmGxA95d42OPbaqZBf8ZxRMaTSNwDsWDbPMF30loUrDm2pJCQG13xWF0pFRHK23+0ltiA==",
+  "dgSpecHash": "vrRkROkatFrtsRUq2m0QFF6cJH0tl2Kbw7Pgt9+LqBslJoGjpZTj9YwtAdKAVN1r5o6nujrExIKbZOFsQbd2Aw==",
   "success": true,
   "projectFilePath": "/mnt/c/Users/sofia/Source/Repos/Sistema-de-Eventos2/Eventos/backend/src/Services/Eventos/Eventos.Pruebas/Eventos.Pruebas.csproj",
   "expectedPackageFiles": [
+    "/home/sofia/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
+    "/home/sofia/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.1/automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "/home/sofia/.nuget/packages/bogus/35.4.0/bogus.35.4.0.nupkg.sha512",
     "/home/sofia/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
     "/home/sofia/.nuget/packages/coverlet.collector/6.0.0/coverlet.collector.6.0.0.nupkg.sha512",
@@ -14,6 +16,7 @@
     "/home/sofia/.nuget/packages/mediatr/12.2.0/mediatr.12.2.0.nupkg.sha512",
     "/home/sofia/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",
     "/home/sofia/.nuget/packages/microsoft.codecoverage/17.8.0/microsoft.codecoverage.17.8.0.nupkg.sha512",
+    "/home/sofia/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
     "/home/sofia/.nuget/packages/microsoft.entityframeworkcore/8.0.0/microsoft.entityframeworkcore.8.0.0.nupkg.sha512",
     "/home/sofia/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.0/microsoft.entityframeworkcore.abstractions.8.0.0.nupkg.sha512",
     "/home/sofia/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.0/microsoft.entityframeworkcore.analyzers.8.0.0.nupkg.sha512",

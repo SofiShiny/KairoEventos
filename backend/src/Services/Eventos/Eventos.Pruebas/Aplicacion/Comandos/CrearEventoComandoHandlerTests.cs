@@ -1,8 +1,10 @@
 ﻿using Eventos.Aplicacion.Comandos;
 using Eventos.Aplicacion.DTOs;
+using Eventos.Aplicacion.Validators;
 using Eventos.Dominio.Entidades;
 using Eventos.Dominio.Repositorios;
 using FluentAssertions;
+using FluentValidation;
 using Moq;
 using Xunit;
 
@@ -11,6 +13,7 @@ namespace Eventos.Pruebas.Aplicacion.Comandos;
 public class CrearEventoComandoHandlerTests
 {
  private readonly Mock<IRepositorioEvento> _repo;
+ private readonly IValidator<CrearEventoComando> _validator;
  private readonly CrearEventoComandoHandler _handler;
  private readonly DateTime _inicio;
  private readonly DateTime _fin;
@@ -21,14 +24,15 @@ public class CrearEventoComandoHandlerTests
  public CrearEventoComandoHandlerTests()
  {
  _repo = new Mock<IRepositorioEvento>(MockBehavior.Strict);
- _handler = new CrearEventoComandoHandler(_repo.Object);
+ _validator = new CrearEventoComandoValidator();
+ _handler = new CrearEventoComandoHandler(_repo.Object, _validator);
  _inicio = DateTime.UtcNow.AddDays(5);
  _fin = _inicio.AddDays(1);
  _ubicBase = new UbicacionDto{ NombreLugar="Lugar", Direccion="Dir", Ciudad="Ciudad", Region="Reg", CodigoPostal="0000", Pais="Pais" };
  }
 
  private CrearEventoComando Cmd(string titulo="Conferencia", string desc="Desc", UbicacionDto? u=null, int max=100, DateTime? ini=null, DateTime? fin=null, string? org=null)
- => new(titulo, desc, u, ini ?? _inicio, fin ?? _fin, max, org ?? _org);
+ => new(titulo, desc, u!, ini ?? _inicio, fin ?? _fin, max, org ?? _org);
 
  private void SetupAgregar() => _repo.Setup(r=>r.AgregarAsync(It.IsAny<Evento>(), It.IsAny<CancellationToken>()))
  .Callback<Evento, CancellationToken>((e,ct)=> _capturado = e)

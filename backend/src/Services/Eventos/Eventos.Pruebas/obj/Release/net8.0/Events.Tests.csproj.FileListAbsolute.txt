@@ -1,7 +1,0 @@
-C:\Users\sofia\source\repos\v0-event-management-platform-5\backend\src\Services\Events\Events.Tests\bin\Release\net8.0\CoverletSourceRootsMapping_Events.Tests
-C:\Users\sofia\source\repos\v0-event-management-platform-5\backend\src\Services\Events\Events.Tests\obj\Release\net8.0\Events.Tests.csproj.AssemblyReference.cache
-C:\Users\sofia\source\repos\v0-event-management-platform-5\backend\src\Services\Events\Events.Tests\obj\Release\net8.0\Events.Tests.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\sofia\source\repos\v0-event-management-platform-5\backend\src\Services\Events\Events.Tests\obj\Release\net8.0\Events.Tests.AssemblyInfoInputs.cache
-C:\Users\sofia\source\repos\v0-event-management-platform-5\backend\src\Services\Events\Events.Tests\obj\Release\net8.0\Events.Tests.AssemblyInfo.cs
-C:\Users\sofia\source\repos\v0-event-management-platform-5\backend\src\Services\Events\Events.Tests\obj\Release\net8.0\Events.Tests.csproj.CoreCompileInputs.cache
-C:\Users\sofia\source\repos\v0-event-management-platform-5\backend\src\Services\Events\Events.Tests\obj\Release\net8.0\Events.Tests.sourcelink.json

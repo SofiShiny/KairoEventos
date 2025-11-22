@@ -1,4 +1,4 @@
-using Eventos.Dominio.Entidades;
+﻿using Eventos.Dominio.Entidades;
 using Eventos.Dominio.Enumeraciones;
 using Eventos.Dominio.ObjetosDeValor;
 using Eventos.Infraestructura.Persistencia;
@@ -7,7 +7,9 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Eventos.Pruebas.Infraestructura;
+namespace Eventos.Pruebas.Infraestructura.Repositorios;
+
+// ========== Pruebas de EventoRepositorioTests.cs ==========
 
 public class EventoRepositorioTests
 {
@@ -136,4 +138,92 @@ public class EventoRepositorioTests
         resultados.Should().Contain(e => e.Titulo == "Evento1");
         resultados.Should().Contain(e => e.Titulo == "Evento2");
     }
+}
+
+// ========== Pruebas de EventoRepositorioExisteTests.cs ==========
+
+public class EventoRepositorioExisteTests
+{
+ private readonly EventosDbContext _ctx;
+ private readonly EventoRepository _repo;
+
+ public EventoRepositorioExisteTests()
+ {
+ var options = new DbContextOptionsBuilder<EventosDbContext>()
+ .UseInMemoryDatabase(Guid.NewGuid().ToString())
+ .Options;
+ _ctx = new EventosDbContext(options);
+ _repo = new EventoRepository(_ctx);
+ }
+
+ private Evento Build()
+ {
+ var ubic = new Ubicacion("L","D","C","R","0","P");
+ return new Evento("T","D", ubic, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2),10, "org");
+ }
+
+ [Fact]
+ public async Task ExisteAsync_TrueCuandoExiste()
+ {
+ var e = Build();
+ _ctx.Eventos.Add(e);
+ await _ctx.SaveChangesAsync();
+ (await _repo.ExisteAsync(e.Id)).Should().BeTrue();
+ }
+
+ [Fact]
+ public async Task ExisteAsync_FalseCuandoNoExiste()
+ {
+ (await _repo.ExisteAsync(Guid.NewGuid())).Should().BeFalse();
+ }
+}
+
+// ========== Pruebas de EventoRepositorioExtraTests.cs ==========
+
+public class EventoRepositorioExtraTests
+{
+ private readonly EventosDbContext _ctx;
+ private readonly EventoRepository _repo;
+ private readonly Ubicacion _ubic;
+
+ public EventoRepositorioExtraTests()
+ {
+ var options = new DbContextOptionsBuilder<EventosDbContext>()
+ .UseInMemoryDatabase(Guid.NewGuid().ToString())
+ .Options;
+ _ctx = new EventosDbContext(options);
+ _repo = new EventoRepository(_ctx);
+ _ubic = new Ubicacion("Lugar","Dir","Ciudad","Reg","0000","Pais");
+ }
+
+ private Evento Build(string titulo, int offsetDias)
+ {
+ var ini = DateTime.UtcNow.AddDays(offsetDias);
+ var fin = ini.AddDays(1);
+ return new Evento(titulo, "D", _ubic, ini, fin,10, "org-1");
+ }
+
+ [Fact]
+ public async Task ObtenerEventosPublicadosAsync_FiltraYOrdena()
+ {
+ var e1 = Build("E1",3); var e2 = Build("E2",1);
+ e1.Publicar(); e2.Publicar();
+ _ctx.Eventos.AddRange(e1, e2);
+ await _ctx.SaveChangesAsync();
+ var list = await _repo.ObtenerEventosPublicadosAsync();
+ list.Should().HaveCount(2);
+ list.First().FechaInicio.Should().BeBefore(list.Last().FechaInicio);
+ }
+
+ [Fact]
+ public async Task ObtenerEventosPorOrganizadorAsync_FiltraYOrdenaDesc()
+ {
+ var e1 = Build("E1",1); var e2 = Build("E2",5); var e3 = new Evento("E3","D", _ubic, DateTime.UtcNow.AddDays(7), DateTime.UtcNow.AddDays(8),10, "org-y");
+ _ctx.Eventos.AddRange(e1, e2, e3);
+ await _ctx.SaveChangesAsync();
+ var list = await _repo.ObtenerEventosPorOrganizadorAsync("org-1");
+ list.Should().HaveCount(2);
+ list.First().FechaInicio.Should().BeAfter(list.Last().FechaInicio);
+ list.Should().OnlyContain(e => e.OrganizadorId == "org-1");
+ }
 }

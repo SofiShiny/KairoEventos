@@ -1,4 +1,5 @@
 using Eventos.Aplicacion.Queries;
+using Eventos.Aplicacion; // EventoMappingProfile
 using Eventos.Dominio.Entidades;
 using Eventos.Dominio.Repositorios;
 using Eventos.Dominio.ObjetosDeValor;
@@ -6,7 +7,7 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 using Eventos.Dominio.Enumeraciones;
-using System;
+using AutoMapper;
 
 namespace Eventos.Pruebas.Aplicacion.Queries;
 
@@ -18,11 +19,14 @@ public class ObtenerEventoPorIdQueryHandlerTests
     private readonly Evento _eventoSinUbicacion;
     private readonly DateTime _inicio;
     private readonly DateTime _fin;
+    private readonly IMapper _mapper;
 
     public ObtenerEventoPorIdQueryHandlerTests()
     {
         _repo = new Mock<IRepositorioEvento>(MockBehavior.Strict);
-        _handler = new ObtenerEventoPorIdQueryHandler(_repo.Object);
+        var config = new MapperConfiguration(cfg => cfg.AddProfile(new EventoMappingProfile()));
+        _mapper = config.CreateMapper();
+        _handler = new ObtenerEventoPorIdQueryHandler(_repo.Object, _mapper);
         _inicio = DateTime.UtcNow.AddMonths(1);
         _fin = _inicio.AddHours(8);
         _eventoBase = new Evento("ArtCraft", "Evento de arte", new Ubicacion("Av Principal123","Sucre","Caracas","DF","1029","Venezuela"), _inicio, _fin,100, "organizador-001");

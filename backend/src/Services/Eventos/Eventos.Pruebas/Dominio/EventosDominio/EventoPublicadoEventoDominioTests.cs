@@ -1,9 +1,11 @@
-using BloquesConstruccion.Dominio;
+﻿using BloquesConstruccion.Dominio;
 using Eventos.Dominio.EventosDeDominio;
 using FluentAssertions;
 using Xunit;
 
-namespace Eventos.Pruebas.Dominio;
+namespace Eventos.Pruebas.Dominio.EventosDominio;
+
+// ========== Pruebas de EventoPublicadoEventoDominioTests.cs ==========
 
 public class EventoPublicadoEventoDominioTests
 {

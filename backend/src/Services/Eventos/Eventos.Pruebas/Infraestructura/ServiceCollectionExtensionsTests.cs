@@ -1,11 +1,13 @@
+﻿using Eventos.Infraestructura;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
-using Eventos.Infraestructura;
 
 namespace Eventos.Pruebas.Infraestructura;
+
+// ========== Pruebas de ServiceCollectionExtensionsInfraTests.cs ==========
 
 public class ServiceCollectionExtensionsInfraTests
 {

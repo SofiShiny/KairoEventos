@@ -1,51 +1,51 @@
-using Eventos.Dominio.Enumeraciones;
 using FluentAssertions;
 using Xunit;
+using Eventos.Dominio.Enumeraciones;
 
-namespace Eventos.Pruebas.Dominio;
+namespace Eventos.Pruebas.Dominio.Enumerados;
 
-public class EventoStatusTests
+public class EstadoEventoTests
 {
     [Fact]
-    public void EventoStatus_DeberiaTenerValorDraft()
+    public void EstadoEvento_Borrador_DeberiaSerCero()
     {
-        // Actuar
+        // Arrange & Act
         var status = EstadoEvento.Borrador;
 
-        // Comprobar
+        // Assert
         status.Should().Be(EstadoEvento.Borrador);
         ((int)status).Should().Be(0);
     }
 
     [Fact]
-    public void EventoStatus_DeberiaTenerValorPublicado()
+    public void EstadoEvento_Publicado_DeberiaSerUno()
     {
-        // Actuar
+        // Arrange & Act
         var status = EstadoEvento.Publicado;
 
-        // Comprobar
+        // Assert
         status.Should().Be(EstadoEvento.Publicado);
         ((int)status).Should().Be(1);
     }
 
     [Fact]
-    public void EventoStatus_DeberiaTenerValorCancelado()
+    public void EstadoEvento_Cancelado_DeberiaSerDos()
     {
-        // Actuar
+        // Arrange & Act
         var status = EstadoEvento.Cancelado;
 
-        // Comprobar
+        // Assert
         status.Should().Be(EstadoEvento.Cancelado);
         ((int)status).Should().Be(2);
     }
 
     [Fact]
-    public void EventoStatus_DeberiaTenerValorCompletado()
+    public void EstadoEvento_Completado_DeberiaSerTres()
     {
-        // Actuar
+        // Arrange & Act
         var status = EstadoEvento.Completado;
 
-        // Comprobar
+        // Assert
         status.Should().Be(EstadoEvento.Completado);
         ((int)status).Should().Be(3);
     }
@@ -55,34 +55,34 @@ public class EventoStatusTests
     [InlineData(EstadoEvento.Publicado, "Publicado")]
     [InlineData(EstadoEvento.Cancelado, "Cancelado")]
     [InlineData(EstadoEvento.Completado, "Completado")]
-    public void EventoStatus_DeberiaConvertirAString(EstadoEvento status, string expected)
+    public void EstadoEvento_DeberiaConvertirAString(EstadoEvento status, string expected)
     {
-        // Actuar
+        // Arrange & Act
         var result = status.ToString();
 
-        // Comprobar
+        // Assert
         result.Should().Be(expected);
     }
 
     [Fact]
-    public void EventoStatus_DeberiaPermitirComparacion()
+    public void EstadoEvento_DeberiaTenerValoresUnicos()
     {
-        // Preparar
+        // Arrange & Act
         var draft = EstadoEvento.Borrador;
         var published = EstadoEvento.Publicado;
 
-        // Actuar & Comprobar
+        // Assert
         draft.Should().NotBe(published);
         draft.Should().Be(EstadoEvento.Borrador);
     }
 
     [Fact]
-    public void EventoStatus_DeberiaSoportarTodosLosValores()
+    public void EstadoEvento_DeberiaTenerTodosLosValores()
     {
-        // Preparar & Actuar
+        // Arrange & Act
         var values = Enum.GetValues<EstadoEvento>();
 
-        // Comprobar
+        // Assert
         values.Should().HaveCount(4);
         values.Should().Contain(EstadoEvento.Borrador);
         values.Should().Contain(EstadoEvento.Publicado);
