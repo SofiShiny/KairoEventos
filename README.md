@@ -42,7 +42,7 @@ Este método levanta todo el entorno (API, base de datos, etc.) en contenedores, 
 
 1.  Asegúrate de que Docker Desktop esté en ejecución.
 
-2.  Abre una terminal en el directorio raíz de la solución.
+2.  Abre una terminal en el directorio raíz de la solución. (Sistema-de-Eventos2/Eventos)
 
 3.  Ejecuta el siguiente comando para construir y levantar los contenedores:
   

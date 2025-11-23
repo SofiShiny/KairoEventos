@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BloquesConstruccion.Infraestructura")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6aa863a777adf2b295a3ae1060c2cb9a49602431")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7a6766ee3a15148514220ca36dd7f7409b6eed2")]
 [assembly: System.Reflection.AssemblyProductAttribute("BloquesConstruccion.Infraestructura")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BloquesConstruccion.Infraestructura")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

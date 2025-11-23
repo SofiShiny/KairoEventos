@@ -56,8 +56,12 @@ dkms.conf
 
 # Visual Studio
 .vs/
+*.vsidx
 *.suo
 *.user
+*.userosscache
+*.sln.docstates
+
 
 # Reportes de cobertura y resultados de pruebas (HTML, CSS, JS generados)
 # Ignora cualquier carpeta de reportes de cobertura en cualquier nivel

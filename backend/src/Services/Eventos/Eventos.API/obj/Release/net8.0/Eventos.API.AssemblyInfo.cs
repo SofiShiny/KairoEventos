@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Eventos.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf880706cd228d9224cf9dfe752fb8428cd1ba73")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7a6766ee3a15148514220ca36dd7f7409b6eed2")]
 [assembly: System.Reflection.AssemblyProductAttribute("Eventos.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Eventos.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
