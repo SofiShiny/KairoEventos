@@ -18,16 +18,16 @@ public class Ubicacion : ObjetoValor
     public Ubicacion(string nombreLugar, string direccion, string ciudad, string region, string codigoPostal, string pais)
     {
         if (string.IsNullOrWhiteSpace(nombreLugar))
-            throw new ArgumentException("El nombre del lugar no puede estar vacío", nameof(nombreLugar));
+            throw new ArgumentException("El nombre del lugar no puede estar vacio", nameof(nombreLugar));
         
         if (string.IsNullOrWhiteSpace(direccion))
-            throw new ArgumentException("La dirección no puede estar vacía", nameof(direccion));
+            throw new ArgumentException("La direccion no puede estar vacia", nameof(direccion));
         
         if (string.IsNullOrWhiteSpace(ciudad))
-            throw new ArgumentException("La ciudad no puede estar vacía", nameof(ciudad));
+            throw new ArgumentException("La ciudad no puede estar vacia", nameof(ciudad));
         
         if (string.IsNullOrWhiteSpace(pais))
-            throw new ArgumentException("El país no puede estar vacío", nameof(pais));
+            throw new ArgumentException("El pais no puede estar vacio", nameof(pais));
 
         NombreLugar = nombreLugar;
         Direccion = direccion;

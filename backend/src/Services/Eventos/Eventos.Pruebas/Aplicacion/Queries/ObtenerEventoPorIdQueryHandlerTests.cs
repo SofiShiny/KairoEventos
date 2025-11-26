@@ -1,4 +1,4 @@
-using Eventos.Aplicacion.Queries;
+ï»¿using Eventos.Aplicacion.Queries;
 using Eventos.Aplicacion; // EventoMappingProfile
 using Eventos.Dominio.Entidades;
 using Eventos.Dominio.Repositorios;
@@ -16,7 +16,7 @@ public class ObtenerEventoPorIdQueryHandlerTests
     private readonly Mock<IRepositorioEvento> _repo;
     private readonly ObtenerEventoPorIdQueryHandler _handler;
     private readonly Evento _eventoBase;
-    private readonly Evento _eventoSinUbicacion;
+    private readonly Evento _eventoSinubicacion;
     private readonly DateTime _inicio;
     private readonly DateTime _fin;
     private readonly IMapper _mapper;
@@ -30,8 +30,8 @@ public class ObtenerEventoPorIdQueryHandlerTests
         _inicio = DateTime.UtcNow.AddMonths(1);
         _fin = _inicio.AddHours(8);
         _eventoBase = new Evento("ArtCraft", "Evento de arte", new Ubicacion("Av Principal123","Sucre","Caracas","DF","1029","Venezuela"), _inicio, _fin,100, "organizador-001");
-        _eventoSinUbicacion = new Evento("SinUbic","Desc", new Ubicacion("L","D","C","R","0","P"), _inicio, _fin,10, "org");
-        typeof(Evento).GetProperty("Ubicacion")!.SetValue(_eventoSinUbicacion, null);
+        _eventoSinubicacion = new Evento("SinUbic","Desc", new Ubicacion("L","D","C","R","0","P"), _inicio, _fin,10, "org");
+        typeof(Evento).GetProperty("Ubicacion")!.SetValue(_eventoSinubicacion, null);
     }
 
     private ObtenerEventoPorIdQuery Cmd(Guid id) => new(id);
@@ -79,9 +79,10 @@ public class ObtenerEventoPorIdQueryHandlerTests
     [Fact]
     public async Task Handle_EventoSinUbicacion_Falla()
     {
-        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventoSinUbicacion.Id, It.IsAny<CancellationToken>())).ReturnsAsync(_eventoSinUbicacion);
-        var res = await _handler.Handle(Cmd(_eventoSinUbicacion.Id), CancellationToken.None);
+        _repo.Setup(r=>r.ObtenerPorIdAsync(_eventoSinubicacion.Id, It.IsAny<CancellationToken>())).ReturnsAsync(_eventoSinubicacion);
+        var res = await _handler.Handle(Cmd(_eventoSinubicacion.Id), CancellationToken.None);
         res.EsExitoso.Should().BeFalse();
-        res.Error.Should().Contain("ubicación");
+        res.Error.Should().Contain("ubicacion");
     }
 }
+

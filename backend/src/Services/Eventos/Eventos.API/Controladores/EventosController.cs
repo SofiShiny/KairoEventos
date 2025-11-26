@@ -1,20 +1,21 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Eventos.Dominio.Repositorios;
-using Eventos.Dominio.Entidades;
-using Eventos.Dominio.ObjetosDeValor;
 using Eventos.Aplicacion.DTOs;
 using Swashbuckle.AspNetCore.Filters;
 using Eventos.Aplicacion.Comandos;
 using Eventos.Aplicacion.Queries;
-using BloquesConstruccion.Aplicacion.Comun;
 
 namespace Eventos.API.Controladores;
 
+// Habilita validación automática de modelos y binding de parámetros 
+//(rellenar parametros con datos de distintas fuentes)
 [ApiController]
+//[controller] Genera la ruta automáticamente basándose en el nombre de la clase
 [Route("api/[controller]")]
 public class EventosController : ControllerBase
 {
+    //IMediator: Patrón Mediator desacopla el controlador de los handlers
+    // permitiendo cambiar la lógica sin modificar el controlador
     private readonly IMediator _mediator;
     private readonly ILogger<EventosController> _logger;
 
@@ -24,11 +25,13 @@ public class EventosController : ControllerBase
         _logger = logger;
     }
 
-    // v1 - solo GETs usando queries
+    // Queries (solo lectura) 
+    // El mediator se encarga de entregar la query al handler correspondiente
     [HttpGet]
     public async Task<IActionResult> ObtenerTodos()
     {
         var resultado = await _mediator.Send(new ObtenerEventosQuery());
+        //El patrón Result evita excepciones para flujo de control
         if (resultado.EsFallido) return Problem(resultado.Error);
         return Ok(resultado.Valor);
     }
@@ -57,8 +60,10 @@ public class EventosController : ControllerBase
         return Ok(resultado.Valor);
     }
 
-    // v2 - CRUD y acciones via comandos
-    [HttpPost("v2")]
+    // Comandos (escritura)
+    // Los commands modifican estado, encapsula la intencion de crear un evento y sus datos
+   
+    [HttpPost]
     [SwaggerRequestExample(typeof(EventoCreateDto), typeof(Eventos.API.Swagger.Examples.EventoCrearEjemploOperacion))]
     [ProducesResponseType(typeof(EventoDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -71,6 +76,8 @@ public class EventosController : ControllerBase
             if (dto.Ubicacion == null) return BadRequest("Ubicacion requerida");
             if (dto.FechaFin <= dto.FechaInicio) return BadRequest("FechaFin debe ser posterior a FechaInicio");
 
+            //El comando no ejecuta la logica sino que envia el comando al mediador
+    //El mediador se encarga de entregar el comando al handler correspondiente con la logica de negocio 
             var comando = new CrearEventoComando(
                 dto.Titulo,
                 dto.Descripcion ?? string.Empty,
@@ -78,10 +85,11 @@ public class EventosController : ControllerBase
                 dto.FechaInicio,
                 dto.FechaFin,
                 dto.MaximoAsistentes,
-                "organizador-001");
+                "organizador-001"); // TODO: Obtener del usuario autenticado
 
             var resultado = await _mediator.Send(comando);
             if (resultado.EsFallido) return BadRequest(resultado.Error);
+            // CreatedAtAction Devuelve 201 Created con la URL del recurso creado
             return CreatedAtAction(nameof(ObtenerPorId), new { id = resultado.Valor!.Id }, resultado.Valor);
         }
         catch (Exception ex)
@@ -91,7 +99,7 @@ public class EventosController : ControllerBase
         }
     }
 
-    [HttpPut("v2/{id}")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> Actualizar(Guid id, [FromBody] EventoUpdateDto dto)
     {
         try
@@ -116,7 +124,7 @@ public class EventosController : ControllerBase
         }
     }
 
-    [HttpPatch("v2/{id}/publicar")]
+    [HttpPatch("{id}/publicar")]
     public async Task<IActionResult> Publicar(Guid id)
     {
         try
@@ -132,7 +140,7 @@ public class EventosController : ControllerBase
         }
     }
 
-    [HttpPost("v2/{id}/asistentes")]
+    [HttpPost("{id}/asistentes")]
     public async Task<IActionResult> RegistrarAsistente(Guid id, [FromBody] RegistrarAsistenteDto dto)
     {
         try
@@ -141,7 +149,7 @@ public class EventosController : ControllerBase
             var comando = new RegistrarAsistenteComando(id, dto.UsuarioId, dto.Nombre, dto.Correo);
             var resultado = await _mediator.Send(comando);
             if (resultado.EsFallido) return BadRequest(resultado.Error);
-            // Recuperar el evento actualizado para retornar el asistente reci�n agregado
+            // Recupera el evento actualizado para retornar el asistente recién agregado
             var eventoRes = await _mediator.Send(new ObtenerEventoPorIdQuery(id));
             if (eventoRes.EsFallido) return NotFound(eventoRes.Error);
             var asistente = eventoRes.Valor!.Asistentes!.Last();
@@ -154,7 +162,7 @@ public class EventosController : ControllerBase
         }
     }
 
-    [HttpDelete("v2/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Eliminar(Guid id)
     {
         try

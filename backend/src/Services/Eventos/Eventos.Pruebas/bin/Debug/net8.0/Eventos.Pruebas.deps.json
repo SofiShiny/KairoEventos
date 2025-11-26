@@ -769,7 +769,7 @@
             "rid": "win",
             "assetType": "runtime",
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "0.0.0.0"
+            "fileVersion": "6.0.21.52210"
           },
           "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.dll": {
             "rid": "win",
@@ -1308,7 +1308,7 @@
         "runtime": {
           "lib/netstandard2.0/xunit.abstractions.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.0"
+            "fileVersion": "0.0.0.0"
           }
         }
       },
@@ -1359,10 +1359,7 @@
           "MediatR": "12.2.0"
         },
         "runtime": {
-          "BloquesConstruccion.Aplicacion.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "BloquesConstruccion.Aplicacion.dll": {}
         }
       },
       "BloquesConstruccion.Dominio/1.0.0": {
@@ -1370,10 +1367,7 @@
           "MediatR": "12.2.0"
         },
         "runtime": {
-          "BloquesConstruccion.Dominio.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "BloquesConstruccion.Dominio.dll": {}
         }
       },
       "Eventos.Aplicacion/1.0.0": {
@@ -1386,10 +1380,7 @@
           "MediatR": "12.2.0"
         },
         "runtime": {
-          "Eventos.Aplicacion.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "Eventos.Aplicacion.dll": {}
         }
       },
       "Eventos.Dominio/1.0.0": {
@@ -1397,10 +1388,7 @@
           "BloquesConstruccion.Dominio": "1.0.0"
         },
         "runtime": {
-          "Eventos.Dominio.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "Eventos.Dominio.dll": {}
         }
       },
       "Eventos.Infraestructura/1.0.0": {
@@ -1414,10 +1402,7 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.0"
         },
         "runtime": {
-          "Eventos.Infraestructura.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "Eventos.Infraestructura.dll": {}
         }
       }
     }

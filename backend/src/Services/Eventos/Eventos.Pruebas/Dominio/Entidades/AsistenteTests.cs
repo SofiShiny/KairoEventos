@@ -6,7 +6,6 @@ using Xunit;
 
 namespace Eventos.Pruebas.Dominio.Entidades;
 
-// ========== Pruebas de AsistenteTests.cs ==========
 
 public class AsistenteTests
 {

@@ -1,3 +1,5 @@
+using BloquesConstruccion.Aplicacion.Comun;
+using BloquesConstruccion.Aplicacion.Comandos;
 using Eventos.Dominio.Entidades;
 using Eventos.Aplicacion.DTOs;
 
@@ -7,7 +9,7 @@ internal static class EventoDtoMapper
 {
  public static EventoDto Map(Evento e)
  {
- // Se asume e.Ubicacion no es null debido a validaciones previas
+ // Se asume que e.Ubicacion no es null debido a validaciones previas
  var u = e.Ubicacion;
  var dto = new EventoDto
  {

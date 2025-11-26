@@ -10,80 +10,97 @@ namespace Eventos.Dominio.Entidades;
 
 public class Evento : RaizAgregada<Guid>
 {
- public string Titulo { get; private set; } = string.Empty;
- public string Descripcion { get; private set; } = string.Empty;
- public Ubicacion Ubicacion { get; private set; } = null!;
- public DateTime FechaInicio { get; private set; }
- public DateTime FechaFin { get; private set; }
- public int MaximoAsistentes { get; private set; }
- public EstadoEvento Estado { get; private set; }
- public string OrganizadorId { get; private set; } = string.Empty;
- 
- private readonly List<Asistente> _asistentes = new();
- public IReadOnlyCollection<Asistente> Asistentes => _asistentes.AsReadOnly();
- 
- public int ConteoAsistentesActual => _asistentes.Count;
- public bool EstaCompleto => ConteoAsistentesActual >= MaximoAsistentes;
- public bool EstaPublicado => Estado == EstadoEvento.Publicado;
- public bool EstaCancelado => Estado == EstadoEvento.Cancelado;
+    // Setters privados, solo la entidad puede modificar su estado
+    public string Titulo { get; private set; } = string.Empty;
+    public string Descripcion { get; private set; } = string.Empty;
+    
+    // Ubicacion es un Value Object: no tiene identidad propia, se define por sus valores
+    public Ubicacion Ubicacion { get; private set; } = null!;
+    
+    public DateTime FechaInicio { get; private set; }
+    public DateTime FechaFin { get; private set; }
+    public int MaximoAsistentes { get; private set; }
+    public EstadoEvento Estado { get; private set; }
+    public string OrganizadorId { get; private set; } = string.Empty;
+    
+    // Lista privada + propiedad p√∫blica readonly evita modificaci√≥n externa directa
+    // Solo se puede agregar/quitar asistentes a trav√©s de m√©todos que validan reglas de negocio
+    private readonly List<Asistente> _asistentes = new();
+    public IReadOnlyCollection<Asistente> Asistentes => _asistentes.AsReadOnly();
+    
+    // Propiedades calculadas que encapsulan l√≥gica de negocio reutilizable
+    public int ConteoAsistentesActual => _asistentes.Count;
+    public bool EstaCompleto => ConteoAsistentesActual >= MaximoAsistentes;
+    public bool EstaPublicado => Estado == EstadoEvento.Publicado;
+    public bool EstaCancelado => Estado == EstadoEvento.Cancelado;
 
- private Evento() { } // Para EF Core
+    // Constructor privado para Entity Framework (necesita un constructor sin par√°metros)
+    // No se debe usar directamente en c√≥digo de negocio
+    private Evento() { }
 
- public Evento(
- string titulo,
- string descripcion,
- Ubicacion ubicacion,
- DateTime fechaInicio,
- DateTime fechaFin,
- int maximoAsistentes,
- string organizadorId)
- {
- if (string.IsNullOrWhiteSpace(titulo))
- throw new ArgumentException("El tÌtulo del evento no puede estar vacÌo", nameof(titulo));
- 
- if (string.IsNullOrWhiteSpace(descripcion))
- throw new ArgumentException("La descripciÛn del evento no puede estar vacÌa", nameof(descripcion));
- 
- if (ubicacion == null)
- throw new ArgumentNullException(nameof(ubicacion));
- 
- if (fechaInicio <= DateTime.UtcNow)
- throw new ArgumentException("La fecha de inicio debe ser en el futuro", nameof(fechaInicio));
- 
- if (fechaFin <= fechaInicio)
- throw new ArgumentException("La fecha de finalizaciÛn debe ser posterior a la fecha de inicio", nameof(fechaFin));
- 
- if (maximoAsistentes <=0)
- throw new ArgumentException("El n˙mero m·ximo de asistentes debe ser mayor que cero", nameof(maximoAsistentes));
- 
- if (string.IsNullOrWhiteSpace(organizadorId))
- throw new ArgumentException("El identificador del organizador no puede estar vacÌo", nameof(organizadorId));
+    // Constructor p√∫blico con validaci√≥n exhaustiva
+    // Garantiza que nunca exista un Evento con estado inv√°lido
+    public Evento(
+        string titulo,
+        string descripcion,
+        Ubicacion ubicacion,
+        DateTime fechaInicio,
+        DateTime fechaFin,
+        int maximoAsistentes,
+        string organizadorId)
+    {
+        // Validaciones de negocio en el dominio
+        if (string.IsNullOrWhiteSpace(titulo))
+            throw new ArgumentException("El t√≠tulo del evento no puede estar vac√≠o", nameof(titulo));
+        
+        if (string.IsNullOrWhiteSpace(descripcion))
+            throw new ArgumentException("La descripci√≥n del evento no puede estar vac√≠a", nameof(descripcion));
+        
+        if (ubicacion == null)
+            throw new ArgumentNullException(nameof(ubicacion));
+        
+        // Valida fecha futura: regla de negocio - no tiene sentido crear eventos pasados
+        if (fechaInicio <= DateTime.UtcNow)
+            throw new ArgumentException("La fecha de inicio debe ser en el futuro", nameof(fechaInicio));
+        
+        if (fechaFin <= fechaInicio)
+            throw new ArgumentException("La fecha de finalizaci√≥n debe ser posterior a la fecha de inicio", nameof(fechaFin));
+        
+        if (maximoAsistentes <=0)
+            throw new ArgumentException("El n√∫mero m√°ximo de asistentes debe ser mayor que cero", nameof(maximoAsistentes));
+        
+        if (string.IsNullOrWhiteSpace(organizadorId))
+            throw new ArgumentException("El identificador del organizador no puede estar vac√≠o", nameof(organizadorId));
 
- Id = Guid.NewGuid();
- Titulo = titulo;
- Descripcion = descripcion;
- Ubicacion = ubicacion;
- FechaInicio = fechaInicio;
- FechaFin = fechaFin;
- MaximoAsistentes = maximoAsistentes;
- OrganizadorId = organizadorId;
- Estado = EstadoEvento.Borrador;
- }
+        Id = Guid.NewGuid();
+        Titulo = titulo;
+        Descripcion = descripcion;
+        Ubicacion = ubicacion;
+        FechaInicio = fechaInicio;
+        FechaFin = fechaFin;
+        MaximoAsistentes = maximoAsistentes;
+        OrganizadorId = organizadorId;
+        // Estado inicial Borrador, los eventos deben ser revisados antes de publicarse
+        Estado = EstadoEvento.Borrador;
+    }
 
- public void Publicar()
- {
- if (Estado != EstadoEvento.Borrador)
- throw new InvalidOperationException($"No se puede publicar el evento cuando est· en estado {Estado}");
+    // M√©todo en lugar de setter para encapsular la regla de negocio y generar evento de dominio
+    public void Publicar()
+    {
+        // M√°quina de estados, donde solo ciertas transiciones son v√°lidas
+        if (Estado != EstadoEvento.Borrador)
+            throw new InvalidOperationException($"No se puede publicar el evento cuando est√° en estado {Estado}");
 
- Estado = EstadoEvento.Publicado;
- 
- GenerarEventoDominio(new EventoPublicadoEventoDominio(Id, Titulo, FechaInicio));
- }
+        Estado = EstadoEvento.Publicado;
+        
+        // Evento de dominio permite notificar a otros agregados sin acoplamiento directo
+        GenerarEventoDominio(new EventoPublicadoEventoDominio(Id, Titulo, FechaInicio));
+    }
 
  public void Cancelar()
  {
  if (Estado == EstadoEvento.Cancelado)
- throw new InvalidOperationException("El evento ya est· cancelado");
+ throw new InvalidOperationException("El evento ya est√° cancelado");
  
  if (Estado == EstadoEvento.Completado)
  throw new InvalidOperationException("No se puede cancelar un evento completado");
@@ -95,7 +112,7 @@ public class Evento : RaizAgregada<Guid>
 
  public void RegistrarAsistente(string usuarioId, string nombreUsuario, string correo)
  {
- // Reordenado para permitir distinguir evento cancelado
+ 
  if (EstaCancelado)
  throw new InvalidOperationException("No se puede registrar en un evento cancelado");
  
@@ -103,10 +120,10 @@ public class Evento : RaizAgregada<Guid>
  throw new InvalidOperationException("No se puede registrar en un evento no publicado");
  
  if (EstaCompleto)
- throw new InvalidOperationException("El evento est· completo");
+ throw new InvalidOperationException("El evento est√° completo");
  
  if (_asistentes.Any(a => a.UsuarioId == usuarioId))
- throw new InvalidOperationException("El usuario ya est· registrado");
+ throw new InvalidOperationException("El usuario ya est√° registrado");
 
  var asistente = new Asistente(Id, usuarioId, nombreUsuario, correo);
  _asistentes.Add(asistente);
@@ -118,7 +135,7 @@ public class Evento : RaizAgregada<Guid>
  {
  var asistente = _asistentes.FirstOrDefault(a => a.UsuarioId == usuarioId);
  if (asistente == null)
- throw new InvalidOperationException("El usuario no est· registrado en este evento");
+ throw new InvalidOperationException("El usuario no est√° registrado en este evento");
 
  _asistentes.Remove(asistente);
  }
@@ -132,10 +149,10 @@ public class Evento : RaizAgregada<Guid>
  throw new InvalidOperationException("No se puede actualizar un evento completado");
 
  if (string.IsNullOrWhiteSpace(titulo))
- throw new ArgumentException("El tÌtulo del evento no puede estar vacÌo", nameof(titulo));
+ throw new ArgumentException("El t√≠tulo del evento no puede estar vac√≠o", nameof(titulo));
  
  if (maximoAsistentes < ConteoAsistentesActual)
- throw new ArgumentException($"No se puede reducir el n˙mero m·ximo de asistentes por debajo del recuento actual ({ConteoAsistentesActual})", nameof(maximoAsistentes));
+ throw new ArgumentException($"No se puede reducir el n√∫mero m√°ximo de asistentes por debajo del recuento actual ({ConteoAsistentesActual})", nameof(maximoAsistentes));
 
  Titulo = titulo;
  Descripcion = descripcion;

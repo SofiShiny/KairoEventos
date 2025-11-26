@@ -20,14 +20,14 @@ public class AsistenteDtoPruebas
         {
             Id = id,
             Nombre = nombre,
-            Email = correo,
+            Correo = correo,
             RegistradoEn = registradoEn
         };
 
         // Comprobar
         dto.Id.Should().Be(id);
         dto.Nombre.Should().Be(nombre);
-        dto.Email.Should().Be(correo);
+        dto.Correo.Should().Be(correo);
         dto.RegistradoEn.Should().Be(registradoEn);
     }
 
@@ -38,11 +38,11 @@ public class AsistenteDtoPruebas
         var dto = new AsistenteDto
         {
             Nombre = null,
-            Email = null
+            Correo = null
         };
 
         // Comprobar
         dto.Nombre.Should().BeNull();
-        dto.Email.Should().BeNull();
+        dto.Correo.Should().BeNull();
     }
 }

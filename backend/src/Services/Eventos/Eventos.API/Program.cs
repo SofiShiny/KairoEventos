@@ -8,7 +8,7 @@ using Eventos.Aplicacion;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configuracion de servicios
+//Configuracion de servicios
 var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://0.0.0.0:5000";
 builder.WebHost.UseUrls(urls);
 
@@ -19,7 +19,7 @@ builder.Services.AddControllers().AddJsonOptions(o =>
     o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 builder.Services.AddEndpointsApiExplorer();
-// Aadir ejemplos
+// Agregar ejemplos
 builder.Services.AddSwaggerExamplesFromAssemblies(typeof(Program).Assembly);
 builder.Services.AddSwaggerGen(o =>
 {
@@ -51,7 +51,7 @@ builder.Services.AddDbContext<EventosDbContext>(options =>
     }
 });
 
-// Registrar servicios de la capa de Aplicación
+// Registrar servicios de la capa de aplicacion
 builder.Services.AddEventAplicacionServices();
 
 builder.Services.AddScoped<IRepositorioEvento, EventoRepository>();
@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 2. Construccion y configuracion del pipeline
+// Construccion y configuracion del pipeline
 var app = builder.Build();
 
 if (!string.IsNullOrWhiteSpace(pathBase))

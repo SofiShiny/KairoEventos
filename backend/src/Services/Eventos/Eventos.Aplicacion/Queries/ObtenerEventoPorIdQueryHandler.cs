@@ -1,3 +1,4 @@
+using BloquesConstruccion.Aplicacion.Queries;
 using BloquesConstruccion.Aplicacion.Comun;
 using Eventos.Dominio.Repositorios;
 using Eventos.Aplicacion.DTOs;
@@ -11,7 +12,7 @@ public class ObtenerEventoPorIdQueryHandler : IRequestHandler<ObtenerEventoPorId
     private readonly IRepositorioEvento _repositorioEvento;
     private readonly IMapper _mapper;
     private const string ErrorNoEncontrado = "Evento no encontrado";
-    private const string ErrorUbicacionInvalida = "Los datos de ubicación del evento no son válidos";
+    private const string ErrorUbicacionInvalida = "Los datos de ubicacion del evento no son validos";
 
     public ObtenerEventoPorIdQueryHandler(IRepositorioEvento repositorioEvento, IMapper mapper)
     {

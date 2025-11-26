@@ -1,5 +1,7 @@
 namespace Eventos.Aplicacion.DTOs;
 
+// DTO usado internamente en la aplicación
+// Propiedades nullable para flexibilidad en mapeo desde entidad de dominio
 public class EventoDto
 {
     public Guid Id { get; set; }

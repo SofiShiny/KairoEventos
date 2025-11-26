@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+// DTO específico para respuestas de API
+// Propiedades requeridas no null para garantizar datos completos
+// Usa AsistenteResponseDto para consistencia en la respuesta
 public class EventoResponseDto
 {
     public Guid Id { get; set; }

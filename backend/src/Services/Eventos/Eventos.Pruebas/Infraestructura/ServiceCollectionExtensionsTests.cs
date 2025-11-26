@@ -29,7 +29,7 @@ public class ServiceCollectionExtensionsInfraTests
         var services = new ServiceCollection();
         var configMock = new Mock<IConfiguration>();
         var sectionMock = new Mock<IConfigurationSection>();
-        sectionMock.Setup(s => s["EventosDb"]).Returns("Host=localhost;Database=test;Username=u;Password=p");
+        sectionMock.Setup(s => s["DefaultConnection"]).Returns("Host=localhost;Database=test;Username=u;Password=p");
         configMock.Setup(c => c.GetSection("ConnectionStrings")).Returns(sectionMock.Object);
 
         services.AddEventoInfrastructureServices(configMock.Object);

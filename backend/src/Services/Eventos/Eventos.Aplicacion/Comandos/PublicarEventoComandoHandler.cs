@@ -1,4 +1,4 @@
-using BloquesConstruccion.Aplicacion;
+using BloquesConstruccion.Aplicacion.Comandos;
 using BloquesConstruccion.Aplicacion.Comun;
 using Eventos.Dominio.Repositorios;
 using MediatR;

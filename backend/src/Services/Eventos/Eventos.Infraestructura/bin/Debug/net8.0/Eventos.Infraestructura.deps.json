@@ -626,10 +626,7 @@
           "MediatR": "12.2.0"
         },
         "runtime": {
-          "BloquesConstruccion.Aplicacion.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "BloquesConstruccion.Aplicacion.dll": {}
         }
       },
       "BloquesConstruccion.Dominio/1.0.0": {
@@ -637,10 +634,7 @@
           "MediatR": "12.2.0"
         },
         "runtime": {
-          "BloquesConstruccion.Dominio.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "BloquesConstruccion.Dominio.dll": {}
         }
       },
       "Eventos.Aplicacion/1.0.0": {
@@ -653,10 +647,7 @@
           "MediatR": "12.2.0"
         },
         "runtime": {
-          "Eventos.Aplicacion.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "Eventos.Aplicacion.dll": {}
         }
       },
       "Eventos.Dominio/1.0.0": {
@@ -664,10 +655,7 @@
           "BloquesConstruccion.Dominio": "1.0.0"
         },
         "runtime": {
-          "Eventos.Dominio.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "Eventos.Dominio.dll": {}
         }
       }
     }

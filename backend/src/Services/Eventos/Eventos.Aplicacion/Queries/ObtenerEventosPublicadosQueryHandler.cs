@@ -1,5 +1,5 @@
-using BloquesConstruccion.Aplicacion.Comun;
 using BloquesConstruccion.Aplicacion.Queries;
+using BloquesConstruccion.Aplicacion.Comun;
 using Eventos.Aplicacion.DTOs;
 using Eventos.Dominio.Repositorios;
 using AutoMapper;

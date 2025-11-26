@@ -21,7 +21,7 @@ services:
   eventos-api:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile
     container_name: eventos-api
     depends_on:
       postgres:

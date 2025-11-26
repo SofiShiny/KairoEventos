@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "ZOnOpAs53qA=",
+  "dgSpecHash": "xh8yoG/kmRwta/CIKySAej4D8pT8mJbeLviL0MBSMoY9gsanKKhhvcLWcQtn1iXdbSG6DxvNNdt4hV1wOPSh/w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\sofia\\Source\\Repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Aplicacion\\BloquesConstruccion.Aplicacion.csproj",
+  "projectFilePath": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Aplicacion/BloquesConstruccion.Aplicacion.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\sofia\\.nuget\\packages\\fluentvalidation\\11.8.0\\fluentvalidation.11.8.0.nupkg.sha512",
-    "C:\\Users\\sofia\\.nuget\\packages\\mediatr\\12.0.1\\mediatr.12.0.1.nupkg.sha512",
-    "C:\\Users\\sofia\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
-    "C:\\Users\\sofia\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
+    "/home/sofia/.nuget/packages/fluentvalidation/11.8.0/fluentvalidation.11.8.0.nupkg.sha512",
+    "/home/sofia/.nuget/packages/mediatr/12.0.1/mediatr.12.0.1.nupkg.sha512",
+    "/home/sofia/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",
+    "/home/sofia/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/6.0.0/microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }

@@ -1,0 +1,13 @@
+# Ignorar archivos de build y publicación
+bin/
+obj/
+**/*.user
+**/*.swp
+*.log
+
+# Git
+.git
+.gitignore
+
+# Configuración local
+.env
