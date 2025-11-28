@@ -1,33 +1,40 @@
 {
   "format": 1,
   "restore": {
-    "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Aplicacion/BloquesConstruccion.Aplicacion.csproj": {}
+    "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Aplicacion\\BloquesConstruccion.Aplicacion.csproj": {}
   },
   "projects": {
-    "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Aplicacion/BloquesConstruccion.Aplicacion.csproj": {
+    "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Aplicacion\\BloquesConstruccion.Aplicacion.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Aplicacion/BloquesConstruccion.Aplicacion.csproj",
+        "projectUniqueName": "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Aplicacion\\BloquesConstruccion.Aplicacion.csproj",
         "projectName": "BloquesConstruccion.Aplicacion",
-        "projectPath": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Aplicacion/BloquesConstruccion.Aplicacion.csproj",
-        "packagesPath": "/home/sofia/.nuget/packages/",
-        "outputPath": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Aplicacion/obj/",
+        "projectPath": "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Aplicacion\\BloquesConstruccion.Aplicacion.csproj",
+        "packagesPath": "C:\\Users\\sofia\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Aplicacion\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/sofia/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\sofia\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Dominio/BloquesConstruccion.Dominio.csproj": {
-                "projectPath": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Dominio/BloquesConstruccion.Dominio.csproj"
+              "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Dominio\\BloquesConstruccion.Dominio.csproj": {
+                "projectPath": "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Dominio\\BloquesConstruccion.Dominio.csproj"
               }
             }
           }
@@ -39,7 +46,13 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -70,26 +83,33 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/sofia/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Dominio/BloquesConstruccion.Dominio.csproj": {
+    "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Dominio\\BloquesConstruccion.Dominio.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Dominio/BloquesConstruccion.Dominio.csproj",
+        "projectUniqueName": "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Dominio\\BloquesConstruccion.Dominio.csproj",
         "projectName": "BloquesConstruccion.Dominio",
-        "projectPath": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Dominio/BloquesConstruccion.Dominio.csproj",
-        "packagesPath": "/home/sofia/.nuget/packages/",
-        "outputPath": "/mnt/c/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/backend/src/Shared/BloquesConstruccion/Dominio/obj/",
+        "projectPath": "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Dominio\\BloquesConstruccion.Dominio.csproj",
+        "packagesPath": "C:\\Users\\sofia\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\sofia\\source\\repos\\Sistema-de-Eventos2\\Eventos\\backend\\src\\Shared\\BloquesConstruccion\\Dominio\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/sofia/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\sofia\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -105,7 +125,13 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -132,7 +158,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/sofia/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
