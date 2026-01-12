@@ -53,7 +53,7 @@ public class CuponesController : ControllerBase
     /// Crea un cupón general (reutilizable)
     /// </summary>
     [HttpPost("general")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,organizador")]
     public async Task<ActionResult<CuponDto>> CrearCuponGeneral(
         [FromBody] CrearCuponGeneralRequest request,
         CancellationToken cancellationToken)
@@ -102,7 +102,7 @@ public class CuponesController : ControllerBase
     /// Genera un lote de cupones únicos
     /// </summary>
     [HttpPost("lote")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,organizador")]
     public async Task<ActionResult<List<CuponDto>>> GenerarLoteCupones(
         [FromBody] GenerarLoteRequest request,
         CancellationToken cancellationToken)
@@ -147,7 +147,7 @@ public class CuponesController : ControllerBase
     /// Obtiene todos los cupones de un evento
     /// </summary>
     [HttpGet("evento/{eventoId}")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,organizador")]
     public async Task<ActionResult<List<CuponDto>>> ObtenerCuponesPorEvento(
         Guid eventoId,
         CancellationToken cancellationToken)
@@ -168,7 +168,7 @@ public class CuponesController : ControllerBase
     /// Obtiene todos los cupones globales
     /// </summary>
     [HttpGet("globales")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,organizador")]
     public async Task<ActionResult<List<CuponDto>>> ObtenerCuponesGlobales(CancellationToken cancellationToken)
     {
         try

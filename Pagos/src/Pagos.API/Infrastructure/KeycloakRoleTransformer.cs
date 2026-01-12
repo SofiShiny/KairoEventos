@@ -8,25 +8,26 @@ namespace Pagos.API.Infrastructure;
 
 public class KeycloakRoleTransformer : IClaimsTransformation
 {
+    private readonly ILogger<KeycloakRoleTransformer> _logger;
+
+    public KeycloakRoleTransformer(ILogger<KeycloakRoleTransformer> logger)
+    {
+        _logger = logger;
+    }
+
     public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
-        // 1. Verificar si ya fue transformado
         if (principal.HasClaim(c => c.Type == "role_transformed"))
         {
             return Task.FromResult(principal);
         }
 
-        // 2. Clonar el principal para no modificar el original directamente si es posible,
-        // aunque IClaimsTransformation suele permitir modificar el principal recibido.
         var clone = principal.Clone();
         var identity = (ClaimsIdentity)clone.Identity!;
 
-        Console.WriteLine($"--- INICIANDO TRANSFORMACIÓN DE ROLES ---");
-
-        // Lista temporal para recolectar roles y evitar modificar la colección mientras iteramos
         var rolesToAdd = new List<string>();
 
-        // 3. Extraer de realm_access.roles
+        // 1. Extraer desde realm_access.roles
         var realmAccessClaim = principal.FindFirst("realm_access");
         if (realmAccessClaim != null)
         {
@@ -42,10 +43,13 @@ public class KeycloakRoleTransformer : IClaimsTransformation
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error parsing realm_access from Keycloak token");
+            }
         }
 
-        // 4. Extraer de resource_access
+        // 2. Extraer desde resource_access
         var resourceAccessClaim = principal.FindFirst("resource_access");
         if (resourceAccessClaim != null)
         {
@@ -67,33 +71,27 @@ public class KeycloakRoleTransformer : IClaimsTransformation
             catch { }
         }
 
-        // 5. Extraer de claims planos 'role' o 'roles' (convertir a Lista para evitar error de enumeración)
+        // 3. Extraer de claims planos 'role' o 'roles'
         var flatRoleClaims = principal.FindAll(c => c.Type == "role" || c.Type == "roles").ToList();
         foreach (var claim in flatRoleClaims)
         {
             rolesToAdd.Add(claim.Value);
         }
 
-        // 6. Añadir todos los roles encontrados como Claims de tipo Role estándar
-        // Usamos Distinct para no duplicar roles
+        // 4. Normalizar y añadir claims
         foreach (var roleName in rolesToAdd.Distinct())
         {
-            Console.WriteLine($"[TRANSFORMER] Añadiendo Rol: {roleName}");
             identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
             identity.AddClaim(new Claim("role", roleName));
             
-            // Si el rol no está en minúsculas, añadir también la versión en minúsculas para compatibilidad
+            // Compatibilidad para roles en minúsculas (ej: Admin -> admin)
             if (roleName != roleName.ToLower())
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, roleName.ToLower()));
             }
         }
 
-        // Marcar como transformado
         identity.AddClaim(new Claim("role_transformed", "true"));
-        
-        Console.WriteLine($"--- TRANSFORMACIÓN COMPLETADA ---");
-
         return Task.FromResult(clone);
     }
 }
