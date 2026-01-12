@@ -1,0 +1,252 @@
+name: Entradas - CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Entradas/**'
+      - '.github/workflows/entradas-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'Entradas/**'
+      - '.github/workflows/entradas-ci.yml'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: 'Entradas'
+  SOLUTION_FILE: 'Entradas/Entradas.API.sln'
+  TEST_PROJECT: 'Entradas/Entradas.Pruebas/Entradas.Pruebas.csproj'
+
+jobs:
+  unit-tests:
+    name: Unit Tests & Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+      
+    - name: Build solution
+      run: dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration Release
+      
+    - name: Run unit tests with coverage
+      run: |
+        dotnet test ${{ env.TEST_PROJECT }} \
+          --no-build \
+          --configuration Release \
+          --collect:"XPlat Code Coverage" \
+          --results-directory:./TestResults \
+          --settings:${{ env.PROJECT_PATH }}/coverlet.runsettings \
+          --filter:"Category!=Integration&Category!=E2E&FullyQualifiedName!~Integration&FullyQualifiedName!~TestContainers&FullyQualifiedName!~RabbitMq" \
+          --verbosity:minimal \
+          --logger:"console;verbosity=minimal" \
+          --logger:"trx;LogFileName=test-results.trx"
+      working-directory: ${{ env.PROJECT_PATH }}
+      
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      
+    - name: Generate coverage report
+      run: |
+        reportgenerator \
+          -reports:"TestResults/**/coverage.cobertura.xml" \
+          -targetdir:"coverage-report" \
+          -reporttypes:"Html;JsonSummary;Badges;TextSummary" \
+          -title:"Entradas - Unit Tests Coverage" \
+          -tag:"${{ github.sha }}" \
+          -verbosity:Info
+      working-directory: ${{ env.PROJECT_PATH }}
+      
+    - name: Parse coverage results
+      id: coverage
+      run: |
+        if [ -f "${{ env.PROJECT_PATH }}/coverage-report/Summary.json" ]; then
+          COVERAGE=$(cat ${{ env.PROJECT_PATH }}/coverage-report/Summary.json | jq -r '.summary.linecoverage')
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "Coverage: $COVERAGE%"
+        else
+          echo "coverage=0" >> $GITHUB_OUTPUT
+          echo "Coverage file not found"
+        fi
+        
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report-${{ github.run_number }}
+        path: ${{ env.PROJECT_PATH }}/coverage-report/
+        retention-days: 30
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ github.run_number }}
+        path: ${{ env.PROJECT_PATH }}/TestResults/
+        retention-days: 7
+        
+    - name: Comment coverage on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const coverage = '${{ steps.coverage.outputs.coverage }}';
+          const comment = `## 📊 Test Coverage Report
+          
+          **Overall Coverage:** ${coverage}%
+          
+          ### Quality Gates Status:
+          - **Domain Layer:** Target 85% ✅
+          - **Application Layer:** Target 85% ✅  
+          - **API Layer:** Target 60% ⚠️
+          - **Infrastructure Layer:** Target 60% ⚠️
+          
+          📈 [View detailed coverage report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          > 🚀 Unit tests executed with mocks only - fast and reliable!`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download coverage report
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage-report-${{ github.run_number }}
+        path: coverage-report/
+        
+    - name: Validate quality gates
+      run: |
+        # Parse coverage from JSON summary
+        if [ -f "coverage-report/Summary.json" ]; then
+          OVERALL_COVERAGE=$(cat coverage-report/Summary.json | jq -r '.summary.linecoverage')
+          BRANCH_COVERAGE=$(cat coverage-report/Summary.json | jq -r '.summary.branchcoverage')
+          
+          echo "📊 Coverage Results:"
+          echo "  Overall: $OVERALL_COVERAGE%"
+          echo "  Branch: $BRANCH_COVERAGE%"
+          
+          # Quality gates validation
+          FAILED=false
+          
+          # Check overall coverage (target: 75%)
+          if (( $(echo "$OVERALL_COVERAGE < 75" | bc -l) )); then
+            echo "❌ FAIL: Overall coverage $OVERALL_COVERAGE% < 75%"
+            FAILED=true
+          else
+            echo "✅ PASS: Overall coverage $OVERALL_COVERAGE% >= 75%"
+          fi
+          
+          # Check branch coverage (target: 70%)
+          if (( $(echo "$BRANCH_COVERAGE < 70" | bc -l) )); then
+            echo "❌ FAIL: Branch coverage $BRANCH_COVERAGE% < 70%"
+            FAILED=true
+          else
+            echo "✅ PASS: Branch coverage $BRANCH_COVERAGE% >= 70%"
+          fi
+          
+          if [ "$FAILED" = true ]; then
+            echo ""
+            echo "🚫 Quality gates FAILED - Coverage below thresholds"
+            echo "   Please add more unit tests to improve coverage"
+            exit 1
+          else
+            echo ""
+            echo "🎉 Quality gates PASSED - All coverage thresholds met"
+          fi
+        else
+          echo "❌ Coverage report not found - Quality gates FAILED"
+          exit 1
+        fi
+
+  build-validation:
+    name: Build Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+      
+    - name: Build solution (Debug)
+      run: dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration Debug
+      
+    - name: Build solution (Release)
+      run: dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration Release
+      
+    - name: Validate project structure
+      run: |
+        echo "🔍 Validating project structure..."
+        
+        # Check required files exist
+        REQUIRED_FILES=(
+          "Entradas/Entradas.API/Program.cs"
+          "Entradas/Entradas.Aplicacion/InyeccionDependencias.cs"
+          "Entradas/Entradas.Dominio/Entidades/Entrada.cs"
+          "Entradas/Entradas.Infraestructura/InyeccionDependencias.cs"
+          "Entradas/Entradas.Pruebas/Entradas.Pruebas.csproj"
+          "Entradas/coverlet.runsettings"
+          "Entradas/quality-config.json"
+        )
+        
+        MISSING_FILES=()
+        for file in "${REQUIRED_FILES[@]}"; do
+          if [ ! -f "$file" ]; then
+            MISSING_FILES+=("$file")
+          fi
+        done
+        
+        if [ ${#MISSING_FILES[@]} -eq 0 ]; then
+          echo "✅ All required files present"
+        else
+          echo "❌ Missing required files:"
+          printf '  %s\n' "${MISSING_FILES[@]}"
+          exit 1
+        fi
+        
+        echo "🎉 Project structure validation PASSED"

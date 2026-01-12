@@ -1,0 +1,10 @@
+services:
+ asientos-api:
+ build:
+ context: .
+ dockerfile: backend/src/Services/Asientos/Dockerfile
+ environment:
+ ASPNETCORE_URLS: http://0.0.0.0:5100
+ ports:
+ - "5100:5100"
+ depends_on: []

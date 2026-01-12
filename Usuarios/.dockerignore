@@ -1,0 +1,59 @@
+# Build outputs
+**/bin/
+**/obj/
+**/out/
+
+# Visual Studio / Rider
+**/.vs/
+**/.vscode/
+**/.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Test results
+**/TestResults/
+**/*.trx
+**/*.coverage
+**/*.coveragexml
+
+# NuGet packages
+**/packages/
+*.nupkg
+*.snupkg
+
+# Build logs
+*.log
+**/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+**/Dockerfile
+**/docker-compose*.yml
+**/.dockerignore
+
+# Documentation
+**/README.md
+**/TASK-*.md
+**/*.md
+
+# Test projects (exclude from production image)
+**/Usuarios.Pruebas/
+**/Usuarios.Test/
+**/*.Tests/
+**/*.Test/
+
+# Temporary files
+**/tmp/
+**/temp/

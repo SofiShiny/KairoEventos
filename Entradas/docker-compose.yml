@@ -1,0 +1,146 @@
+# Docker Compose para desarrollo - Microservicio Entradas.API
+# Incluye PostgreSQL, RabbitMQ y la aplicación con networking configurado
+
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: entradas-postgres
+    environment:
+      POSTGRES_DB: entradas_db
+      POSTGRES_USER: entradas_user
+      POSTGRES_PASSWORD: entradas_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - entradas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U entradas_user -d entradas_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Message Broker RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: entradas-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: entradas_user
+      RABBITMQ_DEFAULT_PASS: entradas_password
+      RABBITMQ_DEFAULT_VHOST: entradas_vhost
+    ports:
+      - "5672:5672"    # AMQP port
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./scripts/rabbitmq-definitions.json:/etc/rabbitmq/definitions.json:ro
+    networks:
+      - entradas-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # Aplicación Entradas.API
+  entradas-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: entradas-api
+    environment:
+      # Configuración de ASP.NET Core
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      
+      # Configuración de base de datos
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=entradas_db;Username=entradas_user;Password=entradas_password;Include Error Detail=true"
+      
+      # Configuración de RabbitMQ
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: entradas_user
+      RabbitMQ__Password: entradas_password
+      RabbitMQ__VirtualHost: entradas_vhost
+      
+      # Configuración de servicios externos (mocks para desarrollo)
+      ServiciosExternos__EventosApi__BaseUrl: http://eventos-api-mock:8081
+      ServiciosExternos__AsientosApi__BaseUrl: http://asientos-api-mock:8082
+      ServiciosExternos__Timeout: 30
+      
+      # Configuración de logging
+      Serilog__MinimumLevel__Default: Debug
+      Serilog__MinimumLevel__Override__Microsoft: Information
+      Serilog__MinimumLevel__Override__System: Warning
+      
+      # Configuración de health checks
+      HealthChecks__Enabled: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - entradas-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+  # Mock de API de Eventos (para desarrollo)
+  eventos-api-mock:
+    image: wiremock/wiremock:3.3.1
+    container_name: eventos-api-mock
+    command: ["--global-response-templating", "--verbose"]
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./mocks/eventos:/home/wiremock/mappings:ro
+    networks:
+      - entradas-network
+    restart: unless-stopped
+
+  # Mock de API de Asientos (para desarrollo)
+  asientos-api-mock:
+    image: wiremock/wiremock:3.3.1
+    container_name: asientos-api-mock
+    command: ["--global-response-templating", "--verbose"]
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./mocks/asientos:/home/wiremock/mappings:ro
+    networks:
+      - entradas-network
+    restart: unless-stopped
+
+# Volúmenes persistentes
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+# Red personalizada
+networks:
+  entradas-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

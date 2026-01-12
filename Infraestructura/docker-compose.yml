@@ -1,0 +1,447 @@
+version: '3.8'
+
+# Red externa compartida por todos los microservicios
+networks:
+  kairo-network:
+    driver: bridge
+    name: kairo-network
+
+services:
+  # PostgreSQL - Base de datos relacional compartida
+  postgres:
+    image: postgres:16-alpine
+    container_name: kairo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      # La base de datos por defecto se crea automáticamente
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./configs/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - kairo-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB - Base de datos NoSQL para reportes
+  mongodb:
+    image: mongo:7
+    container_name: kairo-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: kairo_reportes
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - kairo-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ - Message Broker para comunicación asíncrona
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: kairo-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672" # AMQP protocol
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - kairo-network
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Keycloak - Identity and Access Management
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: kairo-keycloak
+    restart: unless-stopped
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+      KC_HEALTH_ENABLED: true
+    command:
+      - start-dev
+      - --import-realm
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./configs/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # API Gateway - Punto de entrada único para todos los microservicios
+  gateway:
+    build:
+      context: ../Gateway
+      dockerfile: Dockerfile
+    container_name: kairo-gateway
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      # Keycloak Configuration
+      Keycloak__Authority: http://keycloak:8080/realms/Kairo
+      Keycloak__Audience: kairo-api
+      Keycloak__MetadataAddress: http://keycloak:8080/realms/Kairo/.well-known/openid-configuration
+      # CORS Configuration
+      Cors__AllowedOrigins__0: http://localhost:5173
+      Cors__AllowedOrigins__1: http://localhost:3000
+      # Microservices URLs (already configured in appsettings.json)
+      # ReverseProxy__Clusters__eventos-cluster__Destinations__destination1__Address: http://eventos-api:8080
+      # ReverseProxy__Clusters__asientos-cluster__Destinations__destination1__Address: http://asientos-api:8080
+      # ReverseProxy__Clusters__usuarios-cluster__Destinations__destination1__Address: http://usuarios-api:8080
+      # ReverseProxy__Clusters__entradas-cluster__Destinations__destination1__Address: http://entradas-api:8080
+      # ReverseProxy__Clusters__reportes-cluster__Destinations__destination1__Address: http://reportes-api:8080
+    ports:
+      - "8080:8080"
+    networks:
+      - kairo-network
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/live" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Servicios Extras - Gestión de transporte, catering y otros servicios
+  servicios-api:
+    build:
+      context: ../Servicios
+      dockerfile: Servicios.API/Dockerfile
+    container_name: kairo-servicios
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_servicios;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+      - ExternalServices__EntradasApiUrl=http://entradas-api:8080/api/entradas
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Recomendaciones - Motor de sugerencias basado en intereses
+  recomendaciones-api:
+    build:
+      context: ../Recomendaciones
+      dockerfile: Recomendaciones.API/Dockerfile
+    container_name: kairo-recomendaciones
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_recomendaciones;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Encuestas - Feedback de eventos y validación de asistencia
+  encuestas-api:
+    build:
+      context: ../Encuestas
+      dockerfile: Encuestas.API/Dockerfile
+    container_name: kairo-encuestas
+    restart: unless-stopped
+    ports:
+      - "5008:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_encuestas;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+      - ExternalServices__EntradasApiUrl=http://entradas-api:8080/api/entradas
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Eventos - Gestión del catálogo de eventos
+  eventos-api:
+    build:
+      context: ../Eventos
+      dockerfile: backend/src/Services/Eventos/Eventos.API/Dockerfile
+    container_name: kairo-eventos
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=kairo_eventos
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - RabbitMq__Host=rabbitmq
+    ports:
+      - "5001:8080"
+    networks:
+      - kairo-network
+    volumes:
+      - eventos_images:/app/wwwroot/imagenes
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Asientos - Gestión de mapas y reserva de asientos
+  asientos-api:
+    build:
+      context: ../Asientos
+      dockerfile: backend/src/Services/Asientos/Dockerfile
+    container_name: kairo-asientos
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_asientos;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+    ports:
+      - "5003:8080"
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Entradas - Venta y validación de entradas
+  entradas-api:
+    build:
+      context: ../Entradas
+      dockerfile: Dockerfile
+    container_name: kairo-entradas
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_entradas;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+      - VerificadorEventos__BaseUrl=http://eventos-api:8080
+      - VerificadorAsientos__BaseUrl=http://asientos-api:8080
+    ports:
+      - "5002:8080"
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Usuarios - Gestión de perfiles y seguridad
+  usuarios-api:
+    build:
+      context: ../Usuarios
+      dockerfile: src/Usuarios.API/Dockerfile
+    container_name: kairo-usuarios
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__PostgresConnection=Host=postgres;Database=kairo_usuarios;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+      - Keycloak__ServerUrl=http://keycloak:8080
+    ports:
+      - "5005:8080"
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+
+  # Pagos - Pasarela de pagos externa y billetera virtual
+  pagos-api:
+    build:
+      context: ../Pagos
+      dockerfile: src/Pagos.API/Dockerfile
+    container_name: kairo-pagos
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Postgres=Host=postgres;Database=kairo_pagos;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+    ports:
+      - "5007:8080"
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Reportes - Panel de analíticas y CSV unificado
+  reportes-api:
+    build:
+      context: ../Reportes
+      dockerfile: Dockerfile
+    container_name: kairo-reportes
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - MongoDbSettings__ConnectionString=mongodb://mongodb:27017
+      - MongoDbSettings__DatabaseName=kairo_reportes
+      - RabbitMQ__Host=rabbitmq
+    networks:
+      - kairo-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Foros - Comunidad y discusiones por evento
+  foros-api:
+    build:
+      context: ../Foros
+      dockerfile: Dockerfile
+    container_name: kairo-foros
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_foros;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Streaming - Centro de transmisiones en vivo
+  streaming-api:
+    build:
+      context: ../Streaming
+      dockerfile: src/Streaming.API/Dockerfile
+    container_name: kairo-streaming
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_streaming;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Marketing - Gestor de promociones y landings
+  marketing-api:
+    build:
+      context: ../Marketing
+      dockerfile: Dockerfile
+    container_name: kairo-marketing
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_marketing;Username=postgres;Password=postgres
+      - RabbitMQ__Host=rabbitmq
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Notificaciones - Sistema de alertas en tiempo real
+  notificaciones-api:
+    build:
+      context: ../Notificaciones
+      dockerfile: Dockerfile
+    container_name: kairo-notificaciones
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - RabbitMQ__Host=rabbitmq
+      - Authentication__Authority=http://keycloak:8080/realms/Kairo
+      # Email Configuration (Reemplazar con credenciales reales o usar Mailtrap/Ethereal para pruebas)
+      - EmailSettings__Host=smtp.ethereal.email
+      - EmailSettings__Puerto=587
+      - EmailSettings__Usuario=wilfred.fadel13@ethereal.email
+      - EmailSettings__Password=wjtxmmnvpgejzKBgvR
+      - EmailSettings__NombreEmisor=Kairo Eventos
+      - EmailSettings__EmailEmisor=no-reply@kairo.com
+      - EmailSettings__UsarSsl=false
+      - UsuariosApi__Url=http://usuarios-api:8080
+    ports:
+      - "5006:8080"
+    networks:
+      - kairo-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+# Volúmenes persistentes
+volumes:
+  postgres_data:
+    name: kairo_postgres_data
+  mongodb_data:
+    name: kairo_mongodb_data
+  rabbitmq_data:
+    name: kairo_rabbitmq_data
+  eventos_images:
+    name: kairo_eventos_images

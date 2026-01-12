@@ -1,0 +1,115 @@
+version: '3.8'
+
+# External network shared by all microservices
+networks:
+  kairo-network:
+    external: true
+    name: kairo-network
+
+services:
+  # Usuarios API - User Management Microservice
+  usuarios-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kairo-usuarios-api
+    restart: unless-stopped
+    environment:
+      # ASP.NET Core Configuration
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      
+      # Database Configuration
+      ConnectionStrings__PostgresConnection: "Host=postgres;Port=5432;Database=kairo_usuarios;Username=postgres;Password=postgres"
+      
+      # Keycloak Configuration
+      Keycloak__Authority: "http://keycloak:8080/realms/Kairo"
+      Keycloak__AdminUrl: "http://keycloak:8080/admin/realms/Kairo"
+      Keycloak__ClientId: "admin-cli"
+      Keycloak__ClientSecret: "your-client-secret-here"
+      Keycloak__Realm: "Kairo"
+      
+      # Logging Configuration
+      Serilog__MinimumLevel__Default: "Information"
+      Serilog__MinimumLevel__Override__Microsoft: "Warning"
+      Serilog__MinimumLevel__Override__System: "Warning"
+    
+    ports:
+      - "8083:8080"
+    
+    networks:
+      - kairo-network
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # PostgreSQL - Shared relational database (reference only - managed by Infraestructura)
+  # This service is defined here for documentation purposes
+  # The actual postgres service is managed in the Infraestructura docker-compose.yml
+  postgres:
+    image: postgres:16-alpine
+    container_name: kairo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kairo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Keycloak - Identity and Access Management (reference only - managed by Infraestructura)
+  # This service is defined here for documentation purposes
+  # The actual keycloak service is managed in the Infraestructura docker-compose.yml
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: kairo-keycloak
+    restart: unless-stopped
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+      KC_HEALTH_ENABLED: true
+    command:
+      - start-dev
+    ports:
+      - "8180:8080"
+    networks:
+      - kairo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+# Persistent volumes
+volumes:
+  postgres_data:
+    name: kairo_postgres_data

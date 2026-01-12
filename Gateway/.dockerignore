@@ -1,0 +1,33 @@
+# Directories
+**/bin/
+**/obj/
+**/out/
+**/logs/
+**/.vs/
+**/.vscode/
+**/.idea/
+
+# Files
+**/*.user
+**/*.suo
+**/*.cache
+**/.DS_Store
+**/Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+**/tests/
+**/*.Test/
+**/*.Tests/
+
+# Build artifacts
+**/publish/
+**/TestResults/

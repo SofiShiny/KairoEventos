@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MassTransit" Version="8.2.0" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.24.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Comunidad.Application\Comunidad.Application.csproj" />
+    <ProjectReference Include="..\Comunidad.Domain\Comunidad.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

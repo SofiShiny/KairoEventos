@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Compilador de Microsoft (R) Visual C#",
+        "version": "5.0.0.0",
+        "fileVersion": "5.0.0-2.25523.111 (b0f34d51)",
+        "semanticVersion": "5.0.0",
+        "language": "es-MX"
+      },
+      "results": [
+        {
+          "ruleId": "CS1501",
+          "level": "error",
+          "message": "Ninguna sobrecarga para el método 'SendAsync' toma 4 argumentos",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/Asientos/backend/src/Services/Asientos/Asientos.Aplicacion/Handlers/ReservarAsientoComandoHandler.cs",
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 14,
+                  "endLine": 40,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CS1061",
+          "level": "error",
+          "message": "\"IClientProxy\" no contiene una definición para \"SendAsync\" ni un método de extensión accesible \"SendAsync\" que acepte un primer argumento del tipo \"IClientProxy\" (¿falta alguna directiva using o una referencia de ensamblado?)",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///C:/Users/sofia/source/repos/Sistema-de-Eventos2/Eventos/Asientos/backend/src/Services/Asientos/Asientos.Aplicacion/Handlers/LiberarAsientoComandoHandler.cs",
+                "region": {
+                  "startLine": 43,
+                  "startColumn": 14,
+                  "endLine": 43,
+                  "endColumn": 23
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "rules": {
+        "CS1061": {
+          "id": "CS1061",
+          "defaultLevel": "error",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS1061)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry",
+              "NotConfigurable"
+            ]
+          }
+        },
+        "CS1501": {
+          "id": "CS1501",
+          "defaultLevel": "error",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS1501)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry",
+              "NotConfigurable"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <!-- Suppress NU1900 warnings globally -->
+    <NoWarn>$(NoWarn);NU1900</NoWarn>
+    
+    <!-- Code Coverage Exclusions for Risk Hotspots Mitigation -->
+    <!-- Exclude generated OpenAPI code from coverage analysis -->
+    <CodeCoverageExcludeByFile>**/Microsoft.AspNetCore.OpenApi.Generated.*</CodeCoverageExcludeByFile>
+    <CodeCoverageExcludeByAttribute>GeneratedCodeAttribute;CompilerGeneratedAttribute</CodeCoverageExcludeByAttribute>
+    
+    <!-- Additional exclusions for auto-generated code -->
+    <ExcludeFromCodeCoverage>
+      Microsoft.AspNetCore.OpenApi.Generated.*;
+      *.Generated.*;
+      **/obj/**;
+      **/bin/**
+    </ExcludeFromCodeCoverage>
+  </PropertyGroup>
+</Project>

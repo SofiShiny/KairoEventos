@@ -1,0 +1,65 @@
+# .dockerignore para Entradas.API
+# Excluir archivos innecesarios del contexto de build
+
+# Directorios de build y output
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Archivos de Visual Studio
+**/.vs/
+**/.vscode/
+*.user
+*.suo
+*.cache
+*.docstates
+
+# Archivos de pruebas y coverage
+**/TestResults/
+**/coverage/
+**/*.trx
+**/*.coverage
+**/*.coveragexml
+
+# Archivos de NuGet
+**/packages/
+**/.nuget/
+
+# Archivos de logs
+**/*.log
+**/logs/
+
+# Archivos temporales
+**/tmp/
+**/temp/
+**/.tmp/
+
+# Archivos de Git
+.git/
+.gitignore
+.gitattributes
+
+# Archivos de documentación
+**/*.md
+**/docs/
+
+# Archivos de configuración local
+**/.env
+**/.env.local
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Archivos de Docker
+**/Dockerfile*
+**/docker-compose*
+**/.dockerignore
+
+# Archivos de sistema
+**/.DS_Store
+**/Thumbs.db
+
+# Archivos de IDE
+**/*.swp
+**/*.swo
+**/*~

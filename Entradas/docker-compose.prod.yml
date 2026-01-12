@@ -1,0 +1,87 @@
+# Docker Compose para producción - Microservicio Entradas.API
+# Configuración optimizada para entorno de producción
+
+version: '3.8'
+
+services:
+  entradas-api:
+    image: entradas-api:latest
+    container_name: entradas-api-prod
+    environment:
+      # Configuración de producción
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      
+      # Configuración de base de datos (usar secrets en producción real)
+      ConnectionStrings__DefaultConnection: "${DATABASE_CONNECTION_STRING}"
+      
+      # Configuración de RabbitMQ
+      RabbitMQ__Host: "${RABBITMQ_HOST}"
+      RabbitMQ__Port: "${RABBITMQ_PORT:-5672}"
+      RabbitMQ__Username: "${RABBITMQ_USERNAME}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+      RabbitMQ__VirtualHost: "${RABBITMQ_VHOST:-/}"
+      
+      # Configuración de servicios externos
+      ServiciosExternos__EventosApi__BaseUrl: "${EVENTOS_API_URL}"
+      ServiciosExternos__AsientosApi__BaseUrl: "${ASIENTOS_API_URL}"
+      ServiciosExternos__Timeout: "${EXTERNAL_SERVICES_TIMEOUT:-30}"
+      
+      # Configuración de logging para producción
+      Serilog__MinimumLevel__Default: Information
+      Serilog__MinimumLevel__Override__Microsoft: Warning
+      Serilog__MinimumLevel__Override__System: Warning
+      Serilog__WriteTo__0__Name: Console
+      Serilog__WriteTo__0__Args__outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+      
+      # Configuración de seguridad
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+      
+      # Configuración de health checks
+      HealthChecks__Enabled: true
+      
+    ports:
+      - "8080:8080"
+    
+    # Recursos limitados para producción
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    
+    # Health check optimizado para producción
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Configuración de logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    networks:
+      - entradas-network
+    
+    restart: unless-stopped
+
+# Red para producción con configuración específica
+networks:
+  entradas-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

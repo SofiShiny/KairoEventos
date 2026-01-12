@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  comunidad-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comunidad-api
+    ports:
+      - "5007:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__MongoDB=mongodb://mongodb:27017
+      - MongoDB__DatabaseName=ComunidadDB
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    depends_on:
+      - mongodb
+      - rabbitmq
+    networks:
+      - kairo-network
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7.0
+    container_name: comunidad-mongodb
+    ports:
+      - "27020:27017"
+    volumes:
+      - comunidad-mongodb-data:/data/db
+    networks:
+      - kairo-network
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: comunidad-rabbitmq
+    ports:
+      - "5675:5672"
+      - "15675:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - comunidad-rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - kairo-network
+    restart: unless-stopped
+
+volumes:
+  comunidad-mongodb-data:
+    driver: local
+  comunidad-rabbitmq-data:
+    driver: local
+
+networks:
+  kairo-network:
+    external: true

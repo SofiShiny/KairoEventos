@@ -1,0 +1,44 @@
+## [Visual Studio]
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+## [Visual Studio Code]
+.vscode/
+
+## [.NET]
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## [Test Results & Coverage]
+TestResults/
+testresults/
+coverageresults/
+*.Coverlet.MSbuild.Props
+
+## [OS]
+Thumbs.db
+ehthumbs.db
+Desktop.ini

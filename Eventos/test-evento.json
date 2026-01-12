@@ -1,0 +1,13 @@
+{
+  "titulo": "Evento de Prueba RabbitMQ",
+  "descripcion": "Verificando integracion con RabbitMQ",
+  "ubicacion": {
+    "nombreLugar": "Centro de Convenciones",
+    "direccion": "Av. Principal 123",
+    "ciudad": "Ciudad de Prueba",
+    "pais": "Pais de Prueba"
+  },
+  "fechaInicio": "2026-02-15T10:00:00Z",
+  "fechaFin": "2026-02-15T18:00:00Z",
+  "maximoAsistentes": 100
+}

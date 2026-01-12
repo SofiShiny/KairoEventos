@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
+    <Exclude>[Asientos.Infraestructura]Asientos.Infraestructura.Migrations.*</Exclude>
+  </PropertyGroup>
+</Project>

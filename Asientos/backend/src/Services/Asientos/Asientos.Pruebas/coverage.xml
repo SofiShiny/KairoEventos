@@ -1,0 +1,1884 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0.99" branch-rate="0.9186" version="1.9" timestamp="1768171466" lines-covered="396" lines-valid="400" branches-covered="79" branches-valid="86">
+  <sources>
+    <source>C:\Users\sofia\source\repos\Sistema-de-Eventos2\Eventos\Asientos\backend\src\Services\Asientos\</source>
+  </sources>
+  <packages>
+    <package name="Asientos.Aplicacion" line-rate="1" branch-rate="0.95" complexity="50">
+      <classes>
+        <class name="Asientos.Aplicacion.Queries.ObtenerMapaAsientosQuery" filename="Asientos.Aplicacion\Queries\ObtenerMapaAsientosQuery.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="5" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="5" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Queries.MapaAsientosDto" filename="Asientos.Aplicacion\Queries\ObtenerMapaAsientosQuery.cs" line-rate="1" branch-rate="1" complexity="5">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="get_EventoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Categorias" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Asientos" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="6" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Guid,System.Collections.Generic.List`1&lt;Asientos.Aplicacion.Queries.CategoriaDto&gt;,System.Collections.Generic.List`1&lt;Asientos.Aplicacion.Queries.AsientoDto&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="1" branch="False" />
+                <line number="12" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="8" hits="1" branch="False" />
+            <line number="9" hits="1" branch="False" />
+            <line number="10" hits="2" branch="False" />
+            <line number="11" hits="6" branch="False" />
+            <line number="7" hits="1" branch="False" />
+            <line number="12" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Queries.CategoriaDto" filename="Asientos.Aplicacion\Queries\ObtenerMapaAsientosQuery.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_Nombre" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="5" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="14" hits="5" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Queries.AsientoDto" filename="Asientos.Aplicacion\Queries\ObtenerMapaAsientosQuery.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="14" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="15" hits="14" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Queries.ObtenerMapaAsientosQueryHandler" filename="Asientos.Aplicacion\Queries\ObtenerMapaAsientosQueryHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Dominio.Repositorios.IRepositorioMapaAsientos)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="4" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="10" hits="4" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Queries.ObtenerMapaAsientosQueryHandler/&lt;&gt;c" filename="Asientos.Aplicacion\Queries\ObtenerMapaAsientosQueryHandler.cs" line-rate="1" branch-rate="1" complexity="5">
+          <methods>
+            <method name="&lt;Handle&gt;b__2_0" signature="(Asientos.Dominio.Entidades.Asiento)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="18" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="&lt;Handle&gt;b__2_1" signature="(Asientos.Aplicacion.Queries.AsientoDto)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="&lt;Handle&gt;b__2_2" signature="(Asientos.Aplicacion.Queries.AsientoDto)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="&lt;Handle&gt;b__2_3" signature="(Asientos.Dominio.ObjetosDeValor.CategoriaAsiento)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="24" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="&lt;Handle&gt;b__2_4" signature="(Asientos.Aplicacion.Queries.CategoriaDto)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="25" hits="2" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="18" hits="3" branch="False" />
+            <line number="19" hits="3" branch="False" />
+            <line number="20" hits="3" branch="False" />
+            <line number="24" hits="2" branch="False" />
+            <line number="25" hits="2" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Queries.ObtenerMapaAsientosQueryHandler/&lt;Handle&gt;d__2" filename="Asientos.Aplicacion\Queries\ObtenerMapaAsientosQueryHandler.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="13" hits="2" branch="False" />
+                <line number="14" hits="2" branch="False" />
+                <line number="15" hits="3" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="175" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="17" hits="1" branch="False" />
+                <line number="21" hits="1" branch="False" />
+                <line number="23" hits="1" branch="False" />
+                <line number="26" hits="1" branch="False" />
+                <line number="28" hits="1" branch="False" />
+                <line number="29" hits="2" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="13" hits="2" branch="False" />
+            <line number="14" hits="2" branch="False" />
+            <line number="15" hits="3" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="175" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="17" hits="1" branch="False" />
+            <line number="21" hits="1" branch="False" />
+            <line number="23" hits="1" branch="False" />
+            <line number="26" hits="1" branch="False" />
+            <line number="28" hits="1" branch="False" />
+            <line number="29" hits="2" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Hubs.AsientosHub/&lt;JoinEvento&gt;d__0" filename="Asientos.Aplicacion\Hubs\AsientosHub.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="1" branch="False" />
+                <line number="10" hits="1" branch="False" />
+                <line number="11" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="9" hits="1" branch="False" />
+            <line number="10" hits="1" branch="False" />
+            <line number="11" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Hubs.AsientosHub/&lt;LeaveEvento&gt;d__1" filename="Asientos.Aplicacion\Hubs\AsientosHub.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="1" branch="False" />
+                <line number="15" hits="1" branch="False" />
+                <line number="16" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="14" hits="1" branch="False" />
+            <line number="15" hits="1" branch="False" />
+            <line number="16" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.AgregarAsientoComandoHandler" filename="Asientos.Aplicacion\Handlers\AgregarAsientoComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Dominio.Repositorios.IRepositorioMapaAsientos,MassTransit.IPublishEndpoint)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="7" branch="False" />
+                <line number="15" hits="7" branch="False" />
+                <line number="16" hits="7" branch="False" />
+                <line number="17" hits="7" branch="False" />
+                <line number="18" hits="7" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="14" hits="7" branch="False" />
+            <line number="15" hits="7" branch="False" />
+            <line number="16" hits="7" branch="False" />
+            <line number="17" hits="7" branch="False" />
+            <line number="18" hits="7" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.AgregarAsientoComandoHandler/&lt;Handle&gt;d__3" filename="Asientos.Aplicacion\Handlers\AgregarAsientoComandoHandler.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="21" hits="8" branch="False" />
+                <line number="22" hits="8" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="176" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="23" hits="7" branch="False" />
+                <line number="26" hits="6" branch="False" />
+                <line number="29" hits="6" branch="False" />
+                <line number="31" hits="6" branch="False" />
+                <line number="32" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="21" hits="8" branch="False" />
+            <line number="22" hits="8" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="176" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="23" hits="7" branch="False" />
+            <line number="26" hits="6" branch="False" />
+            <line number="29" hits="6" branch="False" />
+            <line number="31" hits="6" branch="False" />
+            <line number="32" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.AgregarCategoriaComandoHandler" filename="Asientos.Aplicacion\Handlers\AgregarCategoriaComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Dominio.Repositorios.IRepositorioMapaAsientos,MassTransit.IPublishEndpoint)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="6" branch="False" />
+                <line number="15" hits="6" branch="False" />
+                <line number="16" hits="6" branch="False" />
+                <line number="17" hits="6" branch="False" />
+                <line number="18" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="14" hits="6" branch="False" />
+            <line number="15" hits="6" branch="False" />
+            <line number="16" hits="6" branch="False" />
+            <line number="17" hits="6" branch="False" />
+            <line number="18" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.AgregarCategoriaComandoHandler/&lt;Handle&gt;d__3" filename="Asientos.Aplicacion\Handlers\AgregarCategoriaComandoHandler.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="21" hits="6" branch="False" />
+                <line number="22" hits="6" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="176" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="23" hits="5" branch="False" />
+                <line number="24" hits="5" branch="False" />
+                <line number="27" hits="5" branch="False" />
+                <line number="29" hits="5" branch="False" />
+                <line number="30" hits="5" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="21" hits="6" branch="False" />
+            <line number="22" hits="6" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="176" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="23" hits="5" branch="False" />
+            <line number="24" hits="5" branch="False" />
+            <line number="27" hits="5" branch="False" />
+            <line number="29" hits="5" branch="False" />
+            <line number="30" hits="5" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.CrearMapaAsientosComandoHandler" filename="Asientos.Aplicacion\Handlers\CrearMapaAsientosComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Dominio.Repositorios.IRepositorioMapaAsientos,MassTransit.IPublishEndpoint)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="9" branch="False" />
+                <line number="16" hits="9" branch="False" />
+                <line number="17" hits="9" branch="False" />
+                <line number="18" hits="9" branch="False" />
+                <line number="19" hits="9" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="15" hits="9" branch="False" />
+            <line number="16" hits="9" branch="False" />
+            <line number="17" hits="9" branch="False" />
+            <line number="18" hits="9" branch="False" />
+            <line number="19" hits="9" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.CrearMapaAsientosComandoHandler/&lt;Handle&gt;d__3" filename="Asientos.Aplicacion\Handlers\CrearMapaAsientosComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="22" hits="9" branch="False" />
+                <line number="23" hits="9" branch="False" />
+                <line number="24" hits="9" branch="False" />
+                <line number="27" hits="9" branch="False" />
+                <line number="29" hits="9" branch="False" />
+                <line number="30" hits="9" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="22" hits="9" branch="False" />
+            <line number="23" hits="9" branch="False" />
+            <line number="24" hits="9" branch="False" />
+            <line number="27" hits="9" branch="False" />
+            <line number="29" hits="9" branch="False" />
+            <line number="30" hits="9" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.LiberarAsientoComandoHandler" filename="Asientos.Aplicacion\Handlers\LiberarAsientoComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Dominio.Repositorios.IRepositorioMapaAsientos,MassTransit.IPublishEndpoint,Microsoft.AspNetCore.SignalR.IHubContext`1&lt;Asientos.Aplicacion.Hubs.AsientosHub&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="3" branch="False" />
+                <line number="21" hits="3" branch="False" />
+                <line number="22" hits="3" branch="False" />
+                <line number="23" hits="3" branch="False" />
+                <line number="24" hits="3" branch="False" />
+                <line number="25" hits="3" branch="False" />
+                <line number="26" hits="3" branch="False" />
+                <line number="27" hits="3" branch="False" />
+                <line number="28" hits="3" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="20" hits="3" branch="False" />
+            <line number="21" hits="3" branch="False" />
+            <line number="22" hits="3" branch="False" />
+            <line number="23" hits="3" branch="False" />
+            <line number="24" hits="3" branch="False" />
+            <line number="25" hits="3" branch="False" />
+            <line number="26" hits="3" branch="False" />
+            <line number="27" hits="3" branch="False" />
+            <line number="28" hits="3" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.LiberarAsientoComandoHandler/&lt;&gt;c__DisplayClass4_0" filename="Asientos.Aplicacion\Handlers\LiberarAsientoComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="&lt;Handle&gt;b__0" signature="(Asientos.Dominio.Entidades.Asiento)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="35" hits="4" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="35" hits="4" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.LiberarAsientoComandoHandler/&lt;Handle&gt;d__4" filename="Asientos.Aplicacion\Handlers\LiberarAsientoComandoHandler.cs" line-rate="1" branch-rate="0.75" complexity="4">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="0.75" complexity="4">
+              <lines>
+                <line number="31" hits="3" branch="False" />
+                <line number="32" hits="3" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="221" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="33" hits="3" branch="False" />
+                <line number="36" hits="2" branch="False" />
+                <line number="38" hits="2" branch="False" />
+                <line number="40" hits="2" branch="False" />
+                <line number="43" hits="2" branch="False" />
+                <line number="44" hits="2" branch="False" />
+                <line number="46" hits="2" branch="False" />
+                <line number="48" hits="2" branch="False" />
+                <line number="49" hits="2" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="31" hits="3" branch="False" />
+            <line number="32" hits="3" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="221" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="33" hits="3" branch="False" />
+            <line number="36" hits="2" branch="False" />
+            <line number="38" hits="2" branch="False" />
+            <line number="40" hits="2" branch="False" />
+            <line number="43" hits="2" branch="False" />
+            <line number="44" hits="2" branch="False" />
+            <line number="46" hits="2" branch="False" />
+            <line number="48" hits="2" branch="False" />
+            <line number="49" hits="2" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.ReservarAsientoComandoHandler" filename="Asientos.Aplicacion\Handlers\ReservarAsientoComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Dominio.Repositorios.IRepositorioMapaAsientos,MassTransit.IPublishEndpoint,Microsoft.AspNetCore.SignalR.IHubContext`1&lt;Asientos.Aplicacion.Hubs.AsientosHub&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="4" branch="False" />
+                <line number="21" hits="4" branch="False" />
+                <line number="22" hits="4" branch="False" />
+                <line number="23" hits="4" branch="False" />
+                <line number="24" hits="4" branch="False" />
+                <line number="25" hits="4" branch="False" />
+                <line number="26" hits="4" branch="False" />
+                <line number="27" hits="4" branch="False" />
+                <line number="28" hits="4" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="20" hits="4" branch="False" />
+            <line number="21" hits="4" branch="False" />
+            <line number="22" hits="4" branch="False" />
+            <line number="23" hits="4" branch="False" />
+            <line number="24" hits="4" branch="False" />
+            <line number="25" hits="4" branch="False" />
+            <line number="26" hits="4" branch="False" />
+            <line number="27" hits="4" branch="False" />
+            <line number="28" hits="4" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.ReservarAsientoComandoHandler/&lt;&gt;c__DisplayClass4_0" filename="Asientos.Aplicacion\Handlers\ReservarAsientoComandoHandler.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="&lt;Handle&gt;b__0" signature="(Asientos.Dominio.Entidades.Asiento)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="46" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="46" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Handlers.ReservarAsientoComandoHandler/&lt;Handle&gt;d__4" filename="Asientos.Aplicacion\Handlers\ReservarAsientoComandoHandler.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="31" hits="4" branch="False" />
+                <line number="32" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="221" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="33" hits="4" branch="False" />
+                <line number="35" hits="3" branch="False" />
+                <line number="37" hits="3" branch="False" />
+                <line number="40" hits="3" branch="False" />
+                <line number="41" hits="3" branch="False" />
+                <line number="47" hits="3" branch="False" />
+                <line number="49" hits="3" branch="False" />
+                <line number="50" hits="3" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="31" hits="4" branch="False" />
+            <line number="32" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="221" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="33" hits="4" branch="False" />
+            <line number="35" hits="3" branch="False" />
+            <line number="37" hits="3" branch="False" />
+            <line number="40" hits="3" branch="False" />
+            <line number="41" hits="3" branch="False" />
+            <line number="47" hits="3" branch="False" />
+            <line number="49" hits="3" branch="False" />
+            <line number="50" hits="3" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Consumers.ReservaCanceladaConsumer" filename="Asientos.Aplicacion\Consumers\ReservaCanceladaConsumer.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Dominio.Repositorios.IRepositorioMapaAsientos,Microsoft.Extensions.Logging.ILogger`1&lt;Asientos.Aplicacion.Consumers.ReservaCanceladaConsumer&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="5" branch="False" />
+                <line number="16" hits="5" branch="False" />
+                <line number="17" hits="5" branch="False" />
+                <line number="18" hits="5" branch="False" />
+                <line number="19" hits="5" branch="False" />
+                <line number="20" hits="5" branch="False" />
+                <line number="21" hits="5" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="15" hits="5" branch="False" />
+            <line number="16" hits="5" branch="False" />
+            <line number="17" hits="5" branch="False" />
+            <line number="18" hits="5" branch="False" />
+            <line number="19" hits="5" branch="False" />
+            <line number="20" hits="5" branch="False" />
+            <line number="21" hits="5" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Consumers.ReservaCanceladaConsumer/&lt;Consume&gt;d__3" filename="Asientos.Aplicacion\Consumers\ReservaCanceladaConsumer.cs" line-rate="1" branch-rate="1" complexity="8">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="8">
+              <lines>
+                <line number="24" hits="5" branch="False" />
+                <line number="25" hits="5" branch="False" />
+                <line number="26" hits="5" branch="False" />
+                <line number="27" hits="5" branch="False" />
+                <line number="29" hits="5" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="150" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="30" hits="1" branch="False" />
+                <line number="31" hits="1" branch="False" />
+                <line number="32" hits="1" branch="False" />
+                <line number="35" hits="4" branch="False" />
+                <line number="37" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="359" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="38" hits="1" branch="False" />
+                <line number="39" hits="1" branch="False" />
+                <line number="40" hits="1" branch="False" />
+                <line number="43" hits="3" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="432" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="44" hits="1" branch="False" />
+                <line number="45" hits="1" branch="False" />
+                <line number="46" hits="1" branch="False" />
+                <line number="50" hits="2" branch="False" />
+                <line number="52" hits="2" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="656" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="53" hits="1" branch="False" />
+                <line number="54" hits="1" branch="False" />
+                <line number="55" hits="1" branch="False" />
+                <line number="58" hits="1" branch="False" />
+                <line number="60" hits="1" branch="False" />
+                <line number="62" hits="1" branch="False" />
+                <line number="64" hits="1" branch="False" />
+                <line number="65" hits="5" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="24" hits="5" branch="False" />
+            <line number="25" hits="5" branch="False" />
+            <line number="26" hits="5" branch="False" />
+            <line number="27" hits="5" branch="False" />
+            <line number="29" hits="5" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="150" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="30" hits="1" branch="False" />
+            <line number="31" hits="1" branch="False" />
+            <line number="32" hits="1" branch="False" />
+            <line number="35" hits="4" branch="False" />
+            <line number="37" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="359" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="38" hits="1" branch="False" />
+            <line number="39" hits="1" branch="False" />
+            <line number="40" hits="1" branch="False" />
+            <line number="43" hits="3" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="432" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="44" hits="1" branch="False" />
+            <line number="45" hits="1" branch="False" />
+            <line number="46" hits="1" branch="False" />
+            <line number="50" hits="2" branch="False" />
+            <line number="52" hits="2" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="656" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="53" hits="1" branch="False" />
+            <line number="54" hits="1" branch="False" />
+            <line number="55" hits="1" branch="False" />
+            <line number="58" hits="1" branch="False" />
+            <line number="60" hits="1" branch="False" />
+            <line number="62" hits="1" branch="False" />
+            <line number="64" hits="1" branch="False" />
+            <line number="65" hits="5" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Comandos.AgregarAsientoComando" filename="Asientos.Aplicacion\Comandos\AgregarAsientoComando.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="5" hits="61" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="5" hits="61" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Comandos.AgregarCategoriaComando" filename="Asientos.Aplicacion\Comandos\AgregarCategoriaComando.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="5" hits="37" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="5" hits="37" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Comandos.CrearMapaAsientosComando" filename="Asientos.Aplicacion\Comandos\CrearMapaAsientosComando.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_EventoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="5" hits="27" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="5" hits="27" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Comandos.LiberarAsientoComando" filename="Asientos.Aplicacion\Comandos\LiberarAsientoComando.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="6" hits="14" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="6" hits="14" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Aplicacion.Comandos.ReservarAsientoComando" filename="Asientos.Aplicacion\Comandos\ReservarAsientoComando.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="6" hits="26" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="6" hits="26" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="Asientos.Dominio" line-rate="0.9838" branch-rate="0.9037999999999999" complexity="104">
+      <classes>
+        <class name="Entradas.Dominio.Eventos.ReservaCanceladaEvento" filename="Asientos.Dominio\EventosIntegracion\ReservaCanceladaEvento.cs" line-rate="0.5714" branch-rate="1" complexity="6">
+          <methods>
+            <method name="get_EntradaId" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_AsientoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="17" branch="False" />
+              </lines>
+            </method>
+            <method name="get_EventoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="get_UsuarioId" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_FechaCancelacion" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Nullable`1&lt;System.Guid&gt;,System.Guid,System.Guid,System.DateTime)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="5" branch="False" />
+                <line number="14" hits="5" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="9" hits="0" branch="False" />
+            <line number="10" hits="17" branch="False" />
+            <line number="11" hits="5" branch="False" />
+            <line number="12" hits="0" branch="False" />
+            <line number="13" hits="0" branch="False" />
+            <line number="8" hits="5" branch="False" />
+            <line number="14" hits="5" branch="False" />
+          </lines>
+        </class>
+        <class name="BloquesConstruccion.Dominio.Entidad" filename="Asientos.Dominio\BloquesConstruccion\Entidad.cs" line-rate="1" branch-rate="1" complexity="10">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="5" hits="298" branch="False" />
+              </lines>
+            </method>
+            <method name="Equals" signature="(System.Object)" line-rate="1" branch-rate="1" complexity="8">
+              <lines>
+                <line number="8" hits="6" branch="False" />
+                <line number="9" hits="7" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="10" hits="6" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="29" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="11" hits="6" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="51" type="jump" coverage="100%" />
+                    <condition number="76" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="12" hits="2" branch="False" />
+                <line number="13" hits="6" branch="False" />
+              </lines>
+            </method>
+            <method name="GetHashCode" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="6" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="5" hits="298" branch="False" />
+            <line number="8" hits="6" branch="False" />
+            <line number="9" hits="7" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="10" hits="6" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="29" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="11" hits="6" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="51" type="jump" coverage="100%" />
+                <condition number="76" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="12" hits="2" branch="False" />
+            <line number="13" hits="6" branch="False" />
+            <line number="15" hits="6" branch="False" />
+          </lines>
+        </class>
+        <class name="BloquesConstruccion.Dominio.EventoDominio" filename="Asientos.Dominio\BloquesConstruccion\EventoDominio.cs" line-rate="1" branch-rate="1" complexity="3">
+          <methods>
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="5" hits="146" branch="False" />
+              </lines>
+            </method>
+            <method name="get_OcurrioEn" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="6" hits="146" branch="False" />
+              </lines>
+            </method>
+            <method name="get_IdAgregado" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="154" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="5" hits="146" branch="False" />
+            <line number="6" hits="146" branch="False" />
+            <line number="7" hits="154" branch="False" />
+          </lines>
+        </class>
+        <class name="BloquesConstruccion.Dominio.ObjetoValor" filename="Asientos.Dominio\BloquesConstruccion\ObjetoValor.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="Equals" signature="(System.Object)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="7" hits="4" branch="False" />
+                <line number="8" hits="5" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="17" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="9" hits="3" branch="False" />
+                <line number="10" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="GetHashCode" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="12" hits="5" branch="False" />
+                <line number="13" hits="5" branch="False" />
+                <line number="14" hits="15" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="2" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="15" hits="5" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="7" hits="4" branch="False" />
+            <line number="8" hits="5" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="17" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="9" hits="3" branch="False" />
+            <line number="10" hits="4" branch="False" />
+            <line number="12" hits="5" branch="False" />
+            <line number="13" hits="5" branch="False" />
+            <line number="14" hits="15" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="2" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="15" hits="5" branch="False" />
+          </lines>
+        </class>
+        <class name="BloquesConstruccion.Dominio.RaizAgregada" filename="Asientos.Dominio\BloquesConstruccion\RaizAgregada.cs" line-rate="1" branch-rate="1" complexity="3">
+          <methods>
+            <method name="get_Eventos" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="6" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="GenerarEventoDominio" signature="(BloquesConstruccion.Dominio.EventoDominio)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="83" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="5" hits="35" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="6" hits="4" branch="False" />
+            <line number="7" hits="83" branch="False" />
+            <line number="5" hits="35" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.ObjetosDeValor.CategoriaAsiento" filename="Asientos.Dominio\ObjetosDeValor\CategoriaAsiento.cs" line-rate="1" branch-rate="1" complexity="7">
+          <methods>
+            <method name="get_Nombre" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="69" branch="False" />
+              </lines>
+            </method>
+            <method name="get_PrecioBase" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="24" branch="False" />
+              </lines>
+            </method>
+            <method name="get_TienePrioridad" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name="Crear" signature="(System.String,System.Nullable`1&lt;System.Decimal&gt;,System.Boolean)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="21" hits="53" branch="False" />
+                <line number="22" hits="56" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="9" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="23" hits="50" branch="False" />
+                <line number="24" hits="50" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="24" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.String,System.Nullable`1&lt;System.Decimal&gt;,System.Boolean)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="50" branch="False" />
+                <line number="14" hits="50" branch="False" />
+                <line number="15" hits="50" branch="False" />
+                <line number="16" hits="50" branch="False" />
+                <line number="17" hits="50" branch="False" />
+                <line number="18" hits="50" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="7" hits="69" branch="False" />
+            <line number="8" hits="24" branch="False" />
+            <line number="9" hits="22" branch="False" />
+            <line number="21" hits="53" branch="False" />
+            <line number="22" hits="56" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="9" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="23" hits="50" branch="False" />
+            <line number="24" hits="50" branch="False" />
+            <line number="11" hits="24" branch="False" />
+            <line number="13" hits="50" branch="False" />
+            <line number="14" hits="50" branch="False" />
+            <line number="15" hits="50" branch="False" />
+            <line number="16" hits="50" branch="False" />
+            <line number="17" hits="50" branch="False" />
+            <line number="18" hits="50" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.ObjetosDeValor.CategoriaAsiento/&lt;ObtenerComponentesDeIgualdad&gt;d__12" filename="Asientos.Dominio\ObjetosDeValor\CategoriaAsiento.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="27" hits="4" branch="False" />
+                <line number="28" hits="4" branch="False" />
+                <line number="29" hits="2" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="27" hits="4" branch="False" />
+            <line number="28" hits="4" branch="False" />
+            <line number="29" hits="2" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.EventosDominio.AsientoAgregadoEventoDominio" filename="Asientos.Dominio\EventosDominio\AsientoAgregadoEventoDominio.cs" line-rate="1" branch-rate="1" complexity="5">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="10" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Fila" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Numero" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="8" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Categoria" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="7" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Int32,System.Int32,System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="30" branch="False" />
+                <line number="13" hits="30" branch="False" />
+                <line number="14" hits="30" branch="False" />
+                <line number="15" hits="30" branch="False" />
+                <line number="16" hits="30" branch="False" />
+                <line number="17" hits="30" branch="False" />
+                <line number="18" hits="30" branch="False" />
+                <line number="19" hits="30" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="7" hits="10" branch="False" />
+            <line number="8" hits="8" branch="False" />
+            <line number="9" hits="8" branch="False" />
+            <line number="10" hits="7" branch="False" />
+            <line number="12" hits="30" branch="False" />
+            <line number="13" hits="30" branch="False" />
+            <line number="14" hits="30" branch="False" />
+            <line number="15" hits="30" branch="False" />
+            <line number="16" hits="30" branch="False" />
+            <line number="17" hits="30" branch="False" />
+            <line number="18" hits="30" branch="False" />
+            <line number="19" hits="30" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.EventosDominio.AsientoLiberadoEventoDominio" filename="Asientos.Dominio\EventosDominio\AsientoLiberadoEventoDominio.cs" line-rate="1" branch-rate="1" complexity="5">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="get_AsientoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Fila" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Numero" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="4" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Guid,System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="10" branch="False" />
+                <line number="13" hits="10" branch="False" />
+                <line number="14" hits="10" branch="False" />
+                <line number="15" hits="10" branch="False" />
+                <line number="16" hits="10" branch="False" />
+                <line number="17" hits="10" branch="False" />
+                <line number="18" hits="10" branch="False" />
+                <line number="19" hits="10" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="7" hits="5" branch="False" />
+            <line number="8" hits="1" branch="False" />
+            <line number="9" hits="4" branch="False" />
+            <line number="10" hits="4" branch="False" />
+            <line number="12" hits="10" branch="False" />
+            <line number="13" hits="10" branch="False" />
+            <line number="14" hits="10" branch="False" />
+            <line number="15" hits="10" branch="False" />
+            <line number="16" hits="10" branch="False" />
+            <line number="17" hits="10" branch="False" />
+            <line number="18" hits="10" branch="False" />
+            <line number="19" hits="10" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.EventosDominio.AsientoReservadoEventoDominio" filename="Asientos.Dominio\EventosDominio\AsientoReservadoEventoDominio.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Fila" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Numero" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="14" branch="False" />
+                <line number="12" hits="14" branch="False" />
+                <line number="13" hits="14" branch="False" />
+                <line number="14" hits="14" branch="False" />
+                <line number="15" hits="14" branch="False" />
+                <line number="16" hits="14" branch="False" />
+                <line number="17" hits="14" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="7" hits="5" branch="False" />
+            <line number="8" hits="5" branch="False" />
+            <line number="9" hits="5" branch="False" />
+            <line number="11" hits="14" branch="False" />
+            <line number="12" hits="14" branch="False" />
+            <line number="13" hits="14" branch="False" />
+            <line number="14" hits="14" branch="False" />
+            <line number="15" hits="14" branch="False" />
+            <line number="16" hits="14" branch="False" />
+            <line number="17" hits="14" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.EventosDominio.CategoriaAgregadaEventoDominio" filename="Asientos.Dominio\EventosDominio\CategoriaAgregadaEventoDominio.cs" line-rate="1" branch-rate="1" complexity="3">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name="get_NombreCategoria" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="5" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="28" branch="False" />
+                <line number="11" hits="28" branch="False" />
+                <line number="12" hits="28" branch="False" />
+                <line number="13" hits="28" branch="False" />
+                <line number="14" hits="28" branch="False" />
+                <line number="15" hits="28" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="7" hits="5" branch="False" />
+            <line number="8" hits="5" branch="False" />
+            <line number="10" hits="28" branch="False" />
+            <line number="11" hits="28" branch="False" />
+            <line number="12" hits="28" branch="False" />
+            <line number="13" hits="28" branch="False" />
+            <line number="14" hits="28" branch="False" />
+            <line number="15" hits="28" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.EventosDominio.MapaAsientosCreadoEventoDominio" filename="Asientos.Dominio\EventosDominio\MapaAsientosCreadoEventoDominio.cs" line-rate="1" branch-rate="1" complexity="3">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="7" hits="9" branch="False" />
+              </lines>
+            </method>
+            <method name="get_EventoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="8" hits="7" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Guid)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="44" branch="False" />
+                <line number="11" hits="44" branch="False" />
+                <line number="12" hits="44" branch="False" />
+                <line number="13" hits="44" branch="False" />
+                <line number="14" hits="44" branch="False" />
+                <line number="15" hits="44" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="7" hits="9" branch="False" />
+            <line number="8" hits="7" branch="False" />
+            <line number="10" hits="44" branch="False" />
+            <line number="11" hits="44" branch="False" />
+            <line number="12" hits="44" branch="False" />
+            <line number="13" hits="44" branch="False" />
+            <line number="14" hits="44" branch="False" />
+            <line number="15" hits="44" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.Entidades.Asiento" filename="Asientos.Dominio\Entidades\Asiento.cs" line-rate="1" branch-rate="0.7142000000000001" complexity="22">
+          <methods>
+            <method name="get_MapaId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="26" branch="False" />
+              </lines>
+            </method>
+            <method name="get_EventoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="23" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Fila" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="11" hits="52" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Numero" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="50" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Categoria" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="32" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Reservado" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="75" branch="False" />
+              </lines>
+            </method>
+            <method name="get_UsuarioId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="16" branch="False" />
+              </lines>
+            </method>
+            <method name="Reservar" signature="(System.Nullable`1&lt;System.Guid&gt;)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="44" hits="11" branch="False" />
+                <line number="45" hits="12" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="9" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="46" hits="10" branch="False" />
+                <line number="47" hits="10" branch="False" />
+                <line number="48" hits="10" branch="False" />
+              </lines>
+            </method>
+            <method name="Liberar" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="51" hits="6" branch="False" />
+                <line number="52" hits="7" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="12" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="53" hits="5" branch="False" />
+                <line number="54" hits="5" branch="False" />
+                <line number="55" hits="6" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Guid,System.Int32,System.Int32,Asientos.Dominio.ObjetosDeValor.CategoriaAsiento)" line-rate="1" branch-rate="0.6" complexity="10">
+              <lines>
+                <line number="24" hits="23" branch="False" />
+                <line number="25" hits="23" branch="False" />
+                <line number="26" hits="23" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="21" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="27" hits="23" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="52" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="28" hits="23" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="76" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="29" hits="23" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="101" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="31" hits="23" branch="False" />
+                <line number="32" hits="23" branch="False" />
+                <line number="33" hits="23" branch="False" />
+                <line number="34" hits="23" branch="False" />
+                <line number="35" hits="23" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="156" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="36" hits="22" branch="False" />
+                <line number="37" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid,System.Guid,System.Int32,System.Int32,Asientos.Dominio.ObjetosDeValor.CategoriaAsiento,System.Boolean)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="41" hits="12" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="9" hits="26" branch="False" />
+            <line number="10" hits="23" branch="False" />
+            <line number="11" hits="52" branch="False" />
+            <line number="12" hits="50" branch="False" />
+            <line number="13" hits="32" branch="False" />
+            <line number="14" hits="75" branch="False" />
+            <line number="15" hits="16" branch="False" />
+            <line number="44" hits="11" branch="False" />
+            <line number="45" hits="12" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="9" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="46" hits="10" branch="False" />
+            <line number="47" hits="10" branch="False" />
+            <line number="48" hits="10" branch="False" />
+            <line number="51" hits="6" branch="False" />
+            <line number="52" hits="7" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="12" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="53" hits="5" branch="False" />
+            <line number="54" hits="5" branch="False" />
+            <line number="55" hits="6" branch="False" />
+            <line number="24" hits="23" branch="False" />
+            <line number="25" hits="23" branch="False" />
+            <line number="26" hits="23" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="21" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="27" hits="23" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="52" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="28" hits="23" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="76" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="29" hits="23" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="101" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="31" hits="23" branch="False" />
+            <line number="32" hits="23" branch="False" />
+            <line number="33" hits="23" branch="False" />
+            <line number="34" hits="23" branch="False" />
+            <line number="35" hits="23" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="156" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="36" hits="22" branch="False" />
+            <line number="37" hits="22" branch="False" />
+            <line number="41" hits="12" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Dominio.Agregados.MapaAsientos" filename="Asientos.Dominio\Agregados\MapaAsientos.cs" line-rate="1" branch-rate="0.9582999999999999" complexity="28">
+          <methods>
+            <method name="get_EventoId" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="54" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Asientos" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="16" hits="11" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Categorias" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="17" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="Crear" signature="(System.Guid)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="30" branch="False" />
+                <line number="32" hits="30" branch="False" />
+                <line number="33" hits="29" branch="False" />
+              </lines>
+            </method>
+            <method name="AgregarAsiento" signature="(System.Int32,System.Int32,System.String)" line-rate="1" branch-rate="1" complexity="6">
+              <lines>
+                <line number="36" hits="20" branch="False" />
+                <line number="37" hits="40" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="52" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="38" hits="20" branch="False" />
+                <line number="40" hits="24" branch="True" condition-coverage="100% (4/4)">
+                  <conditions>
+                    <condition number="92" type="jump" coverage="100%" />
+                    <condition number="12" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="41" hits="1" branch="False" />
+                <line number="43" hits="18" branch="False" />
+                <line number="44" hits="18" branch="False" />
+                <line number="45" hits="18" branch="False" />
+                <line number="46" hits="18" branch="False" />
+                <line number="47" hits="18" branch="False" />
+              </lines>
+            </method>
+            <method name="ReservarAsiento" signature="(System.Int32,System.Int32,System.Nullable`1&lt;System.Guid&gt;)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="50" hits="3" branch="False" />
+                <line number="51" hits="5" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="45" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="52" hits="3" branch="False" />
+                <line number="53" hits="2" branch="False" />
+                <line number="54" hits="2" branch="False" />
+                <line number="55" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="ReservarAsientoPorId" signature="(System.Guid,System.Guid)" line-rate="1" branch-rate="0.875" complexity="8">
+              <lines>
+                <line number="58" hits="8" branch="False" />
+                <line number="59" hits="15" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="38" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="60" hits="8" branch="False" />
+                <line number="62" hits="7" branch="True" condition-coverage="83.33% (5/6)">
+                  <conditions>
+                    <condition number="59" type="jump" coverage="100%" />
+                    <condition number="78" type="jump" coverage="50%" />
+                    <condition number="102" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="63" hits="1" branch="False" />
+                <line number="65" hits="6" branch="False" />
+                <line number="66" hits="6" branch="False" />
+                <line number="67" hits="6" branch="False" />
+              </lines>
+            </method>
+            <method name="LiberarAsiento" signature="(System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="70" hits="3" branch="False" />
+                <line number="71" hits="5" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="45" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="72" hits="3" branch="False" />
+                <line number="73" hits="2" branch="False" />
+                <line number="74" hits="2" branch="False" />
+                <line number="75" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="LiberarAsientoPorId" signature="(System.Guid)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="78" hits="4" branch="False" />
+                <line number="79" hits="7" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="38" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="80" hits="4" branch="False" />
+                <line number="81" hits="3" branch="False" />
+                <line number="82" hits="3" branch="False" />
+                <line number="83" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="AgregarCategoria" signature="(System.String,System.Nullable`1&lt;System.Decimal&gt;,System.Boolean)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="86" hits="23" branch="False" />
+                <line number="87" hits="25" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="39" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="88" hits="1" branch="False" />
+                <line number="90" hits="22" branch="False" />
+                <line number="91" hits="22" branch="False" />
+                <line number="92" hits="22" branch="False" />
+                <line number="93" hits="22" branch="False" />
+                <line number="94" hits="22" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(System.Guid)" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="13" hits="30" branch="False" />
+                <line number="14" hits="30" branch="False" />
+                <line number="22" hits="30" branch="False" />
+                <line number="23" hits="30" branch="False" />
+                <line number="24" hits="31" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="43" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="25" hits="29" branch="False" />
+                <line number="26" hits="29" branch="False" />
+                <line number="27" hits="29" branch="False" />
+                <line number="28" hits="29" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="15" hits="54" branch="False" />
+            <line number="16" hits="11" branch="False" />
+            <line number="17" hits="3" branch="False" />
+            <line number="31" hits="30" branch="False" />
+            <line number="32" hits="30" branch="False" />
+            <line number="33" hits="29" branch="False" />
+            <line number="36" hits="20" branch="False" />
+            <line number="37" hits="40" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="52" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="38" hits="20" branch="False" />
+            <line number="40" hits="24" branch="True" condition-coverage="100% (4/4)">
+              <conditions>
+                <condition number="92" type="jump" coverage="100%" />
+                <condition number="12" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="41" hits="1" branch="False" />
+            <line number="43" hits="18" branch="False" />
+            <line number="44" hits="18" branch="False" />
+            <line number="45" hits="18" branch="False" />
+            <line number="46" hits="18" branch="False" />
+            <line number="47" hits="18" branch="False" />
+            <line number="50" hits="3" branch="False" />
+            <line number="51" hits="5" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="45" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="52" hits="3" branch="False" />
+            <line number="53" hits="2" branch="False" />
+            <line number="54" hits="2" branch="False" />
+            <line number="55" hits="2" branch="False" />
+            <line number="58" hits="8" branch="False" />
+            <line number="59" hits="15" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="38" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="60" hits="8" branch="False" />
+            <line number="62" hits="7" branch="True" condition-coverage="83.33% (5/6)">
+              <conditions>
+                <condition number="59" type="jump" coverage="100%" />
+                <condition number="78" type="jump" coverage="50%" />
+                <condition number="102" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="63" hits="1" branch="False" />
+            <line number="65" hits="6" branch="False" />
+            <line number="66" hits="6" branch="False" />
+            <line number="67" hits="6" branch="False" />
+            <line number="70" hits="3" branch="False" />
+            <line number="71" hits="5" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="45" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="72" hits="3" branch="False" />
+            <line number="73" hits="2" branch="False" />
+            <line number="74" hits="2" branch="False" />
+            <line number="75" hits="2" branch="False" />
+            <line number="78" hits="4" branch="False" />
+            <line number="79" hits="7" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="38" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="80" hits="4" branch="False" />
+            <line number="81" hits="3" branch="False" />
+            <line number="82" hits="3" branch="False" />
+            <line number="83" hits="3" branch="False" />
+            <line number="86" hits="23" branch="False" />
+            <line number="87" hits="25" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="39" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="88" hits="1" branch="False" />
+            <line number="90" hits="22" branch="False" />
+            <line number="91" hits="22" branch="False" />
+            <line number="92" hits="22" branch="False" />
+            <line number="93" hits="22" branch="False" />
+            <line number="94" hits="22" branch="False" />
+            <line number="13" hits="30" branch="False" />
+            <line number="14" hits="30" branch="False" />
+            <line number="22" hits="30" branch="False" />
+            <line number="23" hits="30" branch="False" />
+            <line number="24" hits="31" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="43" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="25" hits="29" branch="False" />
+            <line number="26" hits="29" branch="False" />
+            <line number="27" hits="29" branch="False" />
+            <line number="28" hits="29" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="Asientos.Infraestructura" line-rate="0.9854999999999999" branch-rate="0.9285" complexity="22">
+      <classes>
+        <class name="Asientos.Infraestructura.Repositorios.MapaAsientosRepository" filename="Asientos.Infraestructura\Repositorios\MapaAsientosRepository.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name=".ctor" signature="(Asientos.Infraestructura.Persistencia.AsientosDbContext)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="15" hits="48" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="15" hits="48" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Infraestructura.Repositorios.MapaAsientosRepository/&lt;ActualizarAsync&gt;d__4" filename="Asientos.Infraestructura\Repositorios\MapaAsientosRepository.cs" line-rate="0.8" branch-rate="0.5" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="0.8" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="29" hits="12" branch="False" />
+                <line number="30" hits="12" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="50" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="31" hits="0" branch="False" />
+                <line number="33" hits="12" branch="False" />
+                <line number="34" hits="12" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="29" hits="12" branch="False" />
+            <line number="30" hits="12" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="50" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="31" hits="0" branch="False" />
+            <line number="33" hits="12" branch="False" />
+            <line number="34" hits="12" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Infraestructura.Repositorios.MapaAsientosRepository/&lt;AgregarAsientoAsync&gt;d__5" filename="Asientos.Infraestructura\Repositorios\MapaAsientosRepository.cs" line-rate="1" branch-rate="1" complexity="2">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
+              <lines>
+                <line number="37" hits="7" branch="False" />
+                <line number="38" hits="7" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="61" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="39" hits="1" branch="False" />
+                <line number="41" hits="7" branch="False" />
+                <line number="42" hits="7" branch="False" />
+                <line number="43" hits="7" branch="False" />
+                <line number="44" hits="7" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="37" hits="7" branch="False" />
+            <line number="38" hits="7" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="61" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="39" hits="1" branch="False" />
+            <line number="41" hits="7" branch="False" />
+            <line number="42" hits="7" branch="False" />
+            <line number="43" hits="7" branch="False" />
+            <line number="44" hits="7" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Infraestructura.Repositorios.MapaAsientosRepository/&lt;AgregarAsync&gt;d__3" filename="Asientos.Infraestructura\Repositorios\MapaAsientosRepository.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="23" hits="12" branch="False" />
+                <line number="24" hits="12" branch="False" />
+                <line number="25" hits="12" branch="False" />
+                <line number="26" hits="12" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="23" hits="12" branch="False" />
+            <line number="24" hits="12" branch="False" />
+            <line number="25" hits="12" branch="False" />
+            <line number="26" hits="12" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Infraestructura.Repositorios.MapaAsientosRepository/&lt;ObtenerAsientoPorIdAsync&gt;d__6" filename="Asientos.Infraestructura\Repositorios\MapaAsientosRepository.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="47" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="47" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Infraestructura.Repositorios.MapaAsientosRepository/&lt;ObtenerPorIdAsync&gt;d__2" filename="Asientos.Infraestructura\Repositorios\MapaAsientosRepository.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="18" hits="25" branch="False" />
+                <line number="19" hits="25" branch="False" />
+                <line number="20" hits="25" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="18" hits="25" branch="False" />
+            <line number="19" hits="25" branch="False" />
+            <line number="20" hits="25" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Infraestructura.Persistencia.AsientosDbContext" filename="Asientos.Infraestructura\Persistencia\AsientosDbContext.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="get_Asientos" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="13" hits="10" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Mapas" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="14" hits="44" branch="False" />
+              </lines>
+            </method>
+            <method name="OnModelCreating" signature="(Microsoft.EntityFrameworkCore.ModelBuilder)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="20" hits="1" branch="False" />
+                <line number="21" hits="2" branch="False" />
+                <line number="23" hits="1" branch="False" />
+                <line number="24" hits="1" branch="False" />
+                <line number="25" hits="1" branch="False" />
+                <line number="26" hits="1" branch="False" />
+                <line number="27" hits="1" branch="False" />
+                <line number="28" hits="1" branch="False" />
+                <line number="29" hits="1" branch="False" />
+                <line number="30" hits="1" branch="False" />
+                <line number="31" hits="6" branch="False" />
+                <line number="32" hits="1" branch="False" />
+                <line number="33" hits="2" branch="False" />
+                <line number="35" hits="1" branch="False" />
+                <line number="36" hits="1" branch="False" />
+                <line number="37" hits="1" branch="False" />
+                <line number="38" hits="1" branch="False" />
+                <line number="39" hits="1" branch="False" />
+                <line number="40" hits="1" branch="False" />
+                <line number="41" hits="1" branch="False" />
+                <line number="42" hits="1" branch="False" />
+                <line number="43" hits="1" branch="False" />
+                <line number="44" hits="1" branch="False" />
+                <line number="45" hits="1" branch="False" />
+                <line number="46" hits="1" branch="False" />
+                <line number="47" hits="1" branch="False" />
+                <line number="48" hits="1" branch="False" />
+                <line number="49" hits="1" branch="False" />
+                <line number="50" hits="1" branch="False" />
+                <line number="51" hits="2" branch="False" />
+                <line number="52" hits="1" branch="False" />
+                <line number="53" hits="2" branch="False" />
+                <line number="54" hits="1" branch="False" />
+              </lines>
+            </method>
+            <method name=".ctor" signature="(Microsoft.EntityFrameworkCore.DbContextOptions`1&lt;Asientos.Infraestructura.Persistencia.AsientosDbContext&gt;)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="87" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="13" hits="10" branch="False" />
+            <line number="14" hits="44" branch="False" />
+            <line number="20" hits="1" branch="False" />
+            <line number="21" hits="2" branch="False" />
+            <line number="23" hits="1" branch="False" />
+            <line number="24" hits="1" branch="False" />
+            <line number="25" hits="1" branch="False" />
+            <line number="26" hits="1" branch="False" />
+            <line number="27" hits="1" branch="False" />
+            <line number="28" hits="1" branch="False" />
+            <line number="29" hits="1" branch="False" />
+            <line number="30" hits="1" branch="False" />
+            <line number="31" hits="6" branch="False" />
+            <line number="32" hits="1" branch="False" />
+            <line number="33" hits="2" branch="False" />
+            <line number="35" hits="1" branch="False" />
+            <line number="36" hits="1" branch="False" />
+            <line number="37" hits="1" branch="False" />
+            <line number="38" hits="1" branch="False" />
+            <line number="39" hits="1" branch="False" />
+            <line number="40" hits="1" branch="False" />
+            <line number="41" hits="1" branch="False" />
+            <line number="42" hits="1" branch="False" />
+            <line number="43" hits="1" branch="False" />
+            <line number="44" hits="1" branch="False" />
+            <line number="45" hits="1" branch="False" />
+            <line number="46" hits="1" branch="False" />
+            <line number="47" hits="1" branch="False" />
+            <line number="48" hits="1" branch="False" />
+            <line number="49" hits="1" branch="False" />
+            <line number="50" hits="1" branch="False" />
+            <line number="51" hits="2" branch="False" />
+            <line number="52" hits="1" branch="False" />
+            <line number="53" hits="2" branch="False" />
+            <line number="54" hits="1" branch="False" />
+            <line number="12" hits="87" branch="False" />
+          </lines>
+        </class>
+        <class name="Asientos.Infraestructura.Persistencia.AsientosDbContextFactory" filename="Asientos.Infraestructura\Persistencia\AsientosDbContextFactory.cs" line-rate="1" branch-rate="1" complexity="10">
+          <methods>
+            <method name="CreateDbContext" signature="(System.String[])" line-rate="1" branch-rate="1" complexity="10">
+              <lines>
+                <line number="10" hits="4" branch="False" />
+                <line number="12" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="12" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="13" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="32" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="14" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="52" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="15" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="72" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="16" hits="4" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="92" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="17" hits="4" branch="False" />
+                <line number="19" hits="4" branch="False" />
+                <line number="20" hits="4" branch="False" />
+                <line number="21" hits="4" branch="False" />
+                <line number="22" hits="4" branch="False" />
+                <line number="23" hits="4" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="10" hits="4" branch="False" />
+            <line number="12" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="12" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="13" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="32" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="14" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="52" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="15" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="72" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="16" hits="4" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="92" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="17" hits="4" branch="False" />
+            <line number="19" hits="4" branch="False" />
+            <line number="20" hits="4" branch="False" />
+            <line number="21" hits="4" branch="False" />
+            <line number="22" hits="4" branch="False" />
+            <line number="23" hits="4" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>

@@ -1,0 +1,9 @@
+{
+    "username": "usuario_final_test",
+    "nombre": "Usuario Final Test",
+    "correo": "finaltest@example.com",
+    "telefono": "1112223333",
+    "direccion": "calle de prueba final",
+    "rol": 1,
+    "password": "FinalTest123!"
+}

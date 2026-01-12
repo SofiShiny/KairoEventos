@@ -1,0 +1,86 @@
+{
+  "rabbit_version": "3.13.0",
+  "rabbitmq_version": "3.13.0",
+  "product_name": "RabbitMQ",
+  "product_version": "3.13.0",
+  "users": [
+    {
+      "name": "entradas_user",
+      "password_hash": "entradas_password",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["administrator"]
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "entradas_vhost"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "entradas_user",
+      "vhost": "entradas_vhost",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-entradas"
+    }
+  ],
+  "policies": [],
+  "queues": [
+    {
+      "name": "entradas.entrada-creada",
+      "vhost": "entradas_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 3600000
+      }
+    },
+    {
+      "name": "entradas.pago-confirmado",
+      "vhost": "entradas_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 3600000
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "entradas.eventos",
+      "vhost": "entradas_vhost",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "entradas.eventos",
+      "vhost": "entradas_vhost",
+      "destination": "entradas.entrada-creada",
+      "destination_type": "queue",
+      "routing_key": "entrada.creada",
+      "arguments": {}
+    },
+    {
+      "source": "entradas.eventos",
+      "vhost": "entradas_vhost",
+      "destination": "entradas.pago-confirmado",
+      "destination_type": "queue",
+      "routing_key": "pago.confirmado",
+      "arguments": {}
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+services:
+  marketing-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=postgres;Database=MarketingDb;Username=postgres;Password=postgres
+      - RabbitMq__Host=rabbitmq
+    ports:
+      - "8085:8080"
+    depends_on:
+      - postgres
+      - rabbitmq

@@ -1,0 +1,50 @@
+# Build artifacts
+**/bin/
+**/obj/
+
+# User specific
+*.user
+*.suo
+
+# Visual Studio workspace
+.vs/
+
+# Logs
+*.log
+
+# Secrets
+*.env
+
+# Docker
+**/Dockerfile.*.backup
+
+# EF Migrations design-time cache
+*Migrations/*Designer.cs
+
+# Node (if any front-end later)
+node_modules/
+
+# JetBrains
+.idea/
+
+# VSCode
+.vscode/
+
+# Coverage
+coverage/
+*.coverage
+
+# Others
+Thumbs.db
+.DS_Store
+
+# HTML reports
+*.html
+*.htm
+
+# Test result files
+TestResults/
+*.trx
+*.coverage
+*.cobertura.xml
+*.css

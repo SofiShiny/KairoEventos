@@ -1,0 +1,65 @@
+{
+  "descripcion": "Ejemplos de requests para probar la API de Comunidad",
+  
+  "1_crear_comentario": {
+    "metodo": "POST",
+    "url": "http://localhost:5007/api/comunidad/comentarios",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "foroId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "usuarioId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "contenido": "¡Excelente evento! Estoy muy emocionado de participar."
+    }
+  },
+
+  "2_responder_comentario": {
+    "metodo": "POST",
+    "url": "http://localhost:5007/api/comunidad/comentarios/{comentarioId}/responder",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "usuarioId": "8d0e7680-8536-51ef-c4gd-3d074g2a01bf8",
+      "contenido": "¡Gracias! Nos vemos allí."
+    },
+    "nota": "Reemplazar {comentarioId} con el ID del comentario al que se responde"
+  },
+
+  "3_obtener_comentarios_foro": {
+    "metodo": "GET",
+    "url": "http://localhost:5007/api/comunidad/foros/{eventoId}",
+    "nota": "Reemplazar {eventoId} con el ID del evento. Retorna solo comentarios visibles."
+  },
+
+  "4_ocultar_comentario": {
+    "metodo": "DELETE",
+    "url": "http://localhost:5007/api/comunidad/comentarios/{comentarioId}",
+    "nota": "Moderación: Oculta el comentario (soft delete). Reemplazar {comentarioId}."
+  },
+
+  "5_health_check": {
+    "metodo": "GET",
+    "url": "http://localhost:5007/health"
+  },
+
+  "ejemplos_curl": {
+    "crear_comentario": "curl -X POST http://localhost:5007/api/comunidad/comentarios -H \"Content-Type: application/json\" -d '{\"foroId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"usuarioId\":\"7c9e6679-7425-40de-944b-e07fc1f90ae7\",\"contenido\":\"Mi comentario\"}'",
+    
+    "obtener_comentarios": "curl http://localhost:5007/api/comunidad/foros/3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    
+    "responder": "curl -X POST http://localhost:5007/api/comunidad/comentarios/{id}/responder -H \"Content-Type: application/json\" -d '{\"usuarioId\":\"guid\",\"contenido\":\"Mi respuesta\"}'",
+    
+    "ocultar": "curl -X DELETE http://localhost:5007/api/comunidad/comentarios/{id}"
+  },
+
+  "flujo_completo": {
+    "paso_1": "El microservicio Eventos publica un EventoPublicado",
+    "paso_2": "EventoPublicadoConsumer recibe el evento y crea un Foro automáticamente",
+    "paso_3": "Los usuarios crean comentarios principales usando POST /comentarios",
+    "paso_4": "Otros usuarios responden usando POST /comentarios/{id}/responder",
+    "paso_5": "Los moderadores ocultan comentarios inapropiados con DELETE /comentarios/{id}",
+    "paso_6": "Los usuarios consultan comentarios visibles con GET /foros/{eventoId}"
+  }
+}

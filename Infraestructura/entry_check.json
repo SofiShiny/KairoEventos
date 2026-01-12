@@ -1,0 +1,15 @@
+﻿{
+    "id":  "82dbd552-9da1-4a0b-8747-c3303de7054d",
+    "eventoId":  "e71d7ba8-9c1b-4328-beb5-0ad037f86fe1",
+    "tituloEvento":  null,
+    "fechaEvento":  null,
+    "asientoId":  "b36d9ecc-2a9d-484e-9c78-d7b0ebd3a317",
+    "sector":  "vip",
+    "fila":  "3",
+    "numero":  1,
+    "estado":  2,
+    "montoFinal":  100.00,
+    "codigoQr":  "TICKET-E8A15360-8739",
+    "fechaCompra":  "2026-01-08T22:38:06.579165Z",
+    "fechaActualizacion":  "2026-01-08T22:38:20.22332Z"
+}
