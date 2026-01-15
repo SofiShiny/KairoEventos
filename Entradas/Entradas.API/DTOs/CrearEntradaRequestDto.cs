@@ -32,4 +32,8 @@ public class CrearEntradaRequestDto
     public Guid? AsientoId { get; set; }
 
     public List<string>? Cupones { get; set; }
+
+    public string? NombreUsuario { get; set; }
+
+    public string? Email { get; set; }
 }

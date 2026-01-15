@@ -1,7 +1,7 @@
 using BloquesConstruccion.Aplicacion.Comandos;
 using BloquesConstruccion.Aplicacion.Comun;
 using Eventos.Dominio.Repositorios;
-using Eventos.Dominio.EventosDeDominio;
+using Eventos.Dominio.EventosDominio;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;

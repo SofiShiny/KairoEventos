@@ -57,6 +57,9 @@ app.MapControllers();
 app.MapHealthChecks("/health/live");
 app.MapHealthChecks("/health/ready");
 
+// 5. Habilitar WebSockets para SignalR
+app.UseWebSockets();
+
 // Enrutar al Proxy
 app.MapReverseProxy();
 

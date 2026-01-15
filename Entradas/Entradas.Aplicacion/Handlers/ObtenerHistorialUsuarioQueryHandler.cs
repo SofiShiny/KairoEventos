@@ -41,6 +41,7 @@ public class ObtenerHistorialUsuarioQueryHandler : IRequestHandler<ObtenerHistor
                     Id = entrada.Id,
                     EventoId = entrada.EventoId,
                     TituloEvento = entrada.TituloEvento,
+                    EsVirtual = entrada.EsVirtual,
                     FechaEvento = entrada.FechaEvento,
                     AsientoId = entrada.AsientoId,
                     Sector = entrada.NombreSector,
@@ -49,6 +50,8 @@ public class ObtenerHistorialUsuarioQueryHandler : IRequestHandler<ObtenerHistor
                     Estado = entrada.Estado,
                     MontoFinal = entrada.Monto,
                     CodigoQr = entrada.CodigoQr,
+                    NombreUsuario = entrada.NombreUsuario,
+                    EmailUsuario = entrada.EmailUsuario,
                     FechaCompra = entrada.FechaCompra,
                     FechaActualizacion = entrada.FechaActualizacion
                 })

@@ -36,16 +36,11 @@ namespace Asientos.Infraestructura.Migrations
                     CategoriaPrecioBase = table.Column<decimal>(type: "numeric", nullable: true),
                     CategoriaTienePrioridad = table.Column<bool>(type: "boolean", nullable: false),
                     Reservado = table.Column<bool>(type: "boolean", nullable: false),
-                    MapaAsientosId = table.Column<Guid>(type: "uuid", nullable: true)
+                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Asientos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Asientos_Mapas_MapaAsientosId",
-                        column: x => x.MapaAsientosId,
-                        principalTable: "Mapas",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Asientos_Mapas_MapaId",
                         column: x => x.MapaId,
@@ -74,11 +69,6 @@ namespace Asientos.Infraestructura.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Asientos_MapaAsientosId",
-                table: "Asientos",
-                column: "MapaAsientosId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Asientos_MapaId_Fila_Numero",

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 
 type User = {
   id: string;
+  username?: string;
   nombre?: string;
   rol?: 'admin' | 'organizador' | 'usuario';
 };

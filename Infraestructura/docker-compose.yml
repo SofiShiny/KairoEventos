@@ -121,12 +121,17 @@ services:
       # CORS Configuration
       Cors__AllowedOrigins__0: http://localhost:5173
       Cors__AllowedOrigins__1: http://localhost:3000
-      # Microservices URLs (already configured in appsettings.json)
-      # ReverseProxy__Clusters__eventos-cluster__Destinations__destination1__Address: http://eventos-api:8080
-      # ReverseProxy__Clusters__asientos-cluster__Destinations__destination1__Address: http://asientos-api:8080
-      # ReverseProxy__Clusters__usuarios-cluster__Destinations__destination1__Address: http://usuarios-api:8080
-      # ReverseProxy__Clusters__entradas-cluster__Destinations__destination1__Address: http://entradas-api:8080
-      # ReverseProxy__Clusters__reportes-cluster__Destinations__destination1__Address: http://reportes-api:8080
+      # Microservices URLs
+      ReverseProxy__Clusters__eventos-cluster__Destinations__destination1__Address: http://eventos-api:8080
+      ReverseProxy__Clusters__asientos-cluster__Destinations__destination1__Address: http://asientos-api:8080
+      ReverseProxy__Clusters__usuarios-cluster__Destinations__destination1__Address: http://usuarios-api:8080
+      ReverseProxy__Clusters__entradas-cluster__Destinations__destination1__Address: http://entradas-api:8080
+      ReverseProxy__Clusters__pagos-cluster__Destinations__destination1__Address: http://pagos-api:8080
+      ReverseProxy__Clusters__reportes-cluster__Destinations__destination1__Address: http://reportes-api:8080
+      ReverseProxy__Clusters__notificaciones-cluster__Destinations__destination1__Address: http://notificaciones-api:8080
+      ReverseProxy__Clusters__marketing-cluster__Destinations__destination1__Address: http://marketing-api:8080
+      ReverseProxy__Clusters__recomendaciones-cluster__Destinations__destination1__Address: http://recomendaciones-api:8080
+      ReverseProxy__Clusters__streaming-cluster__Destinations__destination1__Address: http://streaming-api:8080
     ports:
       - "8080:8080"
     networks:
@@ -220,6 +225,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - RabbitMq__Host=rabbitmq
+      - Authentication__Authority=http://keycloak:8080/realms/Kairo
+      - Authentication__Audience=kairo-api
     ports:
       - "5001:8080"
     networks:
@@ -315,6 +322,8 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__Postgres=Host=postgres;Database=kairo_pagos;Username=postgres;Password=postgres
       - RabbitMQ__Host=rabbitmq
+      - Authentication__Authority=http://keycloak:8080/realms/Kairo
+      - Authentication__Audience=kairo-api
     ports:
       - "5007:8080"
     networks:
@@ -421,8 +430,8 @@ services:
       # Email Configuration (Reemplazar con credenciales reales o usar Mailtrap/Ethereal para pruebas)
       - EmailSettings__Host=smtp.ethereal.email
       - EmailSettings__Puerto=587
-      - EmailSettings__Usuario=wilfred.fadel13@ethereal.email
-      - EmailSettings__Password=wjtxmmnvpgejzKBgvR
+      - EmailSettings__Usuario=armando.bruen@ethereal.email
+      - EmailSettings__Password=8nHKCKp1JxAsa7MexS
       - EmailSettings__NombreEmisor=Kairo Eventos
       - EmailSettings__EmailEmisor=no-reply@kairo.com
       - EmailSettings__UsarSsl=false

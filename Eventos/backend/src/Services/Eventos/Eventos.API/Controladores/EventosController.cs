@@ -105,7 +105,8 @@ public class EventosController : ControllerBase
                 dto.FechaFin,
                 dto.MaximoAsistentes,
                 organizadorId,
-                dto.Categoria);
+                dto.Categoria,
+                dto.PrecioBase);
 
             var resultado = await _mediator.Send(comando);
             if (resultado.EsFallido) return BadRequest(resultado.Error);
@@ -145,7 +146,8 @@ public class EventosController : ControllerBase
                 dto.Ubicacion,
                 dto.FechaInicio,
                 dto.FechaFin,
-                dto.MaximoAsistentes);
+                dto.MaximoAsistentes,
+                dto.PrecioBase);
 
             var resultado = await _mediator.Send(comando);
             if (resultado.EsFallido) return NotFound(resultado.Error);
@@ -200,6 +202,36 @@ public class EventosController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error cancelando evento {Id}", id);
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpPatch("{id}/finalizar")]
+    public async Task<IActionResult> Finalizar(Guid id)
+    {
+        try
+        {
+            // Obtener el evento actual para verificar permisos
+            var eventoQuery = await _mediator.Send(new ObtenerEventoPorIdQuery(id));
+            if (eventoQuery.EsFallido) return NotFound(eventoQuery.Error);
+
+            // Verificar autorización
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+                      ?? User.FindFirst("sub")?.Value;
+            var isAdmin = User.IsInRole("admin");
+            
+            if (!isAdmin && eventoQuery.Valor?.OrganizadorId != userId)
+            {
+                return Forbid("No tienes permisos para finalizar este evento");
+            }
+
+            var resultado = await _mediator.Send(new FinalizarEventoComando(id));
+            if (resultado.EsFallido) return BadRequest(resultado.Error);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error finalizando evento {Id}", id);
             return StatusCode(500, ex.Message);
         }
     }

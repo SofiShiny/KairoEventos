@@ -15,6 +15,8 @@ public record EntradaResumenDto
     // Alias para compatibilidad con el frontend unificado
     [JsonPropertyName("eventoNombre")]
     public string? TituloEvento { get; init; }
+
+    public bool EsVirtual { get; init; }
     
     public DateTime? FechaEvento { get; init; }
     public Guid? AsientoId { get; init; }
@@ -36,6 +38,8 @@ public record EntradaResumenDto
     public decimal MontoFinal { get; init; }
 
     public string CodigoQr { get; init; } = string.Empty;
+    public string? NombreUsuario { get; init; }
+    public string? EmailUsuario { get; init; }
     public DateTime FechaCompra { get; init; }
     public DateTime FechaActualizacion { get; init; }
 }

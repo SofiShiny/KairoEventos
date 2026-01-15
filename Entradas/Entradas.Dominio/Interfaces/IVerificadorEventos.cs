@@ -57,5 +57,6 @@ public record EventoInfo(
     bool EstaDisponible,
     decimal PrecioBase,
     string? UrlImagen = null,
-    string? OrganizadorId = null
+    string? OrganizadorId = null,
+    bool EsVirtual = false
 );

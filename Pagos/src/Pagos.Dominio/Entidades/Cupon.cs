@@ -67,7 +67,7 @@ public class Cupon
             Estado = EstadoCupon.Activo,
             EventoId = eventoId,
             FechaCreacion = DateTime.UtcNow,
-            FechaExpiracion = fechaExpiracion,
+            FechaExpiracion = fechaExpiracion.HasValue ? DateTime.SpecifyKind(fechaExpiracion.Value, DateTimeKind.Utc) : null,
             ContadorUsos = 0,
             LimiteUsos = limiteUsos
         };
@@ -92,7 +92,7 @@ public class Cupon
             Estado = EstadoCupon.Activo,
             EventoId = eventoId,
             FechaCreacion = DateTime.UtcNow,
-            FechaExpiracion = fechaExpiracion,
+            FechaExpiracion = fechaExpiracion.HasValue ? DateTime.SpecifyKind(fechaExpiracion.Value, DateTimeKind.Utc) : null,
             ContadorUsos = 0
         };
     }

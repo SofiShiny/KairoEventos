@@ -27,7 +27,13 @@ public class EventoPublicadoConsumer : IConsumer<EventoPublicadoEventoDominio>
     public async Task Consume(ConsumeContext<EventoPublicadoEventoDominio> context)
     {
         var mensaje = context.Message;
-        _logger.LogInformation("Procesando evento publicado: {EventoId} - {Nombre}", mensaje.EventoId, mensaje.Nombre);
+        _logger.LogInformation("Procesando evento publicado: {EventoId} - {Titulo}", mensaje.EventoId, mensaje.TituloEvento);
+
+        if (!mensaje.EsVirtual)
+        {
+            _logger.LogInformation("El evento {EventoId} no es virtual, se ignora creación de transmisión.", mensaje.EventoId);
+            return;
+        }
 
         // Verificar si ya existe el streaming para evitar duplicados
         var existente = await _repositorio.ObtenerPorEventoIdAsync(mensaje.EventoId);

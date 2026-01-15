@@ -1,7 +1,7 @@
 using BloquesConstruccion.Aplicacion.Comandos;
 using BloquesConstruccion.Aplicacion.Comun;
 using Eventos.Dominio.Repositorios;
-using Eventos.Dominio.EventosDeDominio;
+using Eventos.Dominio.EventosDominio;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -60,7 +60,8 @@ public class PublicarEventoComandoHandler : IRequestHandler<PublicarEventoComand
             await _publishEndpoint.Publish(new EventoPublicadoEventoDominio(
                 evento.Id,
                 evento.Titulo,
-                evento.FechaInicio), cancellationToken);
+                evento.FechaInicio,
+                evento.EsVirtual), cancellationToken);
             _logger.LogInformation("Evento {EventoId} publicado exitosamente a RabbitMQ", evento.Id);
             
             return Resultado.Exito();

@@ -106,7 +106,8 @@ public class VerificadorEventosHttp : IVerificadorEventos
                 eventoDto.EstaDisponible,
                 eventoDto.PrecioBase,
                 eventoDto.UrlImagen,
-                eventoDto.OrganizadorId
+                eventoDto.OrganizadorId,
+                eventoDto.EsVirtual
             );
 
             _logger.LogDebug("Información del evento obtenida: {EventoId}, Nombre: {Nombre}, Disponible: {Disponible}", 
@@ -249,7 +250,8 @@ internal record EventoInternoDto(
     string? UrlImagen,
     bool EstaDisponible,
     decimal PrecioBase,
-    string? OrganizadorId
+    string? OrganizadorId,
+    bool EsVirtual = false
 );
 
 /// <summary>

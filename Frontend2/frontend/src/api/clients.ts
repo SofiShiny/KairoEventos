@@ -16,6 +16,22 @@ export const seatsApi = axios.create({
   },
 });
 
+// Create axios instance for entradas API
+export const entradasApi = axios.create({
+  baseURL: import.meta.env.VITE_ENTRADAS_API_URL || import.meta.env.VITE_EVENTS_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Create axios instance for streaming API
+export const streamingApi = axios.create({
+  baseURL: import.meta.env.VITE_STREAMING_API_URL || import.meta.env.VITE_EVENTS_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 // Request interceptor for authentication
 const authInterceptor = (config: any) => {
   // Check for auth token in localStorage
@@ -31,10 +47,10 @@ const errorInterceptor = (error: any) => {
   if (error.response) {
     // Server responded with error status
     const { status, data } = error.response;
-    
+
     // Log error for debugging
     console.error(`API Error [${status}]:`, data);
-    
+
     // Handle specific error cases
     switch (status) {
       case 401:
@@ -67,7 +83,7 @@ const errorInterceptor = (error: any) => {
     // Something else happened
     console.error('Request error:', error.message);
   }
-  
+
   return Promise.reject(error);
 };
 

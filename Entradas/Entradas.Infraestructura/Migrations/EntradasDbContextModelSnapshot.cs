@@ -17,7 +17,6 @@ namespace Entradas.Infraestructura.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("entradas")
                 .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -47,6 +46,12 @@ namespace Entradas.Infraestructura.Migrations
                     b.Property<string>("CuponesAplicados")
                         .HasColumnType("jsonb")
                         .HasColumnName("cupones_aplicados");
+
+                    b.Property<bool>("EsVirtual")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("es_virtual");
 
                     b.Property<int>("Estado")
                         .HasColumnType("integer")
@@ -131,11 +136,11 @@ namespace Entradas.Infraestructura.Migrations
                     b.HasIndex("UsuarioId")
                         .HasDatabaseName("ix_entradas_usuario_id");
 
-                    b.ToTable("entradas", "entradas", t =>
+                    b.ToTable("entradas", null, t =>
                         {
-                            t.HasCheckConstraint("ck_entradas_estado_valido", "estado IN (1, 2, 3, 4)");
+                            t.HasCheckConstraint("ck_entradas_estado_valido", "estado IN (0, 1, 2, 3, 4)");
 
-                            t.HasCheckConstraint("ck_entradas_monto_positivo", "monto > 0");
+                            t.HasCheckConstraint("ck_entradas_monto_positivo", "monto >= 0");
                         });
                 });
 #pragma warning restore 612, 618

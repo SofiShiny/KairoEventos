@@ -126,6 +126,7 @@ public class CrearEntradaCommandHandler : IRequestHandler<CrearEntradaCommand, E
             string? nombreSector = request.NombreSector;
             string? fila = request.Fila;
             int? numeroAsiento = request.NumeroAsiento;
+            bool esVirtual = false;
 
             // Obtener info del evento (Título y Fecha siempre necesarios)
             var infoEvento = await _verificadorEventos.ObtenerInfoEventoAsync(request.EventoId, cancellationToken);
@@ -134,6 +135,7 @@ public class CrearEntradaCommandHandler : IRequestHandler<CrearEntradaCommand, E
                 tituloEvento ??= infoEvento.Nombre;
                 imagenEventoUrl ??= infoEvento.UrlImagen;
                 fechaEvento ??= infoEvento.FechaEvento;
+                esVirtual = infoEvento.EsVirtual;
             }
 
             if (request.AsientoId.HasValue)
@@ -185,7 +187,10 @@ public class CrearEntradaCommandHandler : IRequestHandler<CrearEntradaCommand, E
                 fechaEvento,
                 nombreSector,
                 fila,
-                numeroAsiento);
+                numeroAsiento,
+                esVirtual,
+                request.NombreUsuario,
+                request.Email);
 
             _logger.LogDebug("Entidad Entrada creada con ID {EntradaId}", entrada.Id);
             activity?.SetTag("entrada.id", entrada.Id.ToString());

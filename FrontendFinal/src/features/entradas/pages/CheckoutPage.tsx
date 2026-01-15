@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import SeatMap from '../../asientos/components/SeatMap';
@@ -35,35 +35,39 @@ export default function CheckoutPage() {
         }
     }, [eventoId]);
 
+    const onAsientoReservado = useCallback((asientoId: string, usuarioId: string) => {
+        setAsientos(prev => prev.map(a =>
+            a.id === asientoId
+                ? { ...a, reservado: true, usuarioId, estado: 'Ocupado' }
+                : a
+        ));
+
+        // Si el asiento estaba en mi selección pero lo reservó otro, notificar y quitar
+        if (auth.user?.profile.sub !== usuarioId) {
+            setSelectedAsientos(prev => {
+                const isSelectedByMe = prev.some(a => a.id === asientoId);
+                if (isSelectedByMe) {
+                    toast.error('Un asiento de tu selección acaba de ser reservado por otro usuario.');
+                    return prev.filter(a => a.id !== asientoId);
+                }
+                return prev;
+            });
+        }
+    }, [auth.user?.profile.sub]);
+
+    const onAsientoLiberado = useCallback((asientoId: string) => {
+        setAsientos(prev => prev.map(a =>
+            a.id === asientoId
+                ? { ...a, reservado: false, usuarioId: undefined, estado: 'Disponible' }
+                : a
+        ));
+    }, []);
+
     // Suscripción a SignalR para actualizaciones en tiempo real
     useAsientosSignalR({
         eventoId: eventoId || '',
-        onAsientoReservado: (asientoId, usuarioId) => {
-            setAsientos(prev => prev.map(a =>
-                a.id === asientoId
-                    ? { ...a, reservado: true, usuarioId, estado: 'Ocupado' }
-                    : a
-            ));
-
-            // Si el asiento estaba en mi selección pero lo reservó otro, notificar y quitar
-            if (auth.user?.profile.sub !== usuarioId) {
-                setSelectedAsientos(prev => {
-                    const isSelectedByMe = prev.some(a => a.id === asientoId);
-                    if (isSelectedByMe) {
-                        toast.error('Un asiento de tu selección acaba de ser reservado por otro usuario.');
-                        return prev.filter(a => a.id !== asientoId);
-                    }
-                    return prev;
-                });
-            }
-        },
-        onAsientoLiberado: (asientoId) => {
-            setAsientos(prev => prev.map(a =>
-                a.id === asientoId
-                    ? { ...a, reservado: false, usuarioId: undefined, estado: 'Disponible' }
-                    : a
-            ));
-        }
+        onAsientoReservado,
+        onAsientoLiberado
     });
 
     const loadAsientos = async () => {

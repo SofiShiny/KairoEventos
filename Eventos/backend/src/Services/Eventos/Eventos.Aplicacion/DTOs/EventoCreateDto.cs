@@ -23,5 +23,6 @@ public class EventoCreateDto
     // Campos opcionales
     public string? Estado { get; set; }
     public string? Categoria { get; set; }
+    [Range(0, double.MaxValue)] public decimal PrecioBase { get; set; } = 0;
     public List<AsistenteCreateDto>? Asistentes { get; set; }
 }

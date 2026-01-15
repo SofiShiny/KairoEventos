@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate } from 'react-router-dom';
-import { Ticket, Search, User as UserIcon, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { Ticket, Search, User as UserIcon, Settings, LogOut, ChevronRight, Activity } from 'lucide-react';
 import { entradasService, Entrada } from '../../entradas/services/entradas.service';
 import { DigitalTicket } from '../../entradas/components/DigitalTicket';
+import { eventosService } from '../../eventos/services/eventos.service';
 
 export const UserDashboard = () => {
     const auth = useAuth();
     const navigate = useNavigate();
     const [entradas, setEntradas] = useState<Entrada[]>([]);
+    const [eventStatusMap, setEventStatusMap] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
 
     const user = auth.user?.profile;
@@ -23,10 +25,21 @@ export const UserDashboard = () => {
     const loadEntradas = async () => {
         try {
             setLoading(true);
-            const data = await entradasService.getMisEntradas(usuarioId!);
-            setEntradas(data);
+            const [entradasData, eventosData] = await Promise.all([
+                entradasService.getMisEntradas(usuarioId!),
+                eventosService.getEventos()
+            ]);
+
+            setEntradas(entradasData);
+
+            // Crear mapa de estados de eventos
+            const statusMap: Record<string, string> = {};
+            eventosData.forEach(e => {
+                statusMap[e.id] = e.estado;
+            });
+            setEventStatusMap(statusMap);
         } catch (error) {
-            console.error('Error al cargar entradas:', error);
+            console.error('Error al cargar dashboard:', error);
         } finally {
             setLoading(false);
         }
@@ -93,7 +106,7 @@ export const UserDashboard = () => {
                 </div>
 
                 {/* Navegación Rápida */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                     <button
                         onClick={() => navigate('/entradas')}
                         className="group bg-gradient-to-br from-purple-600 to-purple-800 p-1 rounded-3xl transition-transform hover:scale-[1.02]"
@@ -129,16 +142,34 @@ export const UserDashboard = () => {
                     </button>
 
                     <button
-                        className="group bg-neutral-900 border border-neutral-800 p-6 rounded-3xl transition-all opacity-50 cursor-not-allowed"
+                        onClick={() => navigate('/perfil/editar')}
+                        className="group bg-neutral-900 border border-neutral-800 p-6 rounded-3xl transition-all hover:border-neutral-700 hover:bg-neutral-800/50"
                     >
                         <div className="flex justify-between items-start">
-                            <div className="p-3 bg-neutral-800 rounded-2xl">
-                                <Settings className="w-8 h-8 text-neutral-500" />
+                            <div className="p-3 bg-neutral-800 rounded-2xl group-hover:bg-neutral-700 transition-colors">
+                                <Settings className="w-8 h-8 text-neutral-400 group-hover:text-white transition-colors" />
                             </div>
+                            <ChevronRight className="w-6 h-6 text-neutral-600 group-hover:text-neutral-400 transform group-hover:translate-x-1 transition-all" />
                         </div>
                         <div className="text-left mt-8">
                             <h2 className="text-xl font-bold text-white">Configuración</h2>
-                            <p className="text-sm text-neutral-500">Ajustes de cuenta (Pronto)</p>
+                            <p className="text-sm text-neutral-500">Edita tu perfil y preferencias</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/perfil/historial')}
+                        className="group bg-neutral-900 border border-neutral-800 p-6 rounded-3xl transition-all hover:border-orange-500/50 hover:bg-neutral-800/50"
+                    >
+                        <div className="flex justify-between items-start">
+                            <div className="p-3 bg-orange-500/10 rounded-2xl">
+                                <Activity className="w-8 h-8 text-orange-400" />
+                            </div>
+                            <ChevronRight className="w-6 h-6 text-neutral-600 group-hover:text-orange-400 transform group-hover:translate-x-1 transition-all" />
+                        </div>
+                        <div className="text-left mt-8">
+                            <h2 className="text-xl font-bold text-white">Historial</h2>
+                            <p className="text-sm text-neutral-500">Auditoría de tus acciones</p>
                         </div>
                     </button>
                 </div>
@@ -188,6 +219,9 @@ export const UserDashboard = () => {
                                     monto={entrada.precio}
                                     codigo={entrada.codigoQr}
                                     nombreUsuario={(user as any)?.preferred_username || 'Usuario'}
+                                    esVirtual={entrada.esVirtual}
+                                    eventoId={entrada.eventoId}
+                                    eventoEstado={eventStatusMap[entrada.eventoId]}
                                 />
                             ))}
                         </div>

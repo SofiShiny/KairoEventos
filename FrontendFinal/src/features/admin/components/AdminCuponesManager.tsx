@@ -41,15 +41,21 @@ export default function AdminCuponesManager({ eventoId }: AdminCuponesManagerPro
             const data = await pagosService.getCuponesPorEvento(eventoId);
             setCupones(data || []);
         } catch (error: any) {
-            // Si el error es 404 o la lista está vacía, no es un error real
-            if (error.message?.includes('404') || error.response?.status === 404) {
+            console.error('Error al cargar cupones:', error);
+
+            // Manejo específico de errores de autenticación
+            if (error.response?.status === 401) {
+                toast.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            } else if (error.response?.status === 403) {
+                toast.error('No tienes permisos para ver los cupones. Asegúrate de tener rol de administrador u organizador.');
+            } else if (error.response?.status === 404) {
+                // No hay cupones, esto es normal
                 setCupones([]);
+            } else if (error.response?.status >= 500) {
+                toast.error('Error del servidor. Por favor, intenta más tarde.');
             } else {
-                console.error('Error al cargar cupones:', error);
-                // Solo mostrar toast si es un error real de servidor
-                if (error.response?.status >= 500) {
-                    toast.error('Error al conectar con el servidor');
-                }
+                // Otros errores
+                setCupones([]);
             }
         } finally {
             setLoading(false);

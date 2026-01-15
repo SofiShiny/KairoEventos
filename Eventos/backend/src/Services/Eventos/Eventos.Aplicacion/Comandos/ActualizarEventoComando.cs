@@ -12,5 +12,6 @@ public record ActualizarEventoComando(
  UbicacionDto? Ubicacion,
  DateTime? FechaInicio,
  DateTime? FechaFin,
- int? MaximoAsistentes
+ int? MaximoAsistentes,
+ decimal? PrecioBase = null
 ) : IComando<Resultado<EventoDto>>;

@@ -30,7 +30,9 @@ public class ActualizarEventoComandoHandler : IRequestHandler<ActualizarEventoCo
             nuevaUbicacion,
             request.FechaInicio ?? evento.FechaInicio,
             request.FechaFin ?? evento.FechaFin,
-            request.MaximoAsistentes ?? evento.MaximoAsistentes);
+            request.MaximoAsistentes ?? evento.MaximoAsistentes,
+            null,
+            request.PrecioBase);
         
         await _repositorioEvento.ActualizarAsync(evento, cancellationToken);
         return Resultado<EventoDto>.Exito(EventoDtoMapper.Map(evento));

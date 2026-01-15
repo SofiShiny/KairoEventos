@@ -46,7 +46,7 @@ public class MapasAsientosController : ControllerBase
  {
   var mapa = await _context.Mapas
     .Include(m => m.Asientos)
-      .ThenInclude(a => a.Categoria)
+    .Include(m => m.Categorias)
     .FirstOrDefaultAsync(m => m.EventoId == eventoId);
   
   if (mapa == null) 
@@ -55,6 +55,11 @@ public class MapasAsientosController : ControllerBase
   return Ok(new { 
     id = mapa.Id,
     eventoId = mapa.EventoId,
+    categorias = mapa.Categorias.Select(c => new {
+        nombre = c.Nombre,
+        precioBase = c.PrecioBase,
+        tienePrioridad = c.TienePrioridad
+    }).ToList(),
     asientos = mapa.Asientos.Select(a => new {
       id = a.Id,
       fila = a.Fila,

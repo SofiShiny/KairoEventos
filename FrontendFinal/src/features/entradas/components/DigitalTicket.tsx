@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Ticket, User, QrCode } from 'lucide-react';
+import { Calendar, MapPin, Ticket, User, QrCode, Video, ExternalLink } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -16,7 +16,12 @@ interface DigitalTicketProps {
     monto: number;
     codigo: string;
     nombreUsuario: string;
+    esVirtual?: boolean;
+    eventoId: string;
+    eventoEstado?: string;
 }
+
+import { MessageSquare, ClipboardCheck } from 'lucide-react';
 
 export const DigitalTicket = ({
     titulo,
@@ -26,11 +31,16 @@ export const DigitalTicket = ({
     imagenUrl,
     monto,
     codigo,
-    nombreUsuario
+    nombreUsuario,
+    esVirtual,
+    eventoId,
+    eventoEstado
 }: DigitalTicketProps) => {
     // Asegurarse de que estado sea string antes de llamar a toLowerCase
     const estadoStr = String(estado || 'Pendiente');
     const isPagado = estadoStr.toLowerCase().includes('pagada') || estadoStr.toLowerCase().includes('pagado');
+
+    const isCompletado = eventoEstado === 'Completado' || new Date(fecha) < new Date();
 
     return (
         <div className="relative flex flex-col md:flex-row w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl transition-transform hover:scale-[1.01]">
@@ -115,6 +125,41 @@ export const DigitalTicket = ({
                     {codigo ? codigo.toUpperCase() : 'SIN CÓDIGO'}
                 </p>
             </div>
+
+            {/* Acceso Streaming para Eventos Virtuales */}
+            {isPagado && esVirtual && !isCompletado && (
+                <div className="absolute top-4 right-4 md:relative md:top-0 md:right-0 md:w-full md:bg-blue-600/10 md:p-4 md:border-t md:border-blue-500/20 flex flex-col items-center justify-center">
+                    <a
+                        href={`/streaming/${eventoId}`}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-blue-600/20 active:scale-95 group"
+                    >
+                        <Video className="w-4 h-4" />
+                        ACCESO STREAMING
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                </div>
+            )}
+
+            {/* Acceso Post-Evento (Foros y Encuestas) */}
+            {isPagado && isCompletado && (
+                <div className="absolute bottom-0 left-0 w-full bg-neutral-800/80 backdrop-blur-md p-4 border-t border-neutral-700 flex flex-wrap items-center justify-center gap-4 z-20">
+                    <p className="w-full text-center text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 mb-2">Evento Finalizado - Experiencia Kairo</p>
+                    <a
+                        href={`/foros/${eventoId}`}
+                        className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 border border-neutral-700 hover:border-blue-500 text-white rounded-2xl text-xs font-black transition-all group"
+                    >
+                        <MessageSquare className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                        IR AL FORO
+                    </a>
+                    <a
+                        href={`/encuestas/${eventoId}`}
+                        className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 border border-neutral-700 hover:border-purple-500 text-white rounded-2xl text-xs font-black transition-all group"
+                    >
+                        <ClipboardCheck className="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform" />
+                        VALORAR EVENTO
+                    </a>
+                </div>
+            )}
         </div>
     );
 };

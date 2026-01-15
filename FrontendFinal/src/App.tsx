@@ -5,9 +5,11 @@ import { Toaster } from 'react-hot-toast';
 import { router } from './router';
 import { oidcConfig } from './lib/auth-config';
 import { useSignalR } from './hooks/useSignalR';
+import { I18nProvider, useT } from './i18n';
 
 // Componente interno que usa el hook de SignalR
 function AppContent() {
+    const t = useT();
     const { isConnected, connectionError } = useSignalR();
 
     // Forzar logs de estado
@@ -27,7 +29,7 @@ function AppContent() {
                     : 'bg-rose-500 text-white'
                     }`}>
                     <span className={`w-3 h-3 rounded-full animate-pulse ${isConnected ? 'bg-white' : 'bg-white'}`}></span>
-                    {isConnected ? 'SignalR: Conectado' : 'SignalR: Desconectado'}
+                    {isConnected ? t.system.signalrConnected : t.system.signalrDisconnected}
                     {connectionError && <span className="opacity-70 text-[10px] ml-1">({connectionError})</span>}
                 </div>
             </div>
@@ -37,9 +39,11 @@ function AppContent() {
 
 function App() {
     return (
-        <AuthProvider {...oidcConfig}>
-            <AppContent />
-        </AuthProvider>
+        <I18nProvider>
+            <AuthProvider {...oidcConfig}>
+                <AppContent />
+            </AuthProvider>
+        </I18nProvider>
     );
 }
 

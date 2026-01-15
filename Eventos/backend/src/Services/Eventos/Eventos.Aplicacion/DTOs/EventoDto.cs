@@ -16,6 +16,8 @@ public class EventoDto
     public string? OrganizadorId { get; set; }
     public string? UrlImagen { get; set; }
     public string? Categoria { get; set; }
+    public decimal PrecioBase { get; set; }
+    public bool EsVirtual { get; set; }
     public DateTime CreadoEn { get; set; }
     public IEnumerable<AsistenteDto>? Asistentes { get; set; }
 }

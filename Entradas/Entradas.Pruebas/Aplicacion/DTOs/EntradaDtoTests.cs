@@ -21,7 +21,7 @@ public class EntradaDtoTests
         var fechaCompra = DateTime.UtcNow;
 
         // Act
-        var dto = new EntradaDto(id, eventoId, usuarioId, asientoId, monto, codigoQr, estado, fechaCompra);
+        var dto = new EntradaDto(id, eventoId, usuarioId, asientoId, monto, codigoQr, estado, fechaCompra, "Evento", "General", false);
 
         // Assert
         dto.Id.Should().Be(id);

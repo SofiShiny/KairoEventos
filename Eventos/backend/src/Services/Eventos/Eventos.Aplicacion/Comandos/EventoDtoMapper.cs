@@ -32,6 +32,9 @@ internal static class EventoDtoMapper
   Estado = e.Estado.ToString(),
   OrganizadorId = e.OrganizadorId,
   UrlImagen = e.UrlImagen,
+  Categoria = e.Categoria,
+  PrecioBase = e.PrecioBase,
+  EsVirtual = e.EsVirtual,
   CreadoEn = e.CreadoEn,
   Asistentes = e.Asistentes.Any()
   ? e.Asistentes.Select(a => new AsistenteDto

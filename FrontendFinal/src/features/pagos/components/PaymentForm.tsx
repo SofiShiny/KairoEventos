@@ -97,7 +97,7 @@ export default function PaymentForm({ monto, ordenId, usuarioId, onSuccess, onCa
             const pagoRequest: PagoRequest = {
                 ordenId: ordenId,
                 usuarioId: usuarioId,
-                tarjetaNumero: formData.tarjetaNumero.replace(/\s/g, ''),
+                tarjeta: formData.tarjetaNumero.replace(/\s/g, ''),
                 titular: formData.titular,
                 expiracion: formData.expiracion,
                 cvv: formData.cvv,

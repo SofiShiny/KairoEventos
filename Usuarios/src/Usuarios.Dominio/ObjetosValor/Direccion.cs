@@ -9,10 +9,10 @@ namespace Usuarios.Dominio.ObjetosValor
             Valor = valor;
         }
         
-        public static Direccion Crear(string valor)
+        public static Direccion? Crear(string? valor)
         {
             if (string.IsNullOrWhiteSpace(valor))
-                throw new ArgumentException("La dirección no puede estar vacía");
+                return null; // Permitir dirección vacía
             
             if (valor.Trim().Length < 5)
                 throw new ArgumentException("La dirección debe tener al menos 5 caracteres");

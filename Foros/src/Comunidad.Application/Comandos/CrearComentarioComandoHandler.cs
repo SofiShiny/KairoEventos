@@ -19,14 +19,16 @@ public class CrearComentarioComandoHandler : IRequestHandler<CrearComentarioComa
 
     public async Task<Guid> Handle(CrearComentarioComando request, CancellationToken cancellationToken)
     {
-        // Validar que el foro existe
+        // Validar que el foro existe, si no, lo creamos on-the-fly
         var foro = await _foroRepository.ObtenerPorEventoIdAsync(request.ForoId);
         if (foro == null)
         {
-            throw new InvalidOperationException($"El foro con ID {request.ForoId} no existe");
+            // Crear foro automáticamente si no existe (robusto ante falta de mensaje de publicación)
+            foro = Foro.Crear(request.ForoId, "Foro del Evento");
+            await _foroRepository.CrearAsync(foro);
         }
 
-        var comentario = Comentario.Crear(request.ForoId, request.UsuarioId, request.Contenido);
+        var comentario = Comentario.Crear(foro.Id, request.UsuarioId, request.Contenido);
         await _comentarioRepository.CrearAsync(comentario);
 
         return comentario.Id;

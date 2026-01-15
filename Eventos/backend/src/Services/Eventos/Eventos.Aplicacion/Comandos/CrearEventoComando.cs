@@ -13,5 +13,7 @@ public record CrearEventoComando(
     DateTime FechaFin,
     int MaximoAsistentes,
     string OrganizadorId,
-    string? Categoria = null
+    string? Categoria = null,
+    decimal PrecioBase = 0,
+    bool EsVirtual = false
 ) : IComando<Resultado<EventoDto>>;

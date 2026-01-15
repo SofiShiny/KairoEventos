@@ -11,10 +11,17 @@ import {
     Menu,
     Bell,
     Search,
-    User
+    User,
+    Activity,
+    DollarSign,
+    Monitor,
+    FileText
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { LanguageSelector } from '../components/LanguageSelector';
+import { useT } from '../i18n';
+import AuthDebug from '../components/debug/AuthDebug';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -24,12 +31,17 @@ export default function AdminLayout() {
     const location = useLocation();
     const auth = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const t = useT();
 
     const menuItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
-        { icon: Calendar, label: 'Eventos', path: '/admin/eventos' },
-        { icon: BarChart3, label: 'Ventas', path: '/admin/ventas' },
-        { icon: Users, label: 'Usuarios', path: '/admin/usuarios' },
+        { icon: LayoutDashboard, label: t.adminMenu.dashboard, path: '/admin' },
+        { icon: Calendar, label: t.adminMenu.events, path: '/admin/eventos' },
+        { icon: BarChart3, label: t.adminMenu.sales, path: '/admin/ventas' },
+        { icon: DollarSign, label: t.adminMenu.finance, path: '/admin/finanzas' },
+        { icon: Activity, label: t.adminMenu.audit, path: '/admin/auditoria' },
+        { icon: Monitor, label: t.adminMenu.supervision, path: '/admin/supervision' },
+        { icon: FileText, label: t.adminMenu.logs, path: '/admin/logs' },
+        { icon: Users, label: t.adminMenu.users, path: '/admin/usuarios' },
     ];
 
     const handleLogout = () => {
@@ -86,7 +98,7 @@ export default function AdminLayout() {
                             className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-all"
                         >
                             <LogOut className="w-5 h-5" />
-                            {isSidebarOpen && <span className="font-medium">Cerrar Sesión</span>}
+                            {isSidebarOpen && <span className="font-medium">{t.nav.logout}</span>}
                         </button>
                     </div>
                 </div>
@@ -110,7 +122,7 @@ export default function AdminLayout() {
                             <Search className="w-4 h-4 text-slate-500 group-focus-within:text-blue-400" />
                             <input
                                 type="text"
-                                placeholder="Buscar eventos o ventas..."
+                                placeholder={t.common.search + '...'}
                                 className="bg-transparent border-none outline-none text-slate-300 w-64"
                             />
                         </div>
@@ -122,7 +134,7 @@ export default function AdminLayout() {
                             className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors group"
                         >
                             <ShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span className="hidden sm:inline">Volver a la Tienda</span>
+                            <span className="hidden sm:inline">{t.nav.home}</span>
                         </Link>
 
                         <div className="h-6 w-[1px] bg-slate-800" />
@@ -132,10 +144,11 @@ export default function AdminLayout() {
                                 <Bell className="w-5 h-5" />
                                 <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full border-2 border-[#16191f]" />
                             </button>
+                            <LanguageSelector />
                             <div className="flex items-center gap-3 pl-2">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-sm font-bold text-white">{auth.user?.profile.preferred_username || 'Admin User'}</p>
-                                    <p className="text-[10px] text-blue-500 uppercase font-black tracking-widest">Administrator</p>
+                                    <p className="text-[10px] text-blue-500 uppercase font-black tracking-widest">{t.nav.admin}</p>
                                 </div>
                                 <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center border border-white/10 shadow-lg">
                                     <User className="text-white w-5 h-5" />
@@ -152,14 +165,17 @@ export default function AdminLayout() {
 
                 {/* Footer Admin */}
                 <footer className="p-8 border-t border-slate-800 bg-[#16191f]/30 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-sm text-slate-500">© 2026 Kairo Events System. Todos los derechos reservados.</p>
+                    <p className="text-sm text-slate-500">© 2026 Kairo Events System. {t.footer.rights}</p>
                     <div className="flex gap-6 text-sm text-slate-600">
-                        <Link to="#" className="hover:text-slate-400 transition-colors">Documentación</Link>
-                        <Link to="#" className="hover:text-slate-400 transition-colors">Soporte Técnico</Link>
-                        <Link to="#" className="hover:text-slate-400 transition-colors">Estado del Sistema</Link>
+                        <Link to="#" className="hover:text-slate-400 transition-colors">{t.footer.documentation}</Link>
+                        <Link to="#" className="hover:text-slate-400 transition-colors">{t.footer.support}</Link>
+                        <Link to="#" className="hover:text-slate-400 transition-colors">{t.footer.systemStatus}</Link>
                     </div>
                 </footer>
             </main>
+
+            {/* Debug de autenticación - temporal */}
+            <AuthDebug />
         </div>
     );
 }

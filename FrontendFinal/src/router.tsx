@@ -1,14 +1,25 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import StreamingPage from './features/streaming/pages/StreamingPage';
+import { ForoPage } from './features/foros/pages/ForoPage';
+import { EncuestaPage } from './features/encuestas/pages/EncuestaPage';
 import { EventosPage } from './features/eventos/pages/EventosPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 import CheckoutPage from './features/entradas/pages/CheckoutPage';
+import { ServiciosPage } from './features/servicios/pages/ServiciosPage';
 import { UserDashboard } from './features/usuarios/pages/UserDashboard';
+import { ProfileEditPage } from './features/usuarios/pages/ProfileEditPage';
+import { AuditHistoryPage } from './features/usuarios/pages/AuditHistoryPage';
+import { HistorialCorreosPage } from './features/notificaciones/pages/HistorialCorreosPage';
 import { MainLayout } from './components/layout/MainLayout';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './features/admin/pages/AdminDashboard';
 import AdminEventos from './features/admin/pages/AdminEventos';
-import AdminVentas from './features/admin/pages/AdminVentas';
 import AdminUsuarios from './features/admin/pages/AdminUsuarios';
+import { AdminAuditPage } from './features/admin/pages/AdminAuditPage';
+import { ConciliacionPage } from './features/pagos/pages/ConciliacionPage';
+import { ReportesVentasPage } from './features/reportes/pages/ReportesVentasPage';
+import { SupervisionPage } from './features/supervision/pages/SupervisionPage';
+import { LogsPage } from './features/logs/pages/LogsPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const Placeholder = ({ title }: { title: string }) => (
@@ -35,15 +46,18 @@ export const router = createBrowserRouter([
         children: [
             { index: true, element: <EventosPage /> },
             { path: 'perfil', element: <UserDashboard /> },
+            { path: 'perfil/editar', element: <ProfileEditPage /> },
+            { path: 'perfil/historial', element: <AuditHistoryPage /> },
+            { path: 'perfil/correos', element: <HistorialCorreosPage /> },
             { path: 'entradas', element: <UserDashboard /> },
             { path: 'checkout/:eventoId', element: <CheckoutPage /> },
             { path: 'asientos/:eventoId', element: <Placeholder title="Selector de Asientos" /> },
             { path: 'pagos', element: <Placeholder title="Billetera y Pagos" /> },
-            { path: 'servicios', element: <Placeholder title="Servicios Extras" /> },
-            { path: 'foros', element: <Placeholder title="Comunidad y Foros" /> },
-            { path: 'streaming/:id', element: <Placeholder title="Transmisión en Vivo" /> },
+            { path: 'servicios', element: <ServiciosPage /> },
+            { path: 'foros/:id', element: <ForoPage /> },
+            { path: 'streaming/:id', element: <StreamingPage /> },
             { path: 'notificaciones', element: <Placeholder title="Centro de Notificaciones" /> },
-            { path: 'encuestas/:id', element: <Placeholder title="Encuesta de Satisfacción" /> },
+            { path: 'encuestas/:id', element: <EncuestaPage /> },
         ]
     },
     {
@@ -56,7 +70,11 @@ export const router = createBrowserRouter([
         children: [
             { index: true, element: <AdminDashboard /> },
             { path: 'eventos', element: <AdminEventos /> },
-            { path: 'ventas', element: <AdminVentas /> },
+            { path: 'ventas', element: <ReportesVentasPage /> },
+            { path: 'auditoria', element: <AdminAuditPage /> },
+            { path: 'finanzas', element: <ConciliacionPage /> },
+            { path: 'supervision', element: <SupervisionPage /> },
+            { path: 'logs', element: <LogsPage /> },
             {
                 path: 'usuarios', element: (
                     <ProtectedRoute allowedRoles={['admin']}>

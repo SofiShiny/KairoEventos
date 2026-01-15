@@ -27,5 +27,11 @@ public record EntradaDto(
     string? EventoNombre = "Evento",
     
     [property: JsonPropertyName("asientoInfo")]
-    string? AsientoInfo = "General"
+    string? AsientoInfo = "General",
+    
+    bool EsVirtual = false,
+    
+    string? NombreUsuario = null,
+    
+    string? EmailUsuario = null
 );

@@ -16,6 +16,7 @@ export interface Evento {
   maximoAsistentes: number;
   organizadorId?: string;
   publicado: boolean;
+  esVirtual?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -33,6 +34,7 @@ export interface EventoCreateDto {
   };
   maximoAsistentes: number;
   organizadorId?: string;
+  esVirtual?: boolean;
 }
 
 // Category types
@@ -70,4 +72,27 @@ export interface SeatCreateDto {
   categoriaNombre: string; // Category name for backend
   mapaId: string;
   estado?: 'Disponible' | 'Reservado' | 'Ocupado';
+}
+
+// Streaming types
+export interface Transmision {
+  id: string;
+  eventoId: string;
+  plataforma: string;
+  urlAcceso: string;
+  estado: string;
+}
+
+// Ticket types
+export interface Entrada {
+  id: string;
+  eventoId: string;
+  usuarioId: string;
+  asientoId?: string;
+  precio: number;
+  codigoQr: string;
+  estado: string;
+  fechaCompra: string;
+  eventoNombre?: string;
+  asientoInfo?: string;
 }

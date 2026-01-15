@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Encuestas.Aplicacion.Comandos;
 using Encuestas.Dominio.Repositorios;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Encuestas.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EncuestasController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -24,6 +26,13 @@ public class EncuestasController : ControllerBase
         var encuesta = await _repositorio.ObtenerPorEventoIdAsync(eventoId);
         if (encuesta == null) return NotFound();
         return Ok(encuesta);
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult<Guid>> Crear([FromBody] CrearEncuestaCommand command)
+    {
+        var id = await _mediator.Send(command);
+        return StatusCode(201, id);
     }
 
     [HttpPost("responder")]

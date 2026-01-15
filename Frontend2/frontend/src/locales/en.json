@@ -1,0 +1,29 @@
+{
+    "navbar": {
+        "home": "Home",
+        "events": "Events",
+        "admin": "Admin",
+        "organizer": "Organizer",
+        "profile": "My Profile",
+        "settings": "Settings",
+        "logout": "Logout",
+        "login": "Login"
+    },
+    "home": {
+        "hero_title": "Discover your next experience",
+        "hero_subtitle": "Find the best musical, sporting and cultural events in one place.",
+        "recommended_for_you": "Recommended for you",
+        "selection_for_you": "Specially selected for you",
+        "popular_today": "Best sellers today",
+        "popular_subtitle": "Events you can't miss",
+        "all_events": "All Events",
+        "buy_tickets": "Buy Tickets",
+        "view_details": "View Details"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error has occurred",
+        "save": "Save",
+        "cancel": "Cancel"
+    }
+}

@@ -76,6 +76,17 @@ using (var scope = app.Services.CreateScope())
         {
             context.Database.Migrate();
             Console.WriteLine("Migraciones aplicadas exitosamente.");
+            
+            // Diagnóstico de columnas
+            using var command = context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = "SELECT column_name FROM information_schema.columns WHERE table_name = 'Asientos'";
+            context.Database.OpenConnection();
+            using var reader = command.ExecuteReader();
+            Console.WriteLine("Columnas en tabla Asientos:");
+            while (reader.Read())
+            {
+                Console.WriteLine($"- {reader.GetString(0)}");
+            }
         }
     }
     catch (Exception ex)

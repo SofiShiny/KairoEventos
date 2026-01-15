@@ -107,39 +107,6 @@ public class UsuariosController : ControllerBase
     }
 
     /// <summary>
-    /// Actualiza un usuario existente
-    /// </summary>
-    /// <param name="id">ID del usuario a actualizar</param>
-    /// <param name="dto">Datos a actualizar</param>
-    /// <param name="cancellationToken">Token de cancelación</param>
-    /// <returns>Sin contenido si la actualización fue exitosa</returns>
-    [Auditoria]
-    [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status502BadGateway)]
-    public async Task<IActionResult> ActualizarPerfil(
-        Guid id,
-        [FromBody] ActualizarUsuarioDto dto,
-        CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Actualizando perfil de usuario: {UsuarioId}", id);
-
-        var comando = new ActualizarUsuarioComando
-        {
-            UsuarioId = id,
-            Nombre = dto.Nombre,
-            Telefono = dto.Telefono,
-            Direccion = dto.Direccion
-        };
-
-        await _mediator.Send(comando, cancellationToken);
-
-        return NoContent();
-    }
-
-    /// <summary>
     /// Cambia la contraseña del usuario
     /// </summary>
     [Auditoria]
@@ -187,5 +154,41 @@ public class UsuariosController : ControllerBase
         await _mediator.Send(comando, cancellationToken);
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Actualiza el perfil del usuario
+    /// </summary>
+    /// <param name="id">ID del usuario</param>
+    /// <param name="dto">Datos del perfil a actualizar</param>
+    /// <param name="cancellationToken">Token de cancelación</param>
+    /// <returns>Confirmación de actualización</returns>
+    [HttpPut("{id}/perfil")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ActualizarPerfil(
+        Guid id,
+        [FromBody] ActualizarPerfilDto dto,
+        CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Actualizando perfil del usuario: {UsuarioId}", id);
+
+        var comando = new ActualizarPerfilComando
+        {
+            UsuarioId = id,
+            Nombre = dto.Nombre,
+            Telefono = dto.Telefono,
+            Direccion = dto.Direccion
+        };
+
+        var resultado = await _mediator.Send(comando, cancellationToken);
+
+        if (!resultado)
+        {
+            return NotFound(new { mensaje = "Usuario no encontrado" });
+        }
+
+        return Ok(new { mensaje = "Perfil actualizado correctamente" });
     }
 }

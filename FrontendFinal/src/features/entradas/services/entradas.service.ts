@@ -22,6 +22,9 @@ export interface Entrada {
     asientoInfo: string;
     imagenEventoUrl?: string;
     fechaEvento?: string;
+    esVirtual?: boolean;
+    nombreUsuario?: string;
+    emailUsuario?: string;
 }
 
 const ESTADOS_MAP: Record<number, string> = {
@@ -74,7 +77,9 @@ export const entradasService = {
             estado: typeof item.estado === 'number' ? (ESTADOS_MAP[item.estado] || 'Desconocido') : String(item.estado || 'Pendiente'),
             eventoNombre: item.tituloEvento || 'Evento Desconocido',
             asientoInfo: item.nombreSector ? `${item.nombreSector}${item.fila ? ` - Fila ${item.fila}` : ''}${item.numeroAsiento ? ` - Asiento ${item.numeroAsiento}` : ''}` : 'General',
-            fechaCompra: item.fechaCompra
+            fechaCompra: item.fechaCompra,
+            nombreUsuario: item.nombreUsuario,
+            emailUsuario: item.emailUsuario
         }));
     }
 };

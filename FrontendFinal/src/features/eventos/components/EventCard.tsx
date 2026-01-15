@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Evento } from '../types/evento.types';
+import { useT } from '../../../i18n';
 
 interface Props {
     evento: Evento;
@@ -7,7 +8,10 @@ interface Props {
 
 export const EventCard = ({ evento }: Props) => {
     const navigate = useNavigate();
-    const formattedDate = new Date(evento.fechaInicio).toLocaleDateString('es-ES', {
+    const t = useT();
+    const currentLang = document.documentElement.lang === 'es' ? 'es-ES' : 'en-US';
+
+    const formattedDate = new Date(evento.fechaInicio).toLocaleDateString(currentLang, {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
@@ -55,7 +59,7 @@ export const EventCard = ({ evento }: Props) => {
                             onClick={() => navigate(`/checkout/${evento.id}`)}
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
                         >
-                            Ver Tickets y Precios
+                            {t.home.viewTickets}
                         </button>
                     </div>
                 </div>

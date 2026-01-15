@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
+import './i18n';
 
 // Create a client
 const queryClient = new QueryClient({

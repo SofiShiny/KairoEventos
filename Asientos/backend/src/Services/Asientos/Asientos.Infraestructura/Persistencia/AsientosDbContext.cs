@@ -18,30 +18,20 @@ public class AsientosDbContext : DbContext
 
  protected override void OnModelCreating(ModelBuilder modelBuilder)
  {
-  modelBuilder.Ignore<EventoDominio>(); modelBuilder.Entity<MapaAsientos>().Ignore(x => x.Eventos); 
+  modelBuilder.Ignore<EventoDominio>(); 
+  modelBuilder.Entity<MapaAsientos>().Ignore(x => x.Eventos); 
   
-  modelBuilder.Entity<MapaAsientos>(b =>
-  {
-   b.ToTable("Mapas");
-   b.HasKey(x => x.Id);
-   b.Property(x => x.EventoId).IsRequired();
-   b.Navigation(x => x.Asientos).UsePropertyAccessMode(PropertyAccessMode.Field);
-   b.HasMany(x => x.Asientos).WithOne().HasForeignKey(x => x.MapaId).OnDelete(DeleteBehavior.Cascade);
-
-   b.OwnsMany(m => m.Categorias, cat => { cat.Property(c => c.Nombre).IsRequired(); cat.Property(c => c.PrecioBase); cat.Property(c => c.TienePrioridad).IsRequired(); });
-   b.Navigation(m => m.Categorias).UsePropertyAccessMode(PropertyAccessMode.Field);
-  });
-
   modelBuilder.Entity<Asiento>(b =>
   {
    b.ToTable("Asientos");
    b.HasKey(x => x.Id);
+   
    b.Property(x => x.MapaId).IsRequired();
    b.Property(x => x.EventoId).IsRequired();
    b.Property(x => x.Fila).IsRequired();
    b.Property(x => x.Numero).IsRequired();
    b.Property(x => x.Reservado).IsRequired();
-   b.Property(x => x.UsuarioId).IsRequired(false); // Silla vacía por defecto
+   b.Property(x => x.UsuarioId).IsRequired(false);
    
    b.OwnsOne(x => x.Categoria, cat =>
    {
@@ -49,11 +39,32 @@ public class AsientosDbContext : DbContext
     cat.Property(c => c.PrecioBase).HasColumnName("CategoriaPrecioBase");
     cat.Property(c => c.TienePrioridad).HasColumnName("CategoriaTienePrioridad").IsRequired();
    });
-   
+  });
+
+  modelBuilder.Entity<MapaAsientos>(b =>
+  {
+   b.ToTable("Mapas");
+   b.HasKey(x => x.Id);
+   b.Property(x => x.EventoId).IsRequired();
+
+   b.HasMany(m => m.Asientos)
+    .WithOne()
+    .HasForeignKey(a => a.MapaId)
+    .OnDelete(DeleteBehavior.Cascade);
+    
+   b.Navigation(x => x.Asientos).HasField("_asientos").UsePropertyAccessMode(PropertyAccessMode.Field);
+
+   b.OwnsMany(m => m.Categorias, cat => 
+   { 
+       cat.ToTable("MapasCategorias");
+       cat.Property<Guid>("Id").ValueGeneratedOnAdd();
+       cat.HasKey("Id");
+       cat.Property(c => c.Nombre).IsRequired(); 
+       cat.Property(c => c.PrecioBase); 
+       cat.Property(c => c.TienePrioridad).IsRequired(); 
+       cat.WithOwner().HasForeignKey("MapaId");
+   });
+   b.Navigation(m => m.Categorias).HasField("_categorias").UsePropertyAccessMode(PropertyAccessMode.Field);
   });
  }
 }
-
-
-
-

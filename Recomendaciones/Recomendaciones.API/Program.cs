@@ -9,8 +9,35 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configurar CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// Configurar HttpClients para comunicación con otros microservicios
+builder.Services.AddHttpClient("EventosApi", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:EventosApi"] ?? "http://localhost:5001");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+builder.Services.AddHttpClient("EntradasApi", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:EntradasApi"] ?? "http://localhost:5009");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 // Agregar Capas
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Recomendaciones.Aplicacion.Queries.ObtenerRecomendacionesQuery).Assembly));
+builder.Services.AddMediatR(cfg => 
+{
+    cfg.RegisterServicesFromAssembly(typeof(Recomendaciones.Aplicacion.Queries.ObtenerTendenciasQuery).Assembly);
+});
 builder.Services.AgregarInfraestructura(builder.Configuration);
 
 var app = builder.Build();
@@ -34,6 +61,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 

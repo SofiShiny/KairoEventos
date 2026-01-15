@@ -21,6 +21,8 @@ public class CrearMapaAsientosComandoHandler : IRequestHandler<CrearMapaAsientos
  public async Task<Guid> Handle(CrearMapaAsientosComando request, CancellationToken cancellationToken)
  {
   var mapa = MapaAsientos.Crear(request.EventoId);
+  mapa.AgregarCategoria("General", 0, false);
+  mapa.AgregarCategoria("VIP", 0, false);
   await _repo.AgregarAsync(mapa, cancellationToken);
   
   // Publicar evento a RabbitMQ

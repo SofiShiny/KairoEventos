@@ -17,6 +17,8 @@ export const useAsientosSignalR = ({
     useEffect(() => {
         if (!eventoId) return;
 
+        let isMounted = true;
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/../hub/asientos`, {
                 skipNegotiation: true,
@@ -26,23 +28,35 @@ export const useAsientosSignalR = ({
             .build();
 
         connection.on('AsientoReservado', (asientoId: string, usuarioId: string) => {
-            console.log('SignalR: Asiento Reservado', { asientoId, usuarioId });
-            onAsientoReservado(asientoId, usuarioId);
+            if (isMounted) {
+                console.log('SignalR: Asiento Reservado', { asientoId, usuarioId });
+                onAsientoReservado(asientoId, usuarioId);
+            }
         });
 
         connection.on('AsientoLiberado', (asientoId: string) => {
-            console.log('SignalR: Asiento Liberado', { asientoId });
-            onAsientoLiberado(asientoId);
+            if (isMounted) {
+                console.log('SignalR: Asiento Liberado', { asientoId });
+                onAsientoLiberado(asientoId);
+            }
         });
 
         const startConnection = async () => {
             try {
                 await connection.start();
+                if (!isMounted) {
+                    await connection.stop();
+                    return;
+                }
                 console.log('SignalR Connected to AsientosHub');
-                await connection.invoke('JoinEvento', eventoId);
-                console.log(`Joined Group: Evento_${eventoId}`);
+                if (connection.state === signalR.HubConnectionState.Connected) {
+                    await connection.invoke('JoinEvento', eventoId);
+                    console.log(`Joined Group: Evento_${eventoId}`);
+                }
             } catch (err) {
-                console.error('SignalR Connection Error: ', err);
+                if (isMounted) {
+                    console.error('SignalR Connection Error: ', err);
+                }
             }
         };
 
@@ -50,10 +64,16 @@ export const useAsientosSignalR = ({
         connectionRef.current = connection;
 
         return () => {
-            if (connectionRef.current) {
-                connectionRef.current.invoke('LeaveEvento', eventoId)
-                    .then(() => connectionRef.current?.stop())
-                    .catch(err => console.error('Error leaving group or stopping connection', err));
+            isMounted = false;
+            const conn = connectionRef.current;
+            if (conn) {
+                if (conn.state === signalR.HubConnectionState.Connected) {
+                    conn.invoke('LeaveEvento', eventoId)
+                        .finally(() => conn.stop())
+                        .catch(err => console.error('Error leaving group', err));
+                } else {
+                    conn.stop().catch(err => console.error('Error stopping connection', err));
+                }
             }
         };
     }, [eventoId, onAsientoReservado, onAsientoLiberado]);

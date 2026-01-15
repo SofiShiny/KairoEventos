@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_ASIENTOS_API_URL || 'http://localhost:5003';
+import api from '@/lib/axios';
 
 export interface Asiento {
     id: string;
@@ -24,12 +22,12 @@ export interface MapaAsientos {
 class AsientosService {
     async getByEvento(eventoId: string): Promise<Asiento[]> {
         try {
-            // Primero obtenemos el mapa por eventoId
-            const mapaResponse = await axios.get(`${API_URL}/api/asientos/mapas/evento/${eventoId}`);
+            // Primero obtenemos el mapa por eventoId usando la instancia 'api' (que ya tiene /api de base)
+            const mapaResponse = await api.get(`/asientos/mapas/evento/${eventoId}`);
             const mapaId = mapaResponse.data.id;
 
             // Luego obtenemos los asientos completos del mapa
-            const response = await axios.get(`${API_URL}/api/asientos/mapas/${mapaId}`);
+            const response = await api.get(`/asientos/mapas/${mapaId}`);
 
             console.log('Datos del mapa:', response.data);
 
@@ -56,7 +54,7 @@ class AsientosService {
 
     async reservarAsiento(mapaId: string, asientoId: string, usuarioId: string): Promise<void> {
         try {
-            await axios.post(`${API_URL}/api/asientos/reservar`, {
+            await api.post('/asientos/reservar', {
                 mapaId,
                 asientoId,
                 usuarioId
@@ -71,7 +69,7 @@ class AsientosService {
 
     async liberarAsiento(mapaId: string, asientoId: string): Promise<void> {
         try {
-            await axios.post(`${API_URL}/api/asientos/liberar`, {
+            await api.post('/asientos/liberar', {
                 mapaId,
                 asientoId
             });

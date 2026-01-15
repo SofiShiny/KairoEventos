@@ -7,9 +7,11 @@ import { adminReportesService, DashboardMetrics } from '../services/admin.report
 import { StatCard } from '../components/dashboard/StatCard';
 import { VentasChart } from '../components/dashboard/VentasChart';
 import { OcupacionPieChart } from '../components/dashboard/OcupacionPieChart';
+import { useT } from '../../../i18n';
 
 export default function AdminDashboard() {
     const auth = useAuth();
+    const t = useT();
     const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -33,6 +35,14 @@ export default function AdminDashboard() {
     const isAdmin = userRoles.includes('admin');
     const isOrganizador = userRoles.includes('organizador') || userRoles.includes('organizator');
 
+    const formatCurrency = (val: number) => {
+        return new Intl.NumberFormat(document.documentElement.lang === 'es' ? 'es-ES' : 'en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0
+        }).format(val);
+    };
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-96 space-y-4">
@@ -40,7 +50,7 @@ export default function AdminDashboard() {
                     <div className="absolute inset-0 rounded-full border-4 border-purple-500/20"></div>
                     <div className="absolute inset-0 rounded-full border-4 border-t-purple-500 animate-spin"></div>
                 </div>
-                <p className="text-slate-400 font-medium animate-pulse">Cargando métricas en tiempo real...</p>
+                <p className="text-slate-400 font-medium animate-pulse">{t.common.loading}...</p>
             </div>
         );
     }
@@ -50,13 +60,13 @@ export default function AdminDashboard() {
             {/* Welcome Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-black text-white tracking-tight">Análisis de Negocio</h1>
-                    <p className="text-slate-400 mt-2 text-lg">Visualización consolidada de ventas y ocupación de eventos.</p>
+                    <h1 className="text-4xl font-black text-white tracking-tight">{t.dashboard.analysis}</h1>
+                    <p className="text-slate-400 mt-2 text-lg">{t.dashboard.description}</p>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <div className="px-4 py-2 bg-[#16191f] border border-slate-800 rounded-xl text-xs font-bold text-slate-300">
-                        ÚLTIMOS 7 DÍAS
+                        {t.dashboard.last7Days}
                     </div>
                 </div>
             </div>
@@ -65,27 +75,27 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="contents">
                     <StatCard
-                        title="Ventas Totales"
-                        value={`$${metrics?.acumulado.totalVentas.toLocaleString('es-CL') || '0'}`}
+                        title={t.dashboard.totalSales}
+                        value={formatCurrency(metrics?.acumulado.totalVentas || 0)}
                         icon="💰"
                         trend={{ value: '12.5%', positive: true }}
                     />
                     <StatCard
-                        title="Entradas Vendidas"
-                        value={metrics?.acumulado.totalEntradas.toLocaleString() || '0'}
+                        title={t.dashboard.ticketsSold}
+                        value={metrics?.acumulado.totalEntradas.toLocaleString(document.documentElement.lang === 'es' ? 'es-ES' : 'en-US') || '0'}
                         icon="🎫"
                         trend={{ value: '4.2%', positive: true }}
                     />
                     <StatCard
-                        title="Eventos con Datos"
-                        value={metrics?.ocupacion.length || '0'}
+                        title={t.dashboard.eventsWithData}
+                        value={metrics?.ocupacion.length.toString() || '0'}
                         icon="📊"
                     />
                     <StatCard
-                        title="Ticketing Rate"
+                        title={t.dashboard.ticketingRate}
                         value={`${((metrics?.acumulado.totalVentas || 0) / (metrics?.acumulado.totalEntradas || 1)).toFixed(2)}`}
                         icon="📈"
-                        description="Venta promedio por entrada"
+                        description={t.dashboard.avgTicketDescription}
                     />
                 </div>
             </div>
@@ -97,8 +107,8 @@ export default function AdminDashboard() {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 blur-[100px] -mr-32 -mt-32"></div>
                     <div className="flex justify-between items-center mb-6 relative z-10">
                         <div>
-                            <h3 className="text-xl font-bold text-white">Evolución de Ingresos</h3>
-                            <p className="text-sm text-slate-500">Volumen de ventas diarias del periodo</p>
+                            <h3 className="text-xl font-bold text-white">{t.dashboard.revenueEvolution}</h3>
+                            <p className="text-sm text-slate-500">{t.dashboard.dailySalesVolume}</p>
                         </div>
                     </div>
 
@@ -110,8 +120,8 @@ export default function AdminDashboard() {
                 {/* Occupancy Section */}
                 <div className="bg-[#16191f] border border-slate-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-pink-500/5 blur-[80px] -mr-24 -mt-24"></div>
-                    <h3 className="text-xl font-bold text-white mb-1">Ocupación</h3>
-                    <p className="text-sm text-slate-500 mb-8">Estado de inventario de asientos</p>
+                    <h3 className="text-xl font-bold text-white mb-1">{t.dashboard.occupancy}</h3>
+                    <p className="text-sm text-slate-500 mb-8">{t.dashboard.inventoryStatus}</p>
 
                     <div className="relative z-10">
                         <OcupacionPieChart data={metrics?.ocupacion || []} />
@@ -142,8 +152,8 @@ export default function AdminDashboard() {
                         <ArrowUpRight className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-blue-400">Modo Organizador Activo</p>
-                        <p className="text-xs text-blue-400/70 text-slate-400">Las métricas mostradas corresponden únicamente a tus eventos asignados.</p>
+                        <p className="text-sm font-bold text-blue-400">{t.dashboard.organizerMode}</p>
+                        <p className="text-xs text-blue-400/70 text-slate-400">{t.dashboard.organizerMetricsDescription}</p>
                     </div>
                 </div>
             )}

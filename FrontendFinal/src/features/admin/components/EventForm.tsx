@@ -12,7 +12,8 @@ import {
     AlertCircle,
     Clock,
     DollarSign,
-    ImageIcon
+    ImageIcon,
+    Video
 } from 'lucide-react';
 import { Evento } from '../../eventos/types/evento.types';
 import { adminEventosService } from '../services/admin.eventos.service';
@@ -38,6 +39,7 @@ export default function EventForm({ evento, onSuccess, onCancel }: EventFormProp
         maximoAsistentes: evento?.maximoAsistentes || 100,
         categoria: evento?.categoria || 'Conferencia',
         precioBase: 0, // Nuevo campo solicitado
+        esVirtual: evento?.esVirtual || false,
     });
 
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -46,6 +48,10 @@ export default function EventForm({ evento, onSuccess, onCancel }: EventFormProp
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleToggleVirtual = () => {
+        setFormData(prev => ({ ...prev, esVirtual: !prev.esVirtual }));
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +89,8 @@ export default function EventForm({ evento, onSuccess, onCancel }: EventFormProp
                 fechaInicio: new Date(formData.fechaInicio).toISOString(),
                 fechaFin: new Date(formData.fechaFin || formData.fechaInicio).toISOString(),
                 maximoAsistentes: Number(formData.maximoAsistentes),
-                categoria: formData.categoria
+                categoria: formData.categoria,
+                esVirtual: formData.esVirtual
             };
 
             let createdEvento: Evento;
@@ -292,6 +299,30 @@ export default function EventForm({ evento, onSuccess, onCancel }: EventFormProp
                                     onChange={handleChange}
                                     className="w-full bg-[#0f1115] border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white focus:border-blue-500 transition-all"
                                 />
+                            </div>
+
+                            {/* Evento Virtual Switch */}
+                            <div className="md:col-span-2 p-6 bg-blue-500/5 border border-blue-500/20 rounded-2xl flex items-center justify-between group transition-all hover:bg-blue-500/10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                                        <Video className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-black text-white uppercase tracking-tight">Evento Virtual (Streaming)</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-1">
+                                            Se generará un link de Google Meet automáticamente
+                                        </p>
+                                    </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.esVirtual}
+                                        onChange={handleToggleVirtual}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="w-14 h-7 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-6 after:transition-all peer-checked:bg-blue-600 shadow-inner"></div>
+                                </label>
                             </div>
                         </div>
                     </div>

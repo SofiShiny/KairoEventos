@@ -255,7 +255,10 @@ public class EntradasControllerTests
             Monto: 150.00m,
             CodigoQr: "TICKET-GHI789-0123",
             Estado: EstadoEntrada.Pagada,
-            FechaCompra: DateTime.UtcNow.AddDays(-1)
+            FechaCompra: DateTime.UtcNow.AddDays(-1),
+            EventoNombre: "Evento",
+            AsientoInfo: "General",
+            EsVirtual: false
         );
 
         _mediatorMock.Setup(m => m.Send(It.IsAny<ObtenerEntradaQuery>(), It.IsAny<CancellationToken>()))
@@ -334,8 +337,8 @@ public class EntradasControllerTests
         var usuarioId = Guid.NewGuid();
         var entradas = new List<EntradaDto>
         {
-            new(Guid.NewGuid(), Guid.NewGuid(), usuarioId, Guid.NewGuid(), 100m, "TICKET-001", EstadoEntrada.Pagada, DateTime.UtcNow.AddDays(-2)),
-            new(Guid.NewGuid(), Guid.NewGuid(), usuarioId, null, 75m, "TICKET-002", EstadoEntrada.PendientePago, DateTime.UtcNow.AddDays(-1))
+            new(Guid.NewGuid(), Guid.NewGuid(), usuarioId, Guid.NewGuid(), 100m, "TICKET-001", EstadoEntrada.Pagada, DateTime.UtcNow.AddDays(-2), "Evento", "General", false),
+            new(Guid.NewGuid(), Guid.NewGuid(), usuarioId, null, 75m, "TICKET-002", EstadoEntrada.PendientePago, DateTime.UtcNow.AddDays(-1), "Evento", "General", false)
         };
 
         _mediatorMock.Setup(m => m.Send(It.IsAny<ObtenerEntradasPorUsuarioQuery>(), It.IsAny<CancellationToken>()))

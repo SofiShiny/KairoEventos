@@ -1,247 +1,226 @@
 import api from '@/lib/axios';
 
+export enum EstadoTransaccion {
+    Procesando = 0,
+    Aprobada = 1,
+    Rechazada = 2,
+    Reembolsada = 3
+}
+
+export interface Transaccion {
+    id: string;
+    ordenId: string;
+    usuarioId: string;
+    monto: number;
+    tarjetaMascara: string;
+    estado: EstadoTransaccion;
+    fechaCreacion: string;
+    fechaActualizacion?: string;
+    mensajeError?: string;
+}
+
+export interface EstadisticasFinancieras {
+    totalTransacciones: number;
+    totalIngresos: number;
+    transaccionesAprobadas: number;
+    transaccionesRechazadas: number;
+    transaccionesPendientes: number;
+    transaccionesReembolsadas: number;
+    montoAprobado: number;
+    montoRechazado: number;
+    montoPendiente: number;
+    montoReembolsado: number;
+    tasaAprobacion: number;
+}
+
 export interface PagoRequest {
     ordenId: string;
     usuarioId: string;
-    tarjetaNumero: string;
+    tarjeta: string; // El backend espera 'tarjeta'
     titular: string;
     expiracion: string;
     cvv: string;
     monto: number;
     moneda: string;
-    codigoCupon?: string; // Nuevo campo para cupones
+    codigoCupon?: string;
 }
 
 export interface PagoResponse {
     exito: boolean;
-    mensaje: string;
     transaccionId: string;
-    estado?: string;
-}
-
-export interface ValidarCuponResponse {
-    esValido: boolean;
-    descuento: number;
-    nuevoTotal: number;
     mensaje: string;
-    porcentajeDescuento?: number;
-}
-
-export interface CrearCuponGeneralRequest {
-    codigo: string;
-    porcentajeDescuento: number; // Porcentaje 0-100
-    fechaExpiracion?: string;
-    eventoId?: string;
-    esGlobal?: boolean;
-    limiteUsos?: number;
-}
-
-export interface GenerarLoteCuponesRequest {
-    cantidad: number;
-    porcentajeDescuento: number; // Porcentaje 0-100
-    eventoId: string;
-    fechaExpiracion?: string;
+    estado: EstadoTransaccion;
 }
 
 export interface Cupon {
     id: string;
     codigo: string;
-    porcentajeDescuento: number; // Porcentaje 0-100
-    tipo: 'General' | 'Unico';
-    estado: 'Activo' | 'Usado' | 'Expirado' | 'Agotado';
-    fechaExpiracion?: string;
+    porcentajeDescuento: number;
+    tipo: string;
+    estado: string;
     eventoId?: string;
-    usosRestantes?: number;
     fechaCreacion: string;
+    fechaExpiracion?: string;
 }
 
-class PagosService {
-    async procesarPago(datos: PagoRequest): Promise<PagoResponse> {
-        try {
-            // Llamada al microservicio de Pagos a través del Gateway
-            const response = await api.post('/pagos', {
-                ordenId: datos.ordenId,
-                usuarioId: datos.usuarioId,
-                monto: datos.monto,
-                tarjeta: datos.tarjetaNumero.replace(/\s/g, ''), // Enviar sin espacios
-                codigoCupon: datos.codigoCupon // Incluir cupón si existe
-            });
+export interface CrearCuponGeneralRequest {
+    codigo: string;
+    porcentajeDescuento: number;
+    eventoId?: string;
+    esGlobal: boolean;
+    fechaExpiracion?: string;
+    limiteUsos?: number;
+}
 
-            // El backend retorna 202 Accepted con { transaccionId, estado: "Procesando" }
+export interface GenerarLoteRequest {
+    cantidad: number;
+    porcentajeDescuento: number;
+    eventoId: string;
+    fechaExpiracion?: string;
+}
+
+export interface ResultadoValidacionCupon {
+    esValido: boolean;
+    descuento: number;
+    nuevoTotal: number;
+    porcentajeDescuento: number;
+    mensaje: string;
+}
+
+export const pagosService = {
+    getTodasTransacciones: async (): Promise<Transaccion[]> => {
+        const response = await api.get('/pagos');
+        return response.data;
+    },
+
+    getTransaccion: async (id: string): Promise<Transaccion> => {
+        const response = await api.get(`/pagos/${id}`);
+        return response.data;
+    },
+
+    procesarPago: async (request: PagoRequest): Promise<PagoResponse> => {
+        try {
+            // Mapeamos a lo que el backend espera si es necesario
+            const backendRequest = {
+                ordenId: request.ordenId,
+                usuarioId: request.usuarioId,
+                monto: request.monto,
+                tarjeta: request.tarjeta
+            };
+
+            const response = await api.post('/pagos', backendRequest);
+
+            // El backend devuelve 202 Accepted con { transaccionId, estado: "Procesando" }
             return {
                 exito: true,
-                mensaje: 'Pago procesado exitosamente',
                 transaccionId: response.data.transaccionId,
-                estado: response.data.estado
+                mensaje: 'Pago iniciado correctamente',
+                estado: EstadoTransaccion.Procesando
             };
         } catch (error: any) {
-            console.error('Error al procesar pago:', error);
-
-            if (error.response?.data?.mensaje) {
-                return {
-                    exito: false,
-                    mensaje: error.response.data.mensaje,
-                    transaccionId: ''
-                };
-            }
-
-            if (error.response?.status === 400) {
-                return {
-                    exito: false,
-                    mensaje: 'Datos de pago inválidos. Por favor verifica la información.',
-                    transaccionId: ''
-                };
-            }
-
             return {
                 exito: false,
-                mensaje: 'Error al procesar el pago. Por favor intenta de nuevo.',
-                transaccionId: ''
+                transaccionId: '',
+                mensaje: error.response?.data?.mensaje || 'Error al procesar el pago',
+                estado: EstadoTransaccion.Rechazada
             };
         }
-    }
+    },
 
-    async consultarEstadoPago(transaccionId: string): Promise<any> {
-        try {
-            const response = await api.get(`/pagos/${transaccionId}`);
-            return response.data;
-        } catch (error) {
-            console.error('Error al consultar estado de pago:', error);
-            throw error;
+    formatearNumeroTarjeta: (value: string): string => {
+        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        const matches = v.match(/\d{4,16}/g);
+        const match = (matches && matches[0]) || '';
+        const parts = [];
+
+        for (let i = 0, len = match.length; i < len; i += 4) {
+            parts.push(match.substring(i, i + 4));
         }
-    }
 
-    // ==================== MÉTODOS DE CUPONES ====================
-
-    /**
-     * Valida un cupón y calcula el descuento aplicable
-     */
-    async validarCupon(
-        codigo: string,
-        eventoId: string,
-        montoTotal: number
-    ): Promise<ValidarCuponResponse> {
-        try {
-            const response = await api.post('/pagos/cupones/validar', {
-                codigo,
-                eventoId,
-                montoTotal
-            });
-
-            return {
-                esValido: true,
-                descuento: response.data.descuento,
-                nuevoTotal: response.data.nuevoTotal,
-                mensaje: response.data.mensaje || 'Cupón aplicado exitosamente',
-                porcentajeDescuento: response.data.porcentajeDescuento
-            };
-        } catch (error: any) {
-            console.error('Error al validar cupón:', error);
-
-            return {
-                esValido: false,
-                descuento: 0,
-                nuevoTotal: montoTotal,
-                mensaje: error.response?.data?.mensaje || 'Cupón inválido o expirado'
-            };
+        if (parts.length) {
+            return parts.join(' ');
+        } else {
+            return value;
         }
-    }
+    },
 
-    /**
-     * Crea un cupón general (un código usado por muchos usuarios)
-     */
-    async crearCuponGeneral(data: CrearCuponGeneralRequest): Promise<Cupon> {
-        try {
-            const response = await api.post('/pagos/cupones/general', {
-                codigo: data.codigo.toUpperCase(),
-                porcentajeDescuento: data.porcentajeDescuento,
-                fechaExpiracion: data.fechaExpiracion,
-                eventoId: data.eventoId,
-                esGlobal: data.esGlobal || false,
-                limiteUsos: data.limiteUsos
-            });
-
-            return response.data;
-        } catch (error: any) {
-            console.error('Error al crear cupón general:', error);
-            throw new Error(error.response?.data?.mensaje || 'Error al crear el cupón');
-        }
-    }
-
-    /**
-     * Genera un lote de cupones únicos (códigos aleatorios de un solo uso)
-     */
-    async generarLoteCupones(data: GenerarLoteCuponesRequest): Promise<Cupon[]> {
-        try {
-            const response = await api.post('/pagos/cupones/lote', {
-                cantidad: data.cantidad,
-                porcentajeDescuento: data.porcentajeDescuento,
-                eventoId: data.eventoId,
-                fechaExpiracion: data.fechaExpiracion
-            });
-
-            return response.data;
-        } catch (error: any) {
-            console.error('Error al generar lote de cupones:', error);
-            throw new Error(error.response?.data?.mensaje || 'Error al generar los cupones');
-        }
-    }
-
-    /**
-     * Obtiene todos los cupones de un evento específico
-     */
-    async getCuponesPorEvento(eventoId: string): Promise<Cupon[]> {
-        try {
-            const response = await api.get(`/pagos/cupones/evento/${eventoId}`);
-            return response.data;
-        } catch (error: any) {
-            console.error('Error al obtener cupones:', error);
-            throw new Error(error.response?.data?.mensaje || 'Error al cargar los cupones');
-        }
-    }
-
-    /**
-     * Obtiene todos los cupones globales (no asociados a un evento específico)
-     */
-    async getCuponesGlobales(): Promise<Cupon[]> {
-        try {
-            const response = await api.get('/pagos/cupones/globales');
-            return response.data;
-        } catch (error: any) {
-            console.error('Error al obtener cupones globales:', error);
-            throw new Error(error.response?.data?.mensaje || 'Error al cargar los cupones');
-        }
-    }
-
-    // ==================== VALIDACIONES DEL LADO DEL CLIENTE ====================
-
-    validarNumeroTarjeta(numero: string): boolean {
-        // Algoritmo de Luhn simplificado
+    validarNumeroTarjeta: (numero: string): boolean => {
         const cleaned = numero.replace(/\s/g, '');
-        return cleaned.length === 16 && /^\d+$/.test(cleaned);
-    }
+        return cleaned.length >= 13 && cleaned.length <= 16 && /^\d+$/.test(cleaned);
+    },
 
-    validarExpiracion(expiracion: string): boolean {
-        const match = expiracion.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
-        if (!match) return false;
+    validarExpiracion: (expiracion: string): boolean => {
+        if (!/^\d{2}\/\d{2}$/.test(expiracion)) return false;
 
-        const mes = parseInt(match[1]);
-        const año = parseInt('20' + match[2]);
-        const ahora = new Date();
-        const fechaExpiracion = new Date(año, mes - 1);
+        const [month, year] = expiracion.split('/').map(Number);
+        const now = new Date();
+        const currentYear = now.getFullYear() % 100;
+        const currentMonth = now.getMonth() + 1;
 
-        return fechaExpiracion > ahora;
-    }
+        if (month < 1 || month > 12) return false;
+        if (year < currentYear) return false;
+        if (year === currentYear && month < currentMonth) return false;
 
-    validarCVV(cvv: string): boolean {
+        return true;
+    },
+
+    validarCVV: (cvv: string): boolean => {
         return /^\d{3,4}$/.test(cvv);
-    }
+    },
 
-    formatearNumeroTarjeta(numero: string): string {
-        const cleaned = numero.replace(/\s/g, '');
-        const chunks = cleaned.match(/.{1,4}/g) || [];
-        return chunks.join(' ');
-    }
-}
+    calcularEstadisticas: (transacciones: Transaccion[]): EstadisticasFinancieras => {
+        const aprobadas = transacciones.filter(t => t.estado === EstadoTransaccion.Aprobada);
+        const rechazadas = transacciones.filter(t => t.estado === EstadoTransaccion.Rechazada);
+        const pendientes = transacciones.filter(t => t.estado === EstadoTransaccion.Procesando);
+        const reembolsadas = transacciones.filter(t => t.estado === EstadoTransaccion.Reembolsada);
 
-export const pagosService = new PagosService();
+        const montoAprobado = aprobadas.reduce((sum, t) => sum + t.monto, 0);
+        const montoRechazado = rechazadas.reduce((sum, t) => sum + t.monto, 0);
+        const montoPendiente = pendientes.reduce((sum, t) => sum + t.monto, 0);
+        const montoReembolsado = reembolsadas.reduce((sum, t) => sum + t.monto, 0);
+
+        const totalIngresos = montoAprobado - montoReembolsado;
+        const tasaAprobacion = transacciones.length > 0
+            ? (aprobadas.length / transacciones.length) * 100
+            : 0;
+
+        return {
+            totalTransacciones: transacciones.length,
+            totalIngresos,
+            transaccionesAprobadas: aprobadas.length,
+            transaccionesRechazadas: rechazadas.length,
+            transaccionesPendientes: pendientes.length,
+            transaccionesReembolsadas: reembolsadas.length,
+            montoAprobado,
+            montoRechazado,
+            montoPendiente,
+            montoReembolsado,
+            tasaAprobacion
+        };
+    },
+
+    // Métodos de cupones
+    getCuponesPorEvento: async (eventoId: string): Promise<Cupon[]> => {
+        const response = await api.get(`/pagos/cupones/evento/${eventoId}`);
+        return response.data;
+    },
+
+    crearCuponGeneral: async (request: CrearCuponGeneralRequest): Promise<Cupon> => {
+        const response = await api.post('/pagos/cupones/general', request);
+        return response.data;
+    },
+
+    generarLoteCupones: async (request: GenerarLoteRequest): Promise<Cupon[]> => {
+        const response = await api.post('/pagos/cupones/lote', request);
+        return response.data;
+    },
+
+    validarCupon: async (codigo: string, eventoId: string | null, montoTotal: number): Promise<ResultadoValidacionCupon> => {
+        const response = await api.post('/pagos/cupones/validar', {
+            codigo,
+            eventoId,
+            montoTotal
+        });
+        return response.data;
+    }
+};

@@ -1,7 +1,10 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
+import { useT } from '../../i18n';
 
 export const MainLayout = () => {
+    const t = useT();
+
     return (
         <div className="min-h-screen bg-black flex flex-col">
             <Navbar />
@@ -17,12 +20,12 @@ export const MainLayout = () => {
                         <span className="font-extrabold text-lg tracking-tighter text-white">KAIRO</span>
                     </div>
                     <p className="text-neutral-500 text-sm">
-                        &copy; 2024 Kairo Events Ecosystem. Todos los derechos reservados.
+                        &copy; 2024 Kairo Events Ecosystem. {t.footer.rights}
                     </p>
                     <div className="flex gap-6 text-neutral-400 text-sm font-medium">
-                        <a href="#" className="hover:text-white transition-colors">Privacidad</a>
-                        <a href="#" className="hover:text-white transition-colors">Términos</a>
-                        <a href="#" className="hover:text-white transition-colors">Soporte</a>
+                        <a href="#" className="hover:text-white transition-colors">{t.footer.privacy}</a>
+                        <a href="#" className="hover:text-white transition-colors">{t.footer.terms}</a>
+                        <a href="#" className="hover:text-white transition-colors">{t.footer.supportLink}</a>
                     </div>
                 </div>
             </footer>

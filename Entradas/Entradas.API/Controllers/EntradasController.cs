@@ -58,7 +58,9 @@ public class EntradasController : ControllerBase
                     request.EventoId,
                     request.UsuarioId,
                     asientoId,
-                    request.Cupones);
+                    request.Cupones,
+                    NombreUsuario: request.NombreUsuario,
+                    Email: request.Email);
 
                 var resultado = await _mediator.Send(comando, cancellationToken);
                 entradasCreadas.Add(resultado);
@@ -95,6 +97,16 @@ public class EntradasController : ControllerBase
         catch (DominioException ex)
         {
             return BadRequest(new ProblemDetails { Title = "Error de validación", Detail = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error crítico al crear entrada: {Message}", ex.Message);
+            return StatusCode(500, new ProblemDetails 
+            { 
+                Title = "Error crítico del sistema", 
+                Detail = ex.Message,
+                Status = 500
+            });
         }
     }
 

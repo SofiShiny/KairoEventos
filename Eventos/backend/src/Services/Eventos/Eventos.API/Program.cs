@@ -8,6 +8,11 @@ using Eventos.Aplicacion;
 using MassTransit;
 using Eventos.Dominio.Interfaces;
 using Eventos.Infraestructura.Servicios;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication;
+using Eventos.API.Infrastructure;
+using System.Security.Claims;
 
 // Asegurar que la carpeta de imagenes existe al inicio para que UseStaticFiles la detecte
 var contentRoot = Directory.GetCurrentDirectory();
@@ -27,7 +32,7 @@ builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 //Configuracion de servicios
-var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://0.0.0.0:5000";
+var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://0.0.0.0:5001";
 builder.WebHost.UseUrls(urls);
 
 var pathBase = Environment.GetEnvironmentVariable("PATH_BASE");
@@ -113,6 +118,32 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Autenticación JWT con Keycloak
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        // Authority desde env o default
+        var authAuthority = Environment.GetEnvironmentVariable("AUTHENTICATION_AUTHORITY") 
+                            ?? builder.Configuration["Authentication:Authority"] 
+                            ?? "http://localhost:8180/realms/Kairo";
+        
+        options.Authority = authAuthority;
+        options.Audience = builder.Configuration["Authentication:Audience"] ?? "kairo-web";
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false, // Deshabilitar para desarrollo (mismatch entre localhost:8180 y keycloak:8080)
+            ValidateAudience = false, // Facilitar pruebas entre microservicios
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            NameClaimType = "preferred_username",
+            RoleClaimType = ClaimTypes.Role
+        };
+    });
+
+builder.Services.AddTransient<IClaimsTransformation, KeycloakRoleTransformer>();
+builder.Services.AddAuthorization();
+
 // Construccion y configuracion del pipeline
 var app = builder.Build();
 
@@ -151,6 +182,7 @@ app.UseSwaggerUI(c =>
 
 app.UseStaticFiles();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

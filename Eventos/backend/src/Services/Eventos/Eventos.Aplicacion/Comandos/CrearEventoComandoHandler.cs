@@ -80,7 +80,9 @@ public class CrearEventoComandoHandler : IRequestHandler<CrearEventoComando, Res
             request.FechaFin,
             request.MaximoAsistentes,
             request.OrganizadorId,
-            request.Categoria ?? "General");
+            request.Categoria ?? "General",
+            request.PrecioBase,
+            request.EsVirtual);
     }
 
     // Aca se mapea manualmente para evitar dependencias de AutoMapper para mantener

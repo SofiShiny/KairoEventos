@@ -7,7 +7,9 @@ import {
   Alert,
   Paper,
   Grid,
-  CircularProgress
+  CircularProgress,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -41,6 +43,7 @@ const EventForm: FC<EventFormProps> = ({ initialData, mode, redirectUrl }) => {
       pais: string;
     };
     maximoAsistentes: number;
+    esVirtual: boolean;
   }>({
     titulo: '',
     descripcion: '',
@@ -50,7 +53,8 @@ const EventForm: FC<EventFormProps> = ({ initialData, mode, redirectUrl }) => {
       ciudad: '',
       pais: ''
     },
-    maximoAsistentes: 100
+    maximoAsistentes: 100,
+    esVirtual: false
   });
 
   const [dates, setDates] = useState<{ start: Dayjs | null; end: Dayjs | null }>({
@@ -69,7 +73,8 @@ const EventForm: FC<EventFormProps> = ({ initialData, mode, redirectUrl }) => {
           ciudad: initialData.ubicacion.ciudad || '',
           pais: initialData.ubicacion.pais || ''
         },
-        maximoAsistentes: initialData.maximoAsistentes
+        maximoAsistentes: initialData.maximoAsistentes,
+        esVirtual: initialData.esVirtual || false
       });
       setDates({
         start: dayjs(initialData.fechaInicio),
@@ -252,6 +257,22 @@ const EventForm: FC<EventFormProps> = ({ initialData, mode, redirectUrl }) => {
             </Grid>
 
             <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.esVirtual}
+                    onChange={(e) => setFormData({ ...formData, esVirtual: e.target.checked })}
+                    color="primary"
+                  />
+                }
+                label="Evento Virtual (Streaming)"
+              />
+              <Typography variant="caption" color="text.secondary" display="block">
+                Si activas esta opción, se generará automáticamente un link de streaming (Google Meet) al publicar el evento.
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
               <Button
                 type="submit"
                 variant="contained"
@@ -285,7 +306,7 @@ const SeatConfigurationWrapper: FC<{ eventoId: string }> = ({ eventoId }) => {
       try {
         // Check if we have a stored mapaId
         const storedMapId = localStorage.getItem(`map_for_event_${eventoId}`);
-        
+
         if (storedMapId) {
           setMapaId(storedMapId);
           setIsLoading(false);
@@ -295,7 +316,7 @@ const SeatConfigurationWrapper: FC<{ eventoId: string }> = ({ eventoId }) => {
         // No stored map, try to create one
         console.log('[SeatConfigurationWrapper] No stored map found, creating new map for event:', eventoId);
         const result = await createMapForEvent(eventoId);
-        
+
         if (result.mapId) {
           setMapaId(result.mapId);
         } else {

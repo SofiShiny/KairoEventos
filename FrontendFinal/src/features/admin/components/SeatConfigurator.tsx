@@ -31,8 +31,12 @@ export default function SeatConfigurator({ evento, onClose }: SeatConfiguratorPr
             const mapa = await adminAsientosService.getMapaByEvento(evento.id);
             if (mapa) {
                 setMapaId(mapa.id);
-                // Extraer categorías únicas de los asientos si el backend no las da directas
-                // En este backend simplificado, asumimos que podemos obtenerlas o gestionarlas
+                if (mapa.categorias) {
+                    setCategorias(mapa.categorias.map((c: any) => ({
+                        nombre: c.nombre,
+                        precioBase: c.precioBase
+                    })));
+                }
             }
         } catch (err: any) {
             console.error(err);

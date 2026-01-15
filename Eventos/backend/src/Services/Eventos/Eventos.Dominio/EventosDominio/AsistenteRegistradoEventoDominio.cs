@@ -1,6 +1,6 @@
 using BloquesConstruccion.Dominio;
 
-namespace Eventos.Dominio.EventosDeDominio;
+namespace Eventos.Dominio.EventosDominio;
 
 public class AsistenteRegistradoEventoDominio : EventoDominio
 {

@@ -56,7 +56,12 @@ public class AsientosService : IAsientosService
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "Error de comunicación con el microservicio de Asientos");
-            throw new Exception("El servicio de Asientos no está disponible.", ex);
+            throw new ServicioExternoNoDisponibleException("Asientos", "El servicio de Asientos no está disponible.", ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error inesperado al consultar el microservicio de Asientos");
+            throw new ServicioExternoNoDisponibleException("Asientos", "Error inesperado al consultar el servicio de Asientos.", ex);
         }
     }
 }

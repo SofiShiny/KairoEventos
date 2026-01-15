@@ -38,10 +38,19 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         if (error.response?.status === 401) {
-            // Nota: Aquí se podría disparar un evento global o usar el UserManager 
-            // para refrescar el token, pero la redirección es lo más seguro.
-            localStorage.removeItem(OIDC_KEY);
-            window.location.href = '/login';
+            // Verificar si realmente el token expiró o si es un problema de autorización del backend
+            const token = getOidcToken();
+
+            if (!token) {
+                // No hay token, redirigir al login
+                localStorage.removeItem(OIDC_KEY);
+                window.location.href = '/login';
+            } else {
+                // Hay token pero el backend rechazó la petición
+                // Esto puede ser un problema de configuración del backend, no cerramos sesión
+                console.warn('401 recibido pero hay token presente. Posible problema de configuración del backend.');
+                // Dejamos que el componente maneje el error
+            }
         }
         return Promise.reject(error);
     }

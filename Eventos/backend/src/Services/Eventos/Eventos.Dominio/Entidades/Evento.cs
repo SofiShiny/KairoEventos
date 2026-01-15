@@ -1,7 +1,7 @@
 using BloquesConstruccion.Dominio;
 using Eventos.Dominio.ObjetosDeValor;
 using Eventos.Dominio.Enumeraciones;
-using Eventos.Dominio.EventosDeDominio;
+using Eventos.Dominio.EventosDominio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +24,8 @@ public class Evento : RaizAgregada<Guid>
     public string OrganizadorId { get; private set; } = string.Empty;
     public string? UrlImagen { get; private set; }
     public string Categoria { get; private set; } = "General";
+    public decimal PrecioBase { get; private set; }
+    public bool EsVirtual { get; private set; }
     
     // Lista privada + propiedad pública readonly evita modificación externa directa
     // Solo se puede agregar/quitar asistentes a través de métodos que validan reglas de negocio
@@ -50,7 +52,9 @@ public class Evento : RaizAgregada<Guid>
         DateTime fechaFin,
         int maximoAsistentes,
         string organizadorId,
-        string categoria = "General")
+        string categoria = "General",
+        decimal precioBase = 0,
+        bool esVirtual = false)
     {
         Validar(titulo, descripcion, ubicacion, fechaInicio, fechaFin, maximoAsistentes, organizadorId);
 
@@ -63,6 +67,8 @@ public class Evento : RaizAgregada<Guid>
         MaximoAsistentes = maximoAsistentes;
         OrganizadorId = organizadorId;
         Categoria = string.IsNullOrWhiteSpace(categoria) ? "General" : categoria;
+        PrecioBase = precioBase >= 0 ? precioBase : 0;
+        EsVirtual = esVirtual;
         Estado = EstadoEvento.Borrador;
     }
 
@@ -100,7 +106,7 @@ public class Evento : RaizAgregada<Guid>
         Estado = EstadoEvento.Publicado;
         
         // Evento de dominio permite notificar a otros agregados sin acoplamiento directo
-        GenerarEventoDominio(new EventoPublicadoEventoDominio(Id, Titulo, FechaInicio));
+        GenerarEventoDominio(new EventoPublicadoEventoDominio(Id, Titulo, FechaInicio, EsVirtual));
     }
 
   public void Cancelar()
@@ -114,6 +120,20 @@ public class Evento : RaizAgregada<Guid>
   Estado = EstadoEvento.Cancelado;
   
   GenerarEventoDominio(new EventoCanceladoEventoDominio(Id, Titulo));
+  }
+
+  public void Finalizar()
+  {
+  if (Estado == EstadoEvento.Completado)
+  throw new InvalidOperationException("El evento ya está finalizado");
+  
+  if (Estado == EstadoEvento.Cancelado)
+  throw new InvalidOperationException("No se puede finalizar un evento cancelado");
+  
+  if (Estado != EstadoEvento.Publicado)
+  throw new InvalidOperationException("Solo se pueden finalizar eventos publicados");
+
+  Estado = EstadoEvento.Completado;
   }
 
   public void RegistrarAsistente(string usuarioId, string nombreUsuario, string correo)
@@ -146,7 +166,7 @@ public class Evento : RaizAgregada<Guid>
   _asistentes.Remove(asistente);
   }
 
-  public void Actualizar(string titulo, string descripcion, Ubicacion ubicacion, DateTime fechaInicio, DateTime fechaFin, int maximoAsistentes, string? categoria = null)
+  public void Actualizar(string titulo, string descripcion, Ubicacion ubicacion, DateTime fechaInicio, DateTime fechaFin, int maximoAsistentes, string? categoria = null, decimal? precioBase = null, bool? esVirtual = null)
   {
   if (Estado == EstadoEvento.Cancelado)
   throw new InvalidOperationException("No se puede actualizar un evento cancelado");
@@ -170,6 +190,16 @@ public class Evento : RaizAgregada<Guid>
   if (!string.IsNullOrWhiteSpace(categoria))
   {
       Categoria = categoria;
+  }
+  
+  if (precioBase.HasValue && precioBase.Value >= 0)
+  {
+      PrecioBase = precioBase.Value;
+  }
+  
+  if (esVirtual.HasValue)
+  {
+      EsVirtual = esVirtual.Value;
   }
   }
 

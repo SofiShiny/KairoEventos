@@ -28,7 +28,10 @@ public static class EntradaMapper
             entrada.Estado,
             entrada.FechaCompra,
             entrada.TituloEvento,
-            $"{(entrada.NombreSector != null ? entrada.NombreSector + " - " : "")}Fila {entrada.Fila}, Asiento {entrada.NumeroAsiento}"
+            $"{(entrada.NombreSector != null ? entrada.NombreSector + " - " : "")}Fila {entrada.Fila}, Asiento {entrada.NumeroAsiento}",
+            entrada.EsVirtual,
+            entrada.NombreUsuario,
+            entrada.EmailUsuario
         );
     }
 

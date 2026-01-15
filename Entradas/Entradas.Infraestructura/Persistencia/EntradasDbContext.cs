@@ -24,9 +24,6 @@ public class EntradasDbContext : DbContext
         
         // Aplicar configuraciones de entidades
         modelBuilder.ApplyConfiguration(new EntradaConfiguration());
-        
-        // Configurar esquema por defecto
-        modelBuilder.HasDefaultSchema("entradas");
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

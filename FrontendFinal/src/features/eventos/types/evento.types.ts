@@ -10,4 +10,5 @@ export interface Evento {
     estado: string;
     maximoAsistentes: number;
     organizadorId: string;
+    esVirtual?: boolean;
 }

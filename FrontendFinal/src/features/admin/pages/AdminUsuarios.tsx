@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { Users, UserPlus, Shield, Mail, Trash2 } from 'lucide-react';
 import { adminUsuariosService, Usuario, CreateUserRequest } from '../services/admin.usuarios.service';
 
+import { useT } from '../../../i18n';
+
 export default function AdminUsuarios() {
+    const t = useT();
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -29,7 +32,7 @@ export default function AdminUsuarios() {
             setUsuarios(data);
         } catch (error: any) {
             console.error('Error al cargar usuarios:', error);
-            alert('Error al cargar usuarios: ' + error.message);
+            alert(`${t.adminUsers.modal.error}: ` + error.message);
         } finally {
             setLoading(false);
         }
@@ -39,35 +42,35 @@ export default function AdminUsuarios() {
         const newErrors: Record<string, string> = {};
 
         if (!formData.username.trim()) {
-            newErrors.username = 'El nombre de usuario es requerido';
+            newErrors.username = t.adminUsers.validation.usernameRequired;
         } else if (formData.username.length < 3) {
-            newErrors.username = 'Mínimo 3 caracteres';
+            newErrors.username = t.adminUsers.validation.usernameMin;
         }
 
         if (!formData.email.trim()) {
-            newErrors.email = 'El email es requerido';
+            newErrors.email = t.adminUsers.validation.emailRequired;
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Email inválido';
+            newErrors.email = t.adminUsers.validation.emailInvalid;
         }
 
         if (!formData.nombre.trim()) {
-            newErrors.nombre = 'El nombre es requerido';
+            newErrors.nombre = t.adminUsers.validation.nameRequired;
         }
 
         if (!formData.telefono.trim()) {
-            newErrors.telefono = 'El teléfono es requerido';
+            newErrors.telefono = t.adminUsers.validation.phoneRequired;
         } else if (!/^\d{10}$/.test(formData.telefono.replace(/\D/g, ''))) {
-            newErrors.telefono = 'Teléfono inválido (10 dígitos)';
+            newErrors.telefono = t.adminUsers.validation.phoneInvalid;
         }
 
         if (!formData.direccion.trim()) {
-            newErrors.direccion = 'La dirección es requerida';
+            newErrors.direccion = t.adminUsers.validation.addressRequired;
         }
 
         if (!formData.password) {
-            newErrors.password = 'La contraseña es requerida';
+            newErrors.password = t.adminUsers.validation.passwordRequired;
         } else if (formData.password.length < 8) {
-            newErrors.password = 'Mínimo 8 caracteres';
+            newErrors.password = t.adminUsers.validation.passwordMin;
         }
 
         setErrors(newErrors);
@@ -82,7 +85,7 @@ export default function AdminUsuarios() {
         setSubmitting(true);
         try {
             await adminUsuariosService.crearUsuario(formData);
-            alert(`✅ Usuario ${formData.role} creado exitosamente`);
+            alert(`✅ ${t.adminUsers.modal.success}`);
             setShowCreateModal(false);
             setFormData({
                 username: '',
@@ -95,21 +98,21 @@ export default function AdminUsuarios() {
             });
             loadUsuarios();
         } catch (error: any) {
-            alert('❌ Error al crear usuario: ' + error.message);
+            alert(`❌ ${t.adminUsers.modal.error}: ` + error.message);
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (userId: string, username: string) => {
-        if (!confirm(`¿Estás seguro de eliminar al usuario "${username}"?`)) return;
+        if (!confirm(t.adminUsers.delete.confirm.replace('{username}', username))) return;
 
         try {
             await adminUsuariosService.eliminarUsuario(userId);
-            alert('✅ Usuario eliminado exitosamente');
+            alert(`✅ ${t.adminUsers.delete.success}`);
             loadUsuarios();
         } catch (error: any) {
-            alert('❌ Error al eliminar usuario: ' + error.message);
+            alert(`❌ ${t.adminUsers.delete.error}: ` + error.message);
         }
     };
 
@@ -121,10 +124,10 @@ export default function AdminUsuarios() {
     };
 
     const getRoleLabel = (roles: string[] | undefined) => {
-        if (!roles || !Array.isArray(roles)) return 'Usuario';
-        if (roles.includes('admin')) return 'Administrador';
-        if (roles.includes('organizador')) return 'Organizador';
-        return 'Usuario';
+        if (!roles || !Array.isArray(roles)) return t.adminUsers.roles.user;
+        if (roles.includes('admin')) return t.adminUsers.roles.admin;
+        if (roles.includes('organizador')) return t.adminUsers.roles.organizer;
+        return t.adminUsers.roles.user;
     };
 
     if (loading) {
@@ -132,7 +135,7 @@ export default function AdminUsuarios() {
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-                    <p className="text-gray-400">Cargando usuarios...</p>
+                    <p className="text-gray-400">{t.common.loading}...</p>
                 </div>
             </div>
         );
@@ -146,16 +149,16 @@ export default function AdminUsuarios() {
                     <div>
                         <h1 className="text-4xl font-black bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-3">
                             <Users className="w-10 h-10 text-purple-500" />
-                            Gestión de Usuarios
+                            {t.adminUsers.title}
                         </h1>
-                        <p className="text-gray-400 mt-2">Administra usuarios y organizadores del sistema</p>
+                        <p className="text-gray-400 mt-2">{t.adminUsers.description}</p>
                     </div>
                     <button
                         onClick={() => setShowCreateModal(true)}
                         className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/50"
                     >
                         <UserPlus className="w-5 h-5" />
-                        Crear Usuario
+                        {t.adminUsers.createNew}
                     </button>
                 </div>
             </div>
@@ -165,7 +168,7 @@ export default function AdminUsuarios() {
                 <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-gray-400 text-sm">Total Usuarios</p>
+                            <p className="text-gray-400 text-sm">{t.adminUsers.totalUsers}</p>
                             <p className="text-3xl font-bold text-white mt-1">{usuarios.length}</p>
                         </div>
                         <Users className="w-12 h-12 text-purple-500 opacity-50" />
@@ -174,7 +177,7 @@ export default function AdminUsuarios() {
                 <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-gray-400 text-sm">Organizadores</p>
+                            <p className="text-gray-400 text-sm">{t.adminUsers.organizers}</p>
                             <p className="text-3xl font-bold text-white mt-1">
                                 {usuarios.filter(u => u.roles?.includes('organizador')).length}
                             </p>
@@ -185,7 +188,7 @@ export default function AdminUsuarios() {
                 <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-gray-400 text-sm">Administradores</p>
+                            <p className="text-gray-400 text-sm">{t.adminUsers.admins}</p>
                             <p className="text-3xl font-bold text-white mt-1">
                                 {usuarios.filter(u => u.roles?.includes('admin')).length}
                             </p>
@@ -201,11 +204,11 @@ export default function AdminUsuarios() {
                     <table className="w-full">
                         <thead className="bg-black/50 border-b border-gray-800">
                             <tr>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Usuario</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Email</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Rol</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">Fecha Creación</th>
-                                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-400">Acciones</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">{t.adminUsers.table.user}</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">{t.adminUsers.table.email}</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">{t.adminUsers.table.role}</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">{t.adminUsers.table.created}</th>
+                                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-400">{t.adminUsers.table.actions}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-800">
@@ -229,14 +232,14 @@ export default function AdminUsuarios() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-gray-400">
-                                        {new Date(usuario.createdTimestamp).toLocaleDateString()}
+                                        {new Date(usuario.createdTimestamp).toLocaleDateString(document.documentElement.lang === 'es' ? 'es-ES' : 'en-US')}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => handleDelete(usuario.id, usuario.username)}
                                                 className="p-2 hover:bg-red-900/20 rounded-lg transition"
-                                                title="Eliminar"
+                                                title={t.common.delete}
                                             >
                                                 <Trash2 className="w-5 h-5 text-red-400" />
                                             </button>
@@ -256,16 +259,16 @@ export default function AdminUsuarios() {
                         <div className="p-6 border-b border-gray-800">
                             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                 <UserPlus className="w-6 h-6 text-purple-500" />
-                                Crear Nuevo Usuario
+                                {t.adminUsers.modal.title}
                             </h2>
-                            <p className="text-gray-400 text-sm mt-1">Registra un nuevo organizador o administrador</p>
+                            <p className="text-gray-400 text-sm mt-1">{t.adminUsers.modal.description}</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             {/* Username */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Nombre de Usuario *
+                                    {t.adminUsers.modal.username} *
                                 </label>
                                 <input
                                     type="text"
@@ -280,7 +283,7 @@ export default function AdminUsuarios() {
                             {/* Email */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Email *
+                                    {t.adminUsers.table.email} *
                                 </label>
                                 <input
                                     type="email"
@@ -295,7 +298,7 @@ export default function AdminUsuarios() {
                             {/* Nombre Completo */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Nombre Completo *
+                                    {t.adminUsers.modal.fullName} *
                                 </label>
                                 <input
                                     type="text"
@@ -310,7 +313,7 @@ export default function AdminUsuarios() {
                             {/* Teléfono */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Teléfono *
+                                    {t.adminUsers.modal.phone} *
                                 </label>
                                 <input
                                     type="tel"
@@ -325,7 +328,7 @@ export default function AdminUsuarios() {
                             {/* Dirección */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Dirección *
+                                    {t.adminUsers.modal.address} *
                                 </label>
                                 <input
                                     type="text"
@@ -340,14 +343,14 @@ export default function AdminUsuarios() {
                             {/* Password */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Contraseña *
+                                    {t.adminUsers.modal.password} *
                                 </label>
                                 <input
                                     type="password"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className={`w-full px-4 py-3 bg-black/50 border ${errors.password ? 'border-red-500' : 'border-gray-700'} rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500`}
-                                    placeholder="Mínimo 8 caracteres"
+                                    placeholder={t.adminUsers.validation.passwordMin}
                                 />
                                 {errors.password && <p className="mt-1 text-sm text-red-400">{errors.password}</p>}
                             </div>
@@ -355,15 +358,15 @@ export default function AdminUsuarios() {
                             {/* Rol */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Rol *
+                                    {t.adminUsers.modal.role} *
                                 </label>
                                 <select
                                     value={formData.role}
                                     onChange={(e) => setFormData({ ...formData, role: e.target.value as 'organizador' | 'admin' })}
                                     className="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
-                                    <option value="organizador">Organizador</option>
-                                    <option value="admin">Administrador</option>
+                                    <option value="organizador">{t.adminUsers.roles.organizer}</option>
+                                    <option value="admin">{t.adminUsers.roles.admin}</option>
                                 </select>
                             </div>
 
@@ -375,14 +378,14 @@ export default function AdminUsuarios() {
                                     className="flex-1 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition"
                                     disabled={submitting}
                                 >
-                                    Cancelar
+                                    {t.common.cancel}
                                 </button>
                                 <button
                                     type="submit"
                                     className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={submitting}
                                 >
-                                    {submitting ? 'Creando...' : 'Crear Usuario'}
+                                    {submitting ? t.adminUsers.modal.creating : t.adminUsers.createNew}
                                 </button>
                             </div>
                         </form>

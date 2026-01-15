@@ -1,5 +1,6 @@
 using MediatR;
 using Entradas.Aplicacion.DTOs;
+using Entradas.Aplicacion.Mappers;
 using Entradas.Dominio.Interfaces;
 using Entradas.Aplicacion.Queries;
 
@@ -43,17 +44,6 @@ public class ObtenerTodasLasEntradasQueryHandler : IRequestHandler<ObtenerTodasL
             entradas = todasEntradas.Where(e => eventosDelOrganizador.Contains(e.EventoId));
         }
 
-        return entradas.Select(e => new EntradaDto(
-            e.Id,
-            e.EventoId,
-            e.UsuarioId,
-            e.AsientoId,
-            e.Monto,
-            e.CodigoQr,
-            e.Estado,
-            e.FechaCompra,
-            e.TituloEvento ?? "Evento",
-            e.NombreSector != null ? $"{e.NombreSector}{(e.Fila != null ? $" - Fila {e.Fila}" : "")}{(e.NumeroAsiento != null ? $" - Asiento {e.NumeroAsiento}" : "")}" : "General"
-        ));
+        return EntradaMapper.ToDto(entradas);
     }
 }

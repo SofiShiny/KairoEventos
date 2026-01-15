@@ -97,6 +97,21 @@ public class Entrada : EntidadBase
     /// Número del asiento (snapshot al momento de la compra)
     /// </summary>
     public int? NumeroAsiento { get; protected set; }
+    
+    /// <summary>
+    /// Indica si el evento es virtual (snapshot al momento de la compra)
+    /// </summary>
+    public bool EsVirtual { get; protected set; }
+
+    /// <summary>
+    /// Nombre del usuario (snapshot al momento de la compra)
+    /// </summary>
+    public string? NombreUsuario { get; protected set; }
+
+    /// <summary>
+    /// Email del usuario (snapshot al momento de la compra)
+    /// </summary>
+    public string? EmailUsuario { get; protected set; }
 
     // Constructor protegido para EF Core
     protected Entrada() : base() { }
@@ -116,7 +131,10 @@ public class Entrada : EntidadBase
         DateTime? fechaEvento = null,
         string? nombreSector = null,
         string? fila = null,
-        int? numeroAsiento = null) 
+        int? numeroAsiento = null,
+        bool esVirtual = false,
+        string? nombreUsuario = null,
+        string? emailUsuario = null) 
     {
         // Inicializar ID y fechas para nueva entrada
         Id = Guid.NewGuid();
@@ -128,7 +146,7 @@ public class Entrada : EntidadBase
         AsientoId = asientoId;
         MontoOriginal = montoOriginal;
         MontoDescuento = montoDescuento;
-        Monto = montoOriginal - montoDescuento;
+        Monto = Math.Max(0, montoOriginal - montoDescuento);
         CuponesAplicados = cuponesJson;
         CodigoQr = codigoQr ?? throw new ArgumentNullException(nameof(codigoQr));
         Estado = EstadoEntrada.Reservada;
@@ -142,6 +160,9 @@ public class Entrada : EntidadBase
         NombreSector = nombreSector;
         Fila = fila;
         NumeroAsiento = numeroAsiento;
+        EsVirtual = esVirtual;
+        NombreUsuario = nombreUsuario;
+        EmailUsuario = emailUsuario;
     }
 
     /// <summary>
@@ -175,7 +196,10 @@ public class Entrada : EntidadBase
         DateTime? fechaEvento = null,
         string? nombreSector = null,
         string? fila = null,
-        int? numeroAsiento = null)
+        int? numeroAsiento = null,
+        bool esVirtual = false,
+        string? nombreUsuario = null,
+        string? emailUsuario = null)
     {
         ValidarParametrosCreacion(eventoId, usuarioId, montoOriginal, codigoQr);
         
@@ -193,7 +217,10 @@ public class Entrada : EntidadBase
             fechaEvento,
             nombreSector,
             fila,
-            numeroAsiento);
+            numeroAsiento,
+            esVirtual,
+            nombreUsuario,
+            emailUsuario);
     }
 
     /// <summary>
@@ -279,9 +306,9 @@ public class Entrada : EntidadBase
             throw new ArgumentException("El ID del usuario no puede ser vacío.", nameof(usuarioId));
         }
 
-        if (monto <= 0)
+        if (monto < 0)
         {
-            throw new ArgumentException("El monto debe ser mayor a cero.", nameof(monto));
+            throw new ArgumentException("El monto no puede ser negativo.", nameof(monto));
         }
 
         if (string.IsNullOrWhiteSpace(codigoQr))

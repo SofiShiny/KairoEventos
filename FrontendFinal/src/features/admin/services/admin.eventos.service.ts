@@ -44,5 +44,12 @@ export const adminEventosService = {
      */
     publicarEvento: async (id: string): Promise<void> => {
         await api.patch(`/eventos/${id}/publicar`);
+    },
+
+    /**
+     * Finaliza un evento manualmente (cambia estado a Completado)
+     */
+    finalizarEvento: async (id: string): Promise<void> => {
+        await api.patch(`/eventos/${id}/finalizar`);
     }
 };

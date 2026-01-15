@@ -15,7 +15,7 @@ public class EntradaConfiguration : IEntityTypeConfiguration<Entrada>
         // Configuración de tabla
         builder.ToTable("entradas", t =>
         {
-            t.HasCheckConstraint("ck_entradas_monto_positivo", "monto > 0");
+            t.HasCheckConstraint("ck_entradas_monto_positivo", "monto >= 0");
             t.HasCheckConstraint("ck_entradas_estado_valido", "estado IN (0, 1, 2, 3, 4)");
         });
         
@@ -120,6 +120,21 @@ public class EntradaConfiguration : IEntityTypeConfiguration<Entrada>
 
         builder.Property(e => e.NumeroAsiento)
             .HasColumnName("numero_asiento")
+            .IsRequired(false);
+            
+        builder.Property(e => e.EsVirtual)
+            .HasColumnName("es_virtual")
+            .HasDefaultValue(false)
+            .IsRequired();
+
+        builder.Property(e => e.NombreUsuario)
+            .HasColumnName("nombre_usuario")
+            .HasMaxLength(200)
+            .IsRequired(false);
+
+        builder.Property(e => e.EmailUsuario)
+            .HasColumnName("email_usuario")
+            .HasMaxLength(200)
             .IsRequired(false);
         
         // Índices
