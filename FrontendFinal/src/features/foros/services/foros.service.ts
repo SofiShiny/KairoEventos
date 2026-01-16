@@ -1,6 +1,7 @@
 import api from '@/lib/axios';
 
 export interface Respuesta {
+    id: string;
     usuarioId: string;
     contenido: string;
     fechaCreacion: string;
@@ -44,5 +45,9 @@ export const forosService = {
 
     ocultarComentario: async (comentarioId: string): Promise<void> => {
         await api.delete(`/comunidad/comentarios/${comentarioId}`);
+    },
+
+    ocultarRespuesta: async (comentarioId: string, respuestaId: string): Promise<void> => {
+        await api.delete(`/comunidad/comentarios/${comentarioId}/respuestas/${respuestaId}`);
     }
 };

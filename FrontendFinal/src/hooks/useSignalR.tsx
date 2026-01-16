@@ -61,6 +61,22 @@ export const useSignalR = () => {
                     ]),
                     { duration: 8000, icon: '🎉' }
                 );
+            } else if (notificacion.tipo === 'pago_rechazado') {
+                toast.error(
+                    React.createElement('div', null, [
+                        React.createElement('strong', { key: 't' }, notificacion.titulo),
+                        React.createElement('p', { key: 'm', className: 'text-sm mt-1' }, notificacion.mensaje)
+                    ]),
+                    { duration: 10000, icon: '⚠️' }
+                );
+            } else if (notificacion.tipo === 'entrada_cancelada') {
+                toast.success(
+                    React.createElement('div', null, [
+                        React.createElement('strong', { key: 't' }, notificacion.titulo),
+                        React.createElement('p', { key: 'm', className: 'text-sm mt-1' }, notificacion.mensaje)
+                    ]),
+                    { duration: 8000, icon: '💰' }
+                );
             } else {
                 toast(notificacion.mensaje, { icon: '📬' });
             }

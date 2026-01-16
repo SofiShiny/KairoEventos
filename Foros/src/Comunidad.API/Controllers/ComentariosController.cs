@@ -105,6 +105,27 @@ public class ComentariosController : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Ocultar una respuesta específica (moderación)
+    /// </summary>
+    [HttpDelete("comentarios/{comentarioId:guid}/respuestas/{respuestaId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> OcultarRespuesta(Guid comentarioId, Guid respuestaId)
+    {
+        try
+        {
+            var comando = new OcultarComentarioComando(comentarioId, respuestaId);
+            await _mediator.Send(comando);
+            return Ok();
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Error al ocultar respuesta");
+            return BadRequest(new { error = ex.Message });
+        }
+    }
 }
 
 public record CrearComentarioRequest(Guid ForoId, Guid UsuarioId, string Contenido);

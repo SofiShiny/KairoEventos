@@ -15,6 +15,18 @@ const formatImageUrl = (url?: string | null) => {
 export const eventosService = {
     getEventos: async (): Promise<Evento[]> => {
         const response = await api.get<any[]>('/eventos');
+        const first = response.data?.[0];
+        if (first) {
+            console.log('DEBUG: Evento #1 keys:', Object.keys(first));
+            console.log('DEBUG: Evento #1 snapshot:', {
+                id: first.id || first.Id,
+                titulo: first.titulo || first.Titulo,
+                esVirtual: first.esVirtual,
+                EsVirtual: first.EsVirtual,
+                precioBase: first.precioBase,
+                PrecioBase: first.PrecioBase
+            });
+        }
         return response.data.map(e => ({
             id: e.id,
             titulo: e.titulo,
@@ -26,7 +38,9 @@ export const eventosService = {
             categoria: e.categoria || 'General',
             estado: e.estado,
             maximoAsistentes: e.maximoAsistentes,
-            organizadorId: e.organizadorId
+            organizadorId: e.organizadorId,
+            esVirtual: e.esVirtual === true || e.EsVirtual === true,
+            precioBase: e.precioBase ?? e.PrecioBase ?? 0
         }));
     },
 
@@ -43,7 +57,9 @@ export const eventosService = {
             categoria: e.categoria || 'General',
             estado: e.estado,
             maximoAsistentes: e.maximoAsistentes,
-            organizadorId: e.organizadorId
+            organizadorId: e.organizadorId,
+            esVirtual: e.esVirtual === true || e.EsVirtual === true,
+            precioBase: e.precioBase ?? e.PrecioBase ?? 0
         }));
     },
 
@@ -61,7 +77,9 @@ export const eventosService = {
             categoria: e.categoria || 'General',
             estado: e.estado,
             maximoAsistentes: e.maximoAsistentes,
-            organizadorId: e.organizadorId
+            organizadorId: e.organizadorId,
+            esVirtual: e.esVirtual === true || e.EsVirtual === true,
+            precioBase: e.precioBase ?? e.PrecioBase ?? 0
         };
     },
 

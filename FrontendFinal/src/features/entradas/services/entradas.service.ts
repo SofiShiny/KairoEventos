@@ -81,5 +81,10 @@ export const entradasService = {
             nombreUsuario: item.nombreUsuario,
             emailUsuario: item.emailUsuario
         }));
+    },
+
+    cancelarEntrada: async (id: string, usuarioId: string) => {
+        const response = await api.put(`/entradas/${id}/cancelar?usuarioId=${usuarioId}`);
+        return response.data;
     }
 };

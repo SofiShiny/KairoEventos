@@ -39,9 +39,17 @@ public class EventoRepository : IRepositorioEvento
 
     public async Task<IEnumerable<Evento>> ObtenerTodosAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Eventos
+        var eventos = await _context.Eventos
             .Include(e => e.Asistentes)
             .ToListAsync(cancellationToken);
+        
+        // DEBUG: Log de los valores leídos de la BD
+        foreach (var e in eventos.Take(3))
+        {
+            Console.WriteLine($"[REPO] Evento {e.Id} leído de BD: EsVirtual={e.EsVirtual}, PrecioBase={e.PrecioBase}");
+        }
+        
+        return eventos;
     }
 
     public async Task<IEnumerable<Evento>> ObtenerEventosPublicadosAsync(CancellationToken cancellationToken = default)

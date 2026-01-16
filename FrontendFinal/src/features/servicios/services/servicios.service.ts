@@ -1,36 +1,36 @@
-import axios from 'axios';
+import api from '@/lib/axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-export interface ServicioGlobal {
+export interface ServicioComplementario {
     id: string;
     nombre: string;
     precio: number;
     activo: boolean;
+    proveedores: any[];
 }
 
-export interface ReservaServicio {
-    id: string;
+export interface ReservarServicioRequest {
     usuarioId: string;
     eventoId: string;
     servicioGlobalId: string;
-    estado: string;
-    fechaCreacion: string;
 }
 
 export const serviciosService = {
-    getCatalogo: async (): Promise<ServicioGlobal[]> => {
-        const response = await axios.get(`${API_URL}/servicios/catalogo`);
+    // El endpoint detectado es /api/servicios/catalogo
+    // Nota: Aunque el nombre sugiere catálogo global, lo usaremos para listar servicios disponibles.
+    getServiciosPorEvento: async (eventoId: string): Promise<ServicioComplementario[]> => {
+        // En una implementación ideal, filtraríamos por eventoId. 
+        // Dado que el endpoint es genérico, obtenemos todo el catálogo.
+        const response = await api.get('/servicios/catalogo');
         return response.data;
     },
 
-    reservar: async (command: { usuarioId: string; eventoId: string; servicioGlobalId: string }): Promise<string> => {
-        const response = await axios.post(`${API_URL}/servicios/reservar`, command);
-        return response.data;
+    reservarServicio: async (request: ReservarServicioRequest): Promise<string> => {
+        const response = await api.post('/servicios/reservar', request);
+        return response.data; // Retorna el Guid de la reserva
     },
 
-    getMisReservas: async (usuarioId: string): Promise<ReservaServicio[]> => {
-        const response = await axios.get(`${API_URL}/servicios/mis-reservas/${usuarioId}`);
+    getMisReservas: async (usuarioId: string): Promise<any[]> => {
+        const response = await api.get(`/servicios/mis-reservas/${usuarioId}`);
         return response.data;
     }
 };

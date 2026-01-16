@@ -37,12 +37,19 @@ public class ObtenerComentariosQueryHandler : IRequestHandler<ObtenerComentarios
                 UsuarioId = c.UsuarioId,
                 Contenido = c.Contenido,
                 FechaCreacion = c.FechaCreacion,
-                Respuestas = c.Respuestas.Select(r => new RespuestaDto
-                {
-                    UsuarioId = r.UsuarioId,
-                    Contenido = r.Contenido,
-                    FechaCreacion = r.FechaCreacion
-                }).ToList()
+                Respuestas = c.Respuestas
+                    .Where(r => r.EsVisible) // Volvemos a filtrar aquí para no complicar el frontend
+                    .Select(r => new RespuestaDto
+                    {
+                        // Buscamos el índice original en la lista NO filtrada para mantener la consistencia
+                        // del ID determinista si el ID real es Guid.Empty
+                        Id = (r.Id == Guid.Empty) 
+                            ? Guid.Parse($"00000000-0000-0000-0000-{c.Respuestas.IndexOf(r):D12}") 
+                            : r.Id,
+                        UsuarioId = r.UsuarioId,
+                        Contenido = r.Contenido,
+                        FechaCreacion = r.FechaCreacion
+                    }).ToList()
             })
             .ToList();
     }

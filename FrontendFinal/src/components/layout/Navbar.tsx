@@ -79,12 +79,20 @@ export const Navbar = () => {
                                 </button>
                             </div>
                         ) : (
-                            <button
-                                onClick={() => auth.signinRedirect()}
-                                className="px-6 py-2.5 bg-white text-black font-black rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95"
-                            >
-                                {t.nav.login.toUpperCase()}
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <Link
+                                    to="/register"
+                                    className="px-6 py-2.5 bg-neutral-900 text-white font-bold rounded-xl border border-neutral-700 hover:bg-neutral-800 transition-all active:scale-95"
+                                >
+                                    {t.nav.register}
+                                </Link>
+                                <button
+                                    onClick={() => auth.signinRedirect()}
+                                    className="px-6 py-2.5 bg-white text-black font-black rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95"
+                                >
+                                    {t.nav.login.toUpperCase()}
+                                </button>
+                            </div>
                         )}
                     </div>
 
@@ -125,12 +133,21 @@ export const Navbar = () => {
                             </div>
                         </>
                     ) : (
-                        <button
-                            onClick={() => auth.signinRedirect()}
-                            className="w-full mt-4 py-4 bg-white text-black font-black rounded-2xl"
-                        >
-                            {t.nav.login.toUpperCase()}
-                        </button>
+                        <div className="flex flex-col gap-2 mt-4">
+                            <Link
+                                to="/register"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="w-full py-4 bg-neutral-800 text-white font-bold rounded-2xl text-center"
+                            >
+                                {t.nav.register}
+                            </Link>
+                            <button
+                                onClick={() => auth.signinRedirect()}
+                                className="w-full py-4 bg-white text-black font-black rounded-2xl"
+                            >
+                                {t.nav.login.toUpperCase()}
+                            </button>
+                        </div>
                     )}
                 </div>
             )}

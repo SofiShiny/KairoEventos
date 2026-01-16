@@ -9,10 +9,11 @@ import {
     Sparkles,
     Loader2,
     User,
-    Clock
+    Trash2
 } from 'lucide-react';
 import { forosService, Comentario } from '../services/foros.service';
 import { toast } from 'react-hot-toast';
+import { getUserRoles } from '../../../lib/auth-utils';
 
 export const ForoPage = () => {
     const { id: eventoId } = useParams<{ id: string }>();
@@ -25,6 +26,11 @@ export const ForoPage = () => {
     const [respuestaActiva, setRespuestaActiva] = useState<string | null>(null);
     const [respuestaTexto, setRespuestaTexto] = useState('');
     const [submitting, setSubmitting] = useState(false);
+
+    // Roles de usuario
+    const roles = getUserRoles(auth.user);
+    const canModerate = roles.includes('admin') || roles.includes('organizador');
+
 
     const usuarioId = auth.user?.profile.sub;
     const username = (auth.user?.profile as any)?.preferred_username || 'Usuario';
@@ -107,6 +113,36 @@ export const ForoPage = () => {
         }
     };
 
+    const handleConfirmarOcultarComentario = async (comentarioId: string) => {
+        if (!window.confirm('¿Estás seguro de que deseas ocultar este comentario? Se ocultarán todas sus respuestas.')) {
+            return;
+        }
+
+        try {
+            await forosService.ocultarComentario(comentarioId);
+            toast.success('Comentario ocultado correctamente');
+            await loadComentarios();
+        } catch (error) {
+            console.error('[MODERACION] Error:', error);
+            toast.error('Error al ocultar el comentario.');
+        }
+    };
+
+    const handleConfirmarOcultarRespuesta = async (comentarioId: string, respuestaId: string) => {
+        if (!window.confirm('¿Estás seguro de que deseas ocultar esta respuesta?')) {
+            return;
+        }
+
+        try {
+            await forosService.ocultarRespuesta(comentarioId, respuestaId);
+            toast.success('Respuesta ocultada correctamente');
+            await loadComentarios();
+        } catch (error) {
+            console.error('[MODERACION] Error:', error);
+            toast.error('Error al ocultar la respuesta.');
+        }
+    };
+
     const formatFecha = (fecha: string) => {
         const date = new Date(fecha);
         const ahora = new Date();
@@ -122,8 +158,8 @@ export const ForoPage = () => {
         return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
     };
 
-    const renderComentario = (item: any, index?: number, esRespuesta = false) => {
-        const itemKey = esRespuesta ? `res-${item.usuarioId}-${index}-${item.fechaCreacion}` : item.id;
+    const renderComentario = (item: any, index?: number, esRespuesta = false, parentComentarioId?: string) => {
+        const itemKey = item.id || `res-${item.usuarioId}-${index}-${item.fechaCreacion}`;
 
         return (
             <div
@@ -175,35 +211,77 @@ export const ForoPage = () => {
                                 margin: 0,
                                 color: esRespuesta ? '#aaa' : '#eee',
                                 fontSize: esRespuesta ? '13px' : '15px',
-                                lineHeight: '1.5'
+                                lineHeight: '1.5',
+                                marginBottom: '12px'
                             }}>
                                 {item.contenido}
                             </p>
 
-                            {!esRespuesta && (
-                                <button
-                                    onClick={() => setRespuestaActiva(item.id === respuestaActiva ? null : item.id)}
-                                    style={{
-                                        marginTop: '12px',
-                                        padding: '6px 16px',
-                                        backgroundColor: '#2563eb',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '99px',
-                                        fontSize: '10px',
-                                        fontWeight: 900,
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px'
-                                    }}
-                                >
-                                    <Reply size={12} />
-                                    Responder
-                                </button>
-                            )}
+                            <div className="flex items-center gap-3">
+                                {!esRespuesta && (
+                                    <button
+                                        onClick={() => setRespuestaActiva(item.id === respuestaActiva ? null : item.id)}
+                                        style={{
+                                            padding: '6px 16px',
+                                            backgroundColor: '#2563eb',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '99px',
+                                            fontSize: '10px',
+                                            fontWeight: 900,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px'
+                                        }}
+                                    >
+                                        <Reply size={12} />
+                                        Responder
+                                    </button>
+                                )}
+
+                                {canModerate && (
+                                    <button
+                                        onClick={() => {
+                                            // Detección ultra-robusta de ID (case-insensitive + fallback determinista)
+                                            const itemId = item.id || item.Id || item.ID || item._id ||
+                                                (esRespuesta ? `00000000-0000-0000-0000-${String(index).padStart(12, '0')}` : null);
+
+                                            if (!itemId) {
+                                                toast.error('Error: No se pudo identificar el ID.');
+                                                return;
+                                            }
+
+                                            if (esRespuesta) {
+                                                handleConfirmarOcultarRespuesta(parentComentarioId!, itemId);
+                                            } else {
+                                                handleConfirmarOcultarComentario(itemId);
+                                            }
+                                        }}
+                                        className="hover:scale-105 active:scale-95 transition-transform"
+                                        style={{
+                                            padding: '6px 16px',
+                                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                            color: '#f87171',
+                                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                                            borderRadius: '99px',
+                                            fontSize: '10px',
+                                            fontWeight: 900,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px'
+                                        }}
+                                    >
+                                        <Trash2 size={12} />
+                                        Eliminar
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -254,7 +332,7 @@ export const ForoPage = () => {
                     {/* Cascada de respuestas */}
                     {!esRespuesta && item.respuestas && item.respuestas.length > 0 && (
                         <div style={{ marginTop: '12px' }}>
-                            {item.respuestas.map((resp: any, idx: number) => renderComentario(resp, idx, true))}
+                            {item.respuestas.map((resp: any, idx: number) => renderComentario(resp, idx, true, item.id))}
                         </div>
                     )}
                 </div>

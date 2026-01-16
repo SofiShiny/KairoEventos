@@ -70,6 +70,7 @@ public class ConciliacionPagosJob
                 await _publishEndpoint.Publish(new PagoRechazadoEvento(
                     tx.Id,
                     tx.OrdenId,
+                    tx.UsuarioId,
                     "Timeout de pasarela"
                 ));
             }

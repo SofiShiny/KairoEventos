@@ -22,3 +22,8 @@ public record ProveedorEstadoCambiadoEvent(
     string NombreProveedor,
     bool NuevoEstado
 );
+
+public record ServiciosCateringSincronizadosEvento(
+    int CantidadServicios,
+    DateTime FechaSincronizacion
+);

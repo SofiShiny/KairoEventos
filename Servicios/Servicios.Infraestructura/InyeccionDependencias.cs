@@ -29,7 +29,11 @@ public static class InyeccionDependencias
         })
         .AddPolicyHandler(GetRetryPolicy());
 
-        services.AddScoped<Dominio.Interfaces.IProveedorExternoService, MockProveedorService>();
+        services.AddHttpClient<Dominio.Interfaces.IProveedorExternoService, ProveedorExternoAdapter>(client =>
+        {
+            client.BaseAddress = new Uri(configuration["ExternalServices:ProveedorCateringUrl"] ?? "http://localhost:5005");
+        })
+        .AddPolicyHandler(GetRetryPolicy());
 
         // 3. MassTransit - RabbitMQ
         services.AddMassTransit(x =>

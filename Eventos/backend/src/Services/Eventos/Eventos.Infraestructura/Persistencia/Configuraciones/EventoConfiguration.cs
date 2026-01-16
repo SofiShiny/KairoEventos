@@ -50,6 +50,16 @@ public class EventoConfiguration : IEntityTypeConfiguration<Evento>
         builder.Property(e => e.UrlImagen)
             .HasMaxLength(500)
             .HasColumnName("UrlImagen");
+            
+        builder.Property(e => e.PrecioBase)
+            .IsRequired()
+            .HasColumnName("PrecioBase")
+            .HasDefaultValue(0);
+
+        builder.Property(e => e.EsVirtual)
+            .IsRequired()
+            .HasColumnName("EsVirtual")
+            .HasDefaultValue(false);
 
         builder.Ignore(e => e.EventosDominio);
 

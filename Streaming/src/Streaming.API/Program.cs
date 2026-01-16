@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Streaming.Aplicacion.Consumers;
@@ -34,17 +35,21 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Ejecutar migraciones automáticamente (Opcional, pero útil para microservicios)
-if (app.Environment.IsDevelopment())
+// Ejecutar migraciones automáticamente
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<StreamingDbContext>();
+    // Asegurarse de que el esquema y las tablas existan
     db.Database.EnsureCreated();
 }
 

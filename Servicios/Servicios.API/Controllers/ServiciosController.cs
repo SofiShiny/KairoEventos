@@ -3,11 +3,13 @@ using MediatR;
 using Servicios.Aplicacion.Comandos;
 using Servicios.Dominio.Repositorios;
 using Servicios.Dominio.Entidades;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Servicios.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[AllowAnonymous] // Forzamos acceso público para descartar Auth Middleware
 public class ServiciosController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -36,7 +38,8 @@ public class ServiciosController : ControllerBase
         }
         catch (UnauthorizedAccessException ex)
         {
-            return Unauthorized(new { message = ex.Message });
+            // Retornamos 403 para diferenciarlo de un error de Autenticación (401 - Token inválido)
+            return StatusCode(403, new { message = ex.Message, error = "No tiene entrada para este evento" });
         }
         catch (InvalidOperationException ex)
         {

@@ -40,6 +40,12 @@ public class Transmision
         return $"https://meet.google.com/{GenerarSegmento(3)}-{GenerarSegmento(4)}-{GenerarSegmento(3)}";
     }
 
+    public void ActualizarUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException("La URL no puede estar vacía");
+        UrlAcceso = url;
+    }
+
     public void IniciarTransmision()
     {
         Estado = EstadoTransmision.EnVivo;

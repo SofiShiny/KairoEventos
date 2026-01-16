@@ -40,4 +40,11 @@ public class RepositorioEncuestas : IRepositorioEncuestas
         await _context.RespuestasUsuarios.AddAsync(respuesta);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<RespuestaUsuario>> ObtenerRespuestasAsync(Guid encuestaId) =>
+        await _context.RespuestasUsuarios
+            .Include(r => r.Valores)
+            .Where(r => r.EncuestaId == encuestaId)
+            .OrderByDescending(r => r.Fecha)
+            .ToListAsync();
 }

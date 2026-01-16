@@ -30,7 +30,7 @@ export const OcupacionPieChart: React.FC<OcupacionPieChartProps> = ({ data }) =>
 
     return (
         <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={300} minWidth={0} debounce={50}>
                 <PieChart>
                     <Pie
                         data={chartData}
@@ -40,6 +40,7 @@ export const OcupacionPieChart: React.FC<OcupacionPieChartProps> = ({ data }) =>
                         outerRadius={80}
                         paddingAngle={5}
                         dataKey="value"
+                        isAnimationActive={false}
                     >
                         {chartData.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

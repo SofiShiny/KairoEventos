@@ -1,6 +1,8 @@
 using Encuestas.Infraestructura;
 using Microsoft.EntityFrameworkCore;
 using Encuestas.Infraestructura.Persistencia;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,21 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true
+        };
+        options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                logger.LogError("Error de Autenticación: {Message}", context.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                logger.LogInformation("Token validado exitosamente para el usuario: {User}", context.Principal?.Identity?.Name);
+                return Task.CompletedTask;
+            }
         };
     });
 

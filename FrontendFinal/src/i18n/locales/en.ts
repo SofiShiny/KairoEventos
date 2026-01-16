@@ -12,6 +12,7 @@ export const en: TranslationKeys = {
         admin: 'Administration',
         logout: 'Logout',
         login: 'Login',
+        register: 'Register',
         connected: 'Connected'
     },
 

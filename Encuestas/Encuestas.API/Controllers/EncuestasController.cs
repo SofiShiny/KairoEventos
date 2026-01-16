@@ -3,12 +3,13 @@ using MediatR;
 using Encuestas.Aplicacion.Comandos;
 using Encuestas.Dominio.Repositorios;
 using Microsoft.AspNetCore.Authorization;
+using Encuestas.Dominio.Entidades;
 
 namespace Encuestas.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+// [Authorize]
 public class EncuestasController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -58,5 +59,12 @@ public class EncuestasController : ControllerBase
     {
         await _mediator.Send(new PublicarEncuestaCommand(id));
         return NoContent();
+    }
+    
+    [HttpGet("{id:guid}/respuestas")]
+    public async Task<ActionResult<IEnumerable<RespuestaUsuario>>> GetRespuestas(Guid id)
+    {
+        var respuestas = await _repositorio.ObtenerRespuestasAsync(id);
+        return Ok(respuestas);
     }
 }

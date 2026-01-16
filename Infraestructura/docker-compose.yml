@@ -132,6 +132,9 @@ services:
       ReverseProxy__Clusters__marketing-cluster__Destinations__destination1__Address: http://marketing-api:8080
       ReverseProxy__Clusters__recomendaciones-cluster__Destinations__destination1__Address: http://recomendaciones-api:8080
       ReverseProxy__Clusters__streaming-cluster__Destinations__destination1__Address: http://streaming-api:8080
+      ReverseProxy__Clusters__servicios-cluster__Destinations__destination1__Address: http://servicios-api:8080
+      ReverseProxy__Clusters__encuestas-cluster__Destinations__destination1__Address: http://encuestas-api:8080
+      ReverseProxy__Clusters__foros-cluster__Destinations__destination1__Address: http://foros-api:8080
     ports:
       - "8080:8080"
     networks:
@@ -156,9 +159,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
+      - Authentication__Authority=http://keycloak:8080/realms/Kairo
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_servicios;Username=postgres;Password=postgres
       - RabbitMQ__Host=rabbitmq
-      - ExternalServices__EntradasApiUrl=http://entradas-api:8080/api/entradas
+      - ExternalServices__EntradasApiUrl=http://entradas-api:8080
     networks:
       - kairo-network
     depends_on:

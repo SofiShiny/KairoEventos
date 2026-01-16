@@ -18,4 +18,5 @@ public class ApiResponse<T>
     }
 
     public static ApiResponse<T> Ok(T data, string message = null) => new ApiResponse<T>(data, message, true);
+    public static ApiResponse<T> Error(string message, T data = default) => new ApiResponse<T>(data, message, false);
 }

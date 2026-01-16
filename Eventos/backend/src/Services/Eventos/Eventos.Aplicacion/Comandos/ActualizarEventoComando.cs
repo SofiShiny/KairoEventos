@@ -13,5 +13,7 @@ public record ActualizarEventoComando(
  DateTime? FechaInicio,
  DateTime? FechaFin,
  int? MaximoAsistentes,
- decimal? PrecioBase = null
+ string? Categoria = null,
+ decimal? PrecioBase = null,
+ bool? EsVirtual = null
 ) : IComando<Resultado<EventoDto>>;

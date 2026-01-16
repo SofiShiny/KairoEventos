@@ -69,7 +69,7 @@ export default function AdminLayout() {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 px-3 space-y-1">
+                    <nav className="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar-sidebar">
                         {menuItems.map((item) => {
                             const isActive = location.pathname === item.path;
                             return (
@@ -147,11 +147,39 @@ export default function AdminLayout() {
                             <LanguageSelector />
                             <div className="flex items-center gap-3 pl-2">
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-white">{auth.user?.profile.preferred_username || 'Admin User'}</p>
+                                    <p className="text-sm font-bold text-white leading-tight">{auth.user?.profile.preferred_username || 'Admin User'}</p>
                                     <p className="text-[10px] text-blue-500 uppercase font-black tracking-widest">{t.nav.admin}</p>
                                 </div>
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center border border-white/10 shadow-lg">
-                                    <User className="text-white w-5 h-5" />
+                                <div className="relative group/user cursor-pointer">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center border border-white/10 shadow-lg group-hover:shadow-blue-500/20 transition-all">
+                                        <User className="text-white w-5 h-5" />
+                                    </div>
+
+                                    {/* Dropdown Menu on Hover */}
+                                    <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                        <div className="bg-[#1a1e26] border border-slate-800 rounded-xl shadow-2xl p-2 min-w-[200px]">
+                                            <div className="px-4 py-3 border-b border-slate-800 mb-2">
+                                                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">{t.nav.admin}</p>
+                                                <p className="text-sm font-bold text-white truncate">{auth.user?.profile.email}</p>
+                                            </div>
+
+                                            <Link
+                                                to="/"
+                                                className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all text-sm font-medium mb-1"
+                                            >
+                                                <ShoppingBag className="w-4 h-4" />
+                                                <span>{t.nav.home}</span>
+                                            </Link>
+
+                                            <button
+                                                onClick={handleLogout}
+                                                className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-all text-sm font-medium"
+                                            >
+                                                <LogOut className="w-4 h-4" />
+                                                <span>{t.nav.logout}</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -176,6 +204,22 @@ export default function AdminLayout() {
 
             {/* Debug de autenticación - temporal */}
             <AuthDebug />
+
+            <style>{`
+                .custom-scrollbar-sidebar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar-sidebar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar-sidebar::-webkit-scrollbar-thumb {
+                    background: #1e293b;
+                    border-radius: 10px;
+                }
+                .custom-scrollbar-sidebar::-webkit-scrollbar-thumb:hover {
+                    background: #334155;
+                }
+            `}</style>
         </div>
     );
 }

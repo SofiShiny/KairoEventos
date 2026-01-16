@@ -38,7 +38,7 @@ export default function EventForm({ evento, onSuccess, onCancel }: EventFormProp
         fechaFin: evento?.fechaFin ? new Date(evento.fechaFin).toISOString().slice(0, 16) : '',
         maximoAsistentes: evento?.maximoAsistentes || 100,
         categoria: evento?.categoria || 'Conferencia',
-        precioBase: 0, // Nuevo campo solicitado
+        precioBase: evento?.precioBase || 0,
         esVirtual: evento?.esVirtual || false,
     });
 
@@ -90,8 +90,11 @@ export default function EventForm({ evento, onSuccess, onCancel }: EventFormProp
                 fechaFin: new Date(formData.fechaFin || formData.fechaInicio).toISOString(),
                 maximoAsistentes: Number(formData.maximoAsistentes),
                 categoria: formData.categoria,
-                esVirtual: formData.esVirtual
+                precioBase: Number(formData.precioBase),
+                esVirtual: !!formData.esVirtual
             };
+
+            console.log('DEBUG: Enviando DTO de evento:', eventDto);
 
             let createdEvento: Evento;
 

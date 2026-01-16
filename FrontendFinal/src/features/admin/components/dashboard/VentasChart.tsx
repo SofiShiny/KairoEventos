@@ -18,8 +18,8 @@ interface VentasChartProps {
 
 export const VentasChart: React.FC<VentasChartProps> = ({ data }) => {
     return (
-        <div className="h-[300px] w-full mt-4">
-            <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height={300} minWidth={0} debounce={50}>
                 <AreaChart
                     data={data}
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -66,6 +66,7 @@ export const VentasChart: React.FC<VentasChartProps> = ({ data }) => {
                         fillOpacity={1}
                         fill="url(#colorVentas)"
                         name="Ventas"
+                        isAnimationActive={false}
                     />
                 </AreaChart>
             </ResponsiveContainer>

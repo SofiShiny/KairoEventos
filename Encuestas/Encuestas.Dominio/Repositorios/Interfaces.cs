@@ -11,6 +11,7 @@ public interface IRepositorioEncuestas
 
     Task<bool> UsuarioYaRespondioAsync(Guid encuestaId, Guid usuarioId);
     Task GuardarRespuestaAsync(RespuestaUsuario respuesta);
+    Task<IEnumerable<RespuestaUsuario>> ObtenerRespuestasAsync(Guid encuestaId);
 }
 
 public interface IVerificadorAsistencia

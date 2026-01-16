@@ -11,4 +11,5 @@ export interface Evento {
     maximoAsistentes: number;
     organizadorId: string;
     esVirtual?: boolean;
+    precioBase?: number;
 }

@@ -65,7 +65,7 @@ public class ProcesarPagoUseCase : IProcesarPagoUseCase
             await _repositorio.ActualizarAsync(tx);
 
             await _publishEndpoint.Publish(new PagoRechazadoEvento(
-                tx.Id, tx.OrdenId, tx.MensajeError!));
+                tx.Id, tx.OrdenId, tx.UsuarioId, tx.MensajeError!));
             
             _logger.LogWarning("Pago TX {TxId} rechazado: {Motivo}", transaccionId, tx.MensajeError);
         }

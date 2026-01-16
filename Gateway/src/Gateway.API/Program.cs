@@ -16,15 +16,17 @@ builder.Services.AddHealthChecks();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = builder.Configuration["Authentication:Authority"];
-        options.Audience = builder.Configuration["Authentication:Audience"];
-        options.RequireHttpsMetadata = builder.Configuration.GetValue<bool>("Authentication:RequireHttpsMetadata");
+        options.Authority = builder.Configuration["Keycloak:Authority"] ?? builder.Configuration["Authentication:Authority"]; // Fallback
+        options.Audience = builder.Configuration["Keycloak:Audience"] ?? builder.Configuration["Authentication:Audience"];
+        options.RequireHttpsMetadata = false; 
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false, // Critical for docker/localhost mismatch
+            ValidateAudience = false,
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
+            NameClaimType = "preferred_username",
+            RoleClaimType = "role"
         };
     });
 

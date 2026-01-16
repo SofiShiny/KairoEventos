@@ -23,6 +23,10 @@ public class EventoCreateDto
     // Campos opcionales
     public string? Estado { get; set; }
     public string? Categoria { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("precioBase")]
     [Range(0, double.MaxValue)] public decimal PrecioBase { get; set; } = 0;
+
+    [System.Text.Json.Serialization.JsonPropertyName("esVirtual")]
+    public bool EsVirtual { get; set; }
     public List<AsistenteCreateDto>? Asistentes { get; set; }
 }

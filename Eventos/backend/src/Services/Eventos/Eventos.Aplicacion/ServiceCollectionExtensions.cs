@@ -22,7 +22,12 @@ public class EventoMappingProfile : Profile
         CreateMap<Evento, EventoDto>()
             .ForMember(d => d.Ubicacion, opt => opt.MapFrom(s => s))
             .ForMember(d => d.Estado, opt => opt.MapFrom(s => s.Estado.ToString()))
-            .ForMember(d => d.Asistentes, opt => opt.MapFrom(s => s.Asistentes.Select(a => new AsistenteDto { Id = a.Id, NombreUsuario = a.NombreUsuario, Correo = a.Correo, RegistradoEn = a.RegistradoEn })));
+            .ForMember(d => d.PrecioBase, opt => opt.MapFrom(s => s.PrecioBase))
+            .ForMember(d => d.EsVirtual, opt => opt.MapFrom(s => s.EsVirtual))
+            .ForMember(d => d.Asistentes, opt => opt.MapFrom(s => s.Asistentes.Select(a => new AsistenteDto { Id = a.Id, NombreUsuario = a.NombreUsuario, Correo = a.Correo, RegistradoEn = a.RegistradoEn })))
+            .AfterMap((src, dest) => {
+                Console.WriteLine($"[AUTOMAPPER] Mapeado evento {src.Id}: EsVirtual={src.EsVirtual} -> DTO.EsVirtual={dest.EsVirtual}, PrecioBase={src.PrecioBase} -> DTO.PrecioBase={dest.PrecioBase}");
+            });
     }
 }
 

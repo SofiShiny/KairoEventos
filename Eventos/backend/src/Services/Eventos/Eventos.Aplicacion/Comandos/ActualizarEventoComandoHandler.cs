@@ -22,6 +22,8 @@ public class ActualizarEventoComandoHandler : IRequestHandler<ActualizarEventoCo
         // Se construye la ubicación separadamente, para poder actualizaciar parcialmente la ubicación
         var nuevaUbicacion = ConstruirUbicacion(evento, request.Ubicacion);
         
+        Console.WriteLine($"[DEBUG] Handler recibiendo: EsVirtual={request.EsVirtual}, PrecioBase={request.PrecioBase}");
+
         //null coalescing (??) permite que solo se cambie lo que viene en el request
         // Si un campo es null, mantiene el valor actual del evento
         evento.Actualizar(
@@ -31,10 +33,18 @@ public class ActualizarEventoComandoHandler : IRequestHandler<ActualizarEventoCo
             request.FechaInicio ?? evento.FechaInicio,
             request.FechaFin ?? evento.FechaFin,
             request.MaximoAsistentes ?? evento.MaximoAsistentes,
-            null,
-            request.PrecioBase);
+            request.Categoria,
+            request.PrecioBase,
+            request.EsVirtual);
+
+        Console.WriteLine($"[DEBUG] Entidad tras Actualizar(): EsVirtual={evento.EsVirtual}, PrecioBase={evento.PrecioBase}");
         
         await _repositorioEvento.ActualizarAsync(evento, cancellationToken);
+        
+        // Verificación rápida del estado tras el guardado
+        var dbState = await _repositorioEvento.ObtenerPorIdAsync(evento.Id, asNoTracking: true, cancellationToken);
+        Console.WriteLine($"[DEBUG] Estado final en DB para {evento.Id}: EsVirtual={dbState?.EsVirtual}");
+
         return Resultado<EventoDto>.Exito(EventoDtoMapper.Map(evento));
     }
 

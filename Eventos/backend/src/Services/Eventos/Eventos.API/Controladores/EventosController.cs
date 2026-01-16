@@ -1,9 +1,10 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Eventos.Aplicacion.DTOs;
 using Swashbuckle.AspNetCore.Filters;
 using Eventos.Aplicacion.Comandos;
 using Eventos.Aplicacion.Queries;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eventos.API.Controladores;
 
@@ -74,6 +75,23 @@ public class EventosController : ControllerBase
         return BadRequest("El evento no está disponible para la venta");
     }
 
+    [HttpGet("debug/{id}")]
+    public async Task<IActionResult> DebugDatabase(Guid id)
+    {
+        var context = HttpContext.RequestServices.GetRequiredService<Eventos.Infraestructura.Persistencia.EventosDbContext>();
+        var evento = await context.Eventos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        if (evento == null) return NotFound();
+
+        return Ok(new
+        {
+            evento.Id,
+            evento.Titulo,
+            evento.EsVirtual,
+            evento.PrecioBase,
+            DatabaseStatus = "Fetched directly from DbContext"
+        });
+    }
+
     // Comandos (escritura)
     // Los commands modifican estado, encapsula la intencion de crear un evento y sus datos
    
@@ -106,7 +124,8 @@ public class EventosController : ControllerBase
                 dto.MaximoAsistentes,
                 organizadorId,
                 dto.Categoria,
-                dto.PrecioBase);
+                dto.PrecioBase,
+                dto.EsVirtual);
 
             var resultado = await _mediator.Send(comando);
             if (resultado.EsFallido) return BadRequest(resultado.Error);
@@ -140,14 +159,16 @@ public class EventosController : ControllerBase
             }
 
             var comando = new ActualizarEventoComando(
-                id,
-                dto.Titulo,
-                dto.Descripcion,
-                dto.Ubicacion,
-                dto.FechaInicio,
-                dto.FechaFin,
-                dto.MaximoAsistentes,
-                dto.PrecioBase);
+                EventoId: id,
+                Titulo: dto.Titulo,
+                Descripcion: dto.Descripcion,
+                Ubicacion: dto.Ubicacion,
+                FechaInicio: dto.FechaInicio,
+                FechaFin: dto.FechaFin,
+                MaximoAsistentes: dto.MaximoAsistentes,
+                Categoria: dto.Categoria,
+                PrecioBase: dto.PrecioBase,
+                EsVirtual: dto.EsVirtual);
 
             var resultado = await _mediator.Send(comando);
             if (resultado.EsFallido) return NotFound(resultado.Error);

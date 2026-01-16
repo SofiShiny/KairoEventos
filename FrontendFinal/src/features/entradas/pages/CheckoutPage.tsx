@@ -6,21 +6,35 @@ import PaymentForm from '../../pagos/components/PaymentForm';
 import CouponInput from '../../pagos/components/CouponInput';
 import { asientosService, Asiento } from '../../asientos/services/asientos.service';
 import { entradasService } from '../services/entradas.service';
+import { serviciosService, ServicioComplementario } from '../../servicios/services/servicios.service';
+import ServiceCard from '../../servicios/components/ServiceCard';
 import { useAsientosSignalR } from '../../../hooks/useAsientosSignalR';
 import { toast } from 'react-hot-toast';
+import { Video, ChevronRight, ShoppingBag, ArrowLeft, Check } from 'lucide-react';
+import { eventosService } from '../../eventos/services/eventos.service';
+import { Evento } from '../../eventos/types/evento.types';
 
 export default function CheckoutPage() {
     const { eventoId } = useParams<{ eventoId: string }>();
     const navigate = useNavigate();
     const auth = useAuth();
 
+    // Steps: 1 = Asientos, 2 = Servicios, 3 = Pago
+    const [step, setStep] = useState(1);
+
     const [asientos, setAsientos] = useState<Asiento[]>([]);
     const [selectedAsientos, setSelectedAsientos] = useState<Asiento[]>([]);
+
+    // Servicios
+    const [servicios, setServicios] = useState<ServicioComplementario[]>([]);
+    const [selectedServicios, setSelectedServicios] = useState<Record<string, number>>({});
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [processingPurchase, setProcessingPurchase] = useState(false);
     const [ordenId, setOrdenId] = useState<string>('');
+    const [evento, setEvento] = useState<Evento | null>(null);
 
     // Estados para cupones
     const [cuponAplicado, setCuponAplicado] = useState<{
@@ -31,18 +45,17 @@ export default function CheckoutPage() {
 
     useEffect(() => {
         if (eventoId) {
-            loadAsientos();
+            loadInitialData();
         }
     }, [eventoId]);
 
+    // SignalR Callbacks
     const onAsientoReservado = useCallback((asientoId: string, usuarioId: string) => {
         setAsientos(prev => prev.map(a =>
             a.id === asientoId
                 ? { ...a, reservado: true, usuarioId, estado: 'Ocupado' }
                 : a
         ));
-
-        // Si el asiento estaba en mi selección pero lo reservó otro, notificar y quitar
         if (auth.user?.profile.sub !== usuarioId) {
             setSelectedAsientos(prev => {
                 const isSelectedByMe = prev.some(a => a.id === asientoId);
@@ -63,20 +76,39 @@ export default function CheckoutPage() {
         ));
     }, []);
 
-    // Suscripción a SignalR para actualizaciones en tiempo real
     useAsientosSignalR({
         eventoId: eventoId || '',
         onAsientoReservado,
         onAsientoLiberado
     });
 
-    const loadAsientos = async () => {
+    const loadInitialData = async () => {
         try {
             setLoading(true);
-            const data = await asientosService.getByEvento(eventoId!);
-            setAsientos(data);
+            setError('');
+
+            // Cargar evento
+            const eventoData = await eventosService.getEventoById(eventoId!);
+            setEvento(eventoData);
+
+            // Cargar asientos si aplica
+            if (!eventoData.esVirtual) {
+                const data = await asientosService.getByEvento(eventoId!);
+                setAsientos(data);
+            }
+
+            // Cargar servicios complementarios
+            try {
+                const serviciosData = await serviciosService.getServiciosPorEvento(eventoId!);
+                setServicios(serviciosData.filter(s => s.activo));
+            } catch (serviceError) {
+                console.warn('Error cargando servicios (continuando sin ellos):', serviceError);
+                setServicios([]);
+            }
+
         } catch (err: any) {
-            setError(err.message || 'Error al cargar los asientos');
+            console.error('Error al cargar datos:', err);
+            setError(err.message || 'Error al cargar los datos del evento');
         } finally {
             setLoading(false);
         }
@@ -86,60 +118,131 @@ export default function CheckoutPage() {
         setSelectedAsientos(selected);
     };
 
-    const subtotal = selectedAsientos.reduce((sum, asiento) => sum + asiento.precio, 0);
+    const handleServiceQuantityChange = (servicioId: string, cantidad: number) => {
+        setSelectedServicios(prev => ({
+            ...prev,
+            [servicioId]: cantidad
+        }));
+    };
+
+    // Cálculos financieros
+    const precioAsientos = evento?.esVirtual
+        ? (evento.precioBase || 0)
+        : selectedAsientos.reduce((sum, asiento) => sum + asiento.precio, 0);
+
+    const precioServicios = servicios.reduce((sum, s) => {
+        const qty = selectedServicios[s.id] || 0;
+        return sum + (s.precio * qty);
+    }, 0);
+
+    const subtotal = precioAsientos + precioServicios;
+
+    // Si hay cupón, recalculamos. Nota: El cupón suele aplicar al total.
+    // Si la API de validar cupón retorna 'nuevoTotal', usamos eso.
+    // Si no, aplicamos porcentaje simple. Aquí asumimos el flujo existente de CouponInput.
     const totalPrice = cuponAplicado ? cuponAplicado.nuevoTotal : subtotal;
 
-    const handlePaymentSuccess = async (transaccionId: string) => {
-        setShowPaymentForm(false);
-        // La entrada ya fue creada en handleInitiatePayment
-        // El consumidor de PagoAprobado en el backend se encargará de marcarla como pagada
-        // y de confirmar el asiento.
+    // Validación de Pasos
+    const canProceedToServices = () => {
+        if (evento?.esVirtual) return true;
+        return selectedAsientos.length > 0;
+    };
 
-        alert(`¡Pago procesado!\n\nTransacción: ${transaccionId}\n\nTu entrada está siendo confirmada. En unos momentos aparecerá en "Mis Entradas".`);
+    const nextStep = () => {
+        if (step === 1) {
+            if (!canProceedToServices()) {
+                toast.error('Selecciona al menos un asiento para continuar');
+                return;
+            }
+            setStep(2);
+        } else if (step === 2) {
+            setStep(3);
+        }
+    };
 
-        // Redirigir a mis entradas
-        navigate('/entradas');
+    const prevStep = () => {
+        if (step > 1) setStep(step - 1);
     };
 
     const handleInitiatePayment = async () => {
-        if (selectedAsientos.length === 0) return;
-
-        // Verificar autenticación
         if (!auth.isAuthenticated) {
-            alert('Debes iniciar sesión para continuar con la compra');
             auth.signinRedirect();
             return;
         }
 
         setProcessingPurchase(true);
         try {
-            // Crear entradas para todos los asientos seleccionados
+            // 1. Crear Orden de Entradas
             const asientoIds = selectedAsientos.map(a => a.id);
-
             const response = await entradasService.crearEntrada({
                 eventoId: eventoId!,
                 usuarioId: auth.user?.profile.sub || '',
-                asientoIds: asientoIds, // Enviar todos los IDs
+                asientoIds: asientoIds,
                 nombreUsuario: (auth.user?.profile as any)?.preferred_username || auth.user?.profile.name,
                 email: auth.user?.profile.email
             });
 
-            // El backend retorna un resumen con todas las entradas creadas
-            // El ordenId puede venir como ordenId (múltiples) o id (individual) dentro de data
             const ordenIdVal = response.ordenId || response.data?.ordenId || response.data?.id || response.id;
 
             if (!ordenIdVal || ordenIdVal === '00000000-0000-0000-0000-000000000000') {
-                console.error('Error: Se recibió un OrdenId inválido:', response);
                 throw new Error('No se pudo generar un número de orden válido.');
             }
 
             setOrdenId(ordenIdVal);
             setShowPaymentForm(true);
         } catch (err: any) {
-            console.error('Error al crear entradas pre-pago:', err);
-            alert('No se pudo iniciar el proceso de compra: ' + (err.response?.data?.detail || err.message));
+            console.error('Error al crear orden:', err);
+            toast.error('Error al iniciar compra: ' + (err.response?.data?.detail || err.message));
         } finally {
             setProcessingPurchase(false);
+        }
+    };
+
+    const handlePaymentSuccess = async (transaccionId: string) => {
+        console.log('[PAGO] Éxitoso, ID de Transacción:', transaccionId);
+        setShowPaymentForm(false);
+        const loadingToast = toast.loading('Pago exitoso. Contratando servicios extra...');
+
+        try {
+            // 2. Contratar Servicios Extras (Post-Pago de Entradas)
+            // Recorremos los servicios seleccionados y llamamos a reservar para cada unidad
+            const servicesToReserve = Object.entries(selectedServicios).filter(([_, qty]) => qty > 0);
+
+            // Promise.all para concurrencia
+            const reservasPromesas = [];
+            for (const [srvId, qty] of servicesToReserve) {
+                // Si la cantidad es > 1, debemos decidir si hacemos N llamadas o si la API soporta cantidad.
+                // Basado en el backend, es 1 llamada por reserva. Haremos un loop simple.
+                for (let i = 0; i < qty; i++) {
+                    reservasPromesas.push(serviciosService.reservarServicio({
+                        usuarioId: auth.user?.profile.sub || '',
+                        eventoId: eventoId!,
+                        servicioGlobalId: srvId
+                    }));
+                }
+            }
+
+            await Promise.all(reservasPromesas);
+
+            toast.dismiss(loadingToast);
+            toast.success(`¡Todo listo! Entradas y ${servicesToReserve.length > 0 ? 'servicios extras' : ''} confirmados.`, {
+                duration: 6000,
+                icon: '🎉'
+            });
+
+            setTimeout(() => {
+                navigate('/entradas');
+            }, 2500);
+
+        } catch (srvError) {
+            console.error('Error reservando servicios:', srvError);
+            toast.dismiss(loadingToast);
+            // Aunque falle el servicio, la entrada ya se pagó. Advertimos al usuario.
+            toast.error('Tu entrada está lista pero hubo un error registrando algunos servicios extras. Contacta soporte.', { duration: 8000 });
+
+            setTimeout(() => {
+                navigate('/entradas');
+            }, 30000);
         }
     };
 
@@ -148,7 +251,7 @@ export default function CheckoutPage() {
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-                    <p className="text-gray-400">Cargando asientos...</p>
+                    <p className="text-gray-400">Cargando experiencia...</p>
                 </div>
             </div>
         );
@@ -161,192 +264,227 @@ export default function CheckoutPage() {
                     <div className="text-red-500 text-5xl mb-4">⚠️</div>
                     <h2 className="text-2xl font-bold text-white mb-2">Error</h2>
                     <p className="text-gray-400 mb-6">{error}</p>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition"
-                    >
-                        Volver
-                    </button>
+                    <button onClick={() => navigate(-1)} className="px-6 py-2 bg-purple-600 rounded-lg">Volver</button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-black text-white">
-            {/* Fondo con efectos */}
+        <div className="min-h-screen bg-black text-white pb-20">
+            {/* Background */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div className="relative container mx-auto px-4 py-8">
-                {/* Header */}
+                {/* Header & Stepper */}
                 <div className="mb-8">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition mb-4"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Volver
-                    </button>
-
-                    <h1 className="text-4xl font-black bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                        Selecciona tus Asientos
-                    </h1>
-                    <p className="text-gray-400 mt-2">Elige los mejores lugares para tu experiencia</p>
-                </div>
-
-                {/* Layout Principal */}
-                <div className="grid lg:grid-cols-3 gap-8">
-                    {/* Mapa de Asientos - 2 columnas */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl p-6 shadow-2xl">
-                            <SeatMap
-                                asientos={asientos}
-                                onSelectionChange={handleSelectionChange}
-                            />
+                    <div className="flex items-center justify-between mb-6">
+                        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-400 hover:text-white transition">
+                            <ArrowLeft size={20} /> Volver
+                        </button>
+                        <div className="flex items-center gap-2">
+                            {[1, 2, 3].map(s => (
+                                <div key={s} className={`flex items-center ${s < 3 ? 'after:content-[""] after:w-8 after:h-[2px] after:bg-gray-800 after:mx-2' : ''}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${step === s ? 'bg-purple-600 text-white' :
+                                        step > s ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-500'
+                                        }`}>
+                                        {step > s ? <Check size={14} /> : s}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Resumen de Compra - 1 columna */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl p-6 shadow-2xl sticky top-8">
-                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                <span className="text-2xl">🎫</span>
-                                Tu Ticket
-                            </h2>
+                    <h1 className="text-3xl font-black text-white mb-1">
+                        {step === 1 && (evento?.esVirtual ? 'Pase Digital' : 'Selecciona Asientos')}
+                        {step === 2 && 'Personaliza tu Experiencia'}
+                        {step === 3 && 'Resumen & Pago'}
+                    </h1>
+                </div>
 
-                            {/* Lista de Asientos Seleccionados */}
-                            <div className="space-y-3 mb-6 max-h-64 overflow-y-auto custom-scrollbar">
-                                {selectedAsientos.length === 0 ? (
-                                    <div className="text-center py-8">
-                                        <div className="text-gray-600 text-5xl mb-3">💺</div>
-                                        <p className="text-gray-500 text-sm">
-                                            Selecciona asientos del mapa
-                                        </p>
+                <div className="grid lg:grid-cols-3 gap-8">
+                    {/* Main Content Area */}
+                    <div className="lg:col-span-2">
+                        <div className="bg-gray-900/50 border border-white/10 rounded-3xl p-6 min-h-[500px]">
+                            {/* PASO 1: ASIENTOS */}
+                            {step === 1 && (
+                                <>
+                                    {evento?.esVirtual ? (
+                                        <div className="h-full flex flex-col items-center justify-center text-center py-10">
+                                            <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400 mb-6">
+                                                <Video size={48} />
+                                            </div>
+                                            <h2 className="text-2xl font-bold mb-2">Evento Virtual Global</h2>
+                                            <p className="text-gray-400 max-w-md">Tu pase te da acceso ilimitado al streaming en vivo y repeticiones on-demand.</p>
+                                        </div>
+                                    ) : (
+                                        <SeatMap asientos={asientos} onSelectionChange={handleSelectionChange} />
+                                    )}
+                                </>
+                            )}
+
+                            {/* PASO 2: SERVICIOS */}
+                            {step === 2 && (
+                                <div>
+                                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                        <ShoppingBag size={20} className="text-purple-400" /> Complementos Disponibles
+                                    </h2>
+                                    {servicios.length === 0 ? (
+                                        <div className="text-center py-12 bg-white/5 rounded-2xl">
+                                            <p className="text-gray-400">No hay servicios extras disponibles para este evento.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            {servicios.map(servicio => (
+                                                <ServiceCard
+                                                    key={servicio.id}
+                                                    servicio={servicio}
+                                                    cantidad={selectedServicios[servicio.id] || 0}
+                                                    onChangeCantidad={(qty) => handleServiceQuantityChange(servicio.id, qty)}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* PASO 3: RESUMEN FINAL visualizado en panel lateral, aquí mostramos detalles extra? */}
+                            {step === 3 && (
+                                <div className="space-y-6">
+                                    <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                                        <h3 className="font-bold text-lg mb-4">Detalles de la Reserva</h3>
+                                        <div className="space-y-4 text-sm">
+                                            <div className="flex justify-between border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">Evento</span>
+                                                <span className="font-medium text-right">{evento?.titulo}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">Fecha</span>
+                                                <span className="font-medium text-right">{new Date(evento?.fechaInicio || '').toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="flex justify-between border-b border-white/10 pb-2">
+                                                <span className="text-gray-400">Entradas</span>
+                                                <span className="font-medium text-right">{selectedAsientos.length === 0 ? '1 Pase Virtual' : `${selectedAsientos.length} Asientos`}</span>
+                                            </div>
+                                            <div className="flex justify-between pb-2">
+                                                <span className="text-gray-400">Servicios Extra</span>
+                                                <span className="font-medium text-right">
+                                                    {Object.values(selectedServicios).reduce((a, b) => a + b, 0)} ítems
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl flex gap-3">
+                                        <div className="bg-blue-500/20 p-2 rounded-lg h-fit text-blue-400">
+                                            <Check size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-blue-400 text-sm">Garantía de Satisfacción</p>
+                                            <p className="text-xs text-blue-200/60 mt-1">Si el evento se cancela, te devolvemos el 100% de tu dinero, incluyendo los servicios extras contratados.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Navigation Buttons */}
+                        <div className="flex justify-between mt-6">
+                            <button
+                                onClick={prevStep}
+                                disabled={step === 1}
+                                className={`px-6 py-3 rounded-xl font-bold transition ${step === 1 ? 'opacity-0' : 'bg-gray-800 hover:bg-gray-700'}`}
+                            >
+                                Atrás
+                            </button>
+
+                            {step < 3 ? (
+                                <button
+                                    onClick={nextStep}
+                                    className="px-8 py-3 bg-white text-black font-black rounded-xl hover:bg-gray-200 transition flex items-center gap-2"
+                                >
+                                    Siguiente <ChevronRight size={18} />
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleInitiatePayment}
+                                    disabled={processingPurchase}
+                                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black rounded-xl hover:opacity-90 transition shadow-lg shadow-purple-900/50"
+                                >
+                                    {processingPurchase ? 'Procesando...' : 'Pagar Ahora'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Sidebar Resumen */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-black border border-gray-800 rounded-2xl p-6 sticky top-8">
+                            <h3 className="text-xl font-bold mb-6">Resumen</h3>
+
+                            {/* Desglose Asientos */}
+                            <div className="mb-4">
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Entradas</p>
+                                {evento?.esVirtual ? (
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <span>Pase Virtual</span>
+                                        <span>${(evento.precioBase || 0).toFixed(2)}</span>
                                     </div>
                                 ) : (
-                                    selectedAsientos.map((asiento) => (
-                                        <div
-                                            key={asiento.id}
-                                            className="flex items-center justify-between p-3 bg-black/50 rounded-lg border border-gray-800 hover:border-purple-500/50 transition"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center font-bold text-sm">
-                                                    {String.fromCharCode(64 + asiento.fila)}{asiento.numero}
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-sm">
-                                                        Fila {String.fromCharCode(64 + asiento.fila)} - Asiento {asiento.numero}
-                                                    </p>
-                                                    <p className="text-xs text-gray-400 capitalize">{asiento.categoria}</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-bold text-purple-400">${asiento.precio.toFixed(2)}</p>
-                                            </div>
+                                    selectedAsientos.map(asiento => (
+                                        <div key={asiento.id} className="flex justify-between text-sm mb-1 text-gray-300">
+                                            <span>{asiento.numero} ({asiento.categoria})</span>
+                                            <span>${asiento.precio.toFixed(2)}</span>
                                         </div>
                                     ))
                                 )}
+                                {selectedAsientos.length === 0 && !evento?.esVirtual && <p className="text-gray-600 text-sm italic">Ningún asiento seleccionado</p>}
                             </div>
 
-                            {/* Separador */}
-                            {selectedAsientos.length > 0 && (
-                                <div className="border-t border-gray-800 my-6"></div>
+                            {/* Desglose Servicios */}
+                            {Object.keys(selectedServicios).length > 0 && (
+                                <div className="mb-4 pt-4 border-t border-gray-800">
+                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Extras</p>
+                                    {servicios.filter(s => selectedServicios[s.id] > 0).map(s => (
+                                        <div key={s.id} className="flex justify-between text-sm mb-1 text-gray-300">
+                                            <span>{selectedServicios[s.id]}x {s.nombre}</span>
+                                            <span>${(s.precio * selectedServicios[s.id]).toFixed(2)}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
 
-                            {/* Cupón de Descuento */}
-                            {selectedAsientos.length > 0 && (
-                                <div className="mb-6">
+                            {/* Cupón */}
+                            {step === 3 && (
+                                <div className="mb-4 pt-4 border-t border-gray-800">
                                     <CouponInput
                                         eventoId={eventoId!}
                                         montoOriginal={subtotal}
-                                        onCouponApplied={(codigo, descuento, nuevoTotal) => {
-                                            setCuponAplicado({ codigo, descuento, nuevoTotal });
-                                            toast.success(`¡Cupón ${codigo} aplicado! Ahorraste $${descuento.toFixed(2)}`);
-                                        }}
-                                        onCouponRemoved={() => {
-                                            setCuponAplicado(null);
-                                            toast.success('Cupón removido');
-                                        }}
+                                        onCouponApplied={(c, d, t) => { setCuponAplicado({ codigo: c, descuento: d, nuevoTotal: t }); toast.success('Cupón aplicado'); }}
+                                        onCouponRemoved={() => setCuponAplicado(null)}
                                         disabled={processingPurchase}
                                     />
                                 </div>
                             )}
 
-                            {/* Resumen de Precio */}
-                            <div className="space-y-3 mb-6">
-                                <div className="flex justify-between text-gray-400">
-                                    <span>Subtotal ({selectedAsientos.length} asiento{selectedAsientos.length !== 1 ? 's' : ''})</span>
+                            {/* Totales */}
+                            <div className="mt-6 pt-4 border-t border-white/20">
+                                <div className="flex justify-between mb-2 text-gray-400">
+                                    <span>Subtotal</span>
                                     <span>${subtotal.toFixed(2)}</span>
                                 </div>
                                 {cuponAplicado && (
-                                    <div className="flex justify-between text-green-400 font-medium animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <span className="flex items-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                            </svg>
-                                            Descuento ({cuponAplicado.codigo})
-                                        </span>
+                                    <div className="flex justify-between mb-2 text-green-400">
+                                        <span>Descuento</span>
                                         <span>-${cuponAplicado.descuento.toFixed(2)}</span>
                                     </div>
                                 )}
-                                <div className="flex justify-between text-gray-400">
-                                    <span>Cargo por servicio</span>
-                                    <span>$0.00</span>
-                                </div>
-                                <div className="border-t border-gray-800 pt-3">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xl font-bold">Total a Pagar</span>
-                                        <span className={`text-3xl font-black bg-gradient-to-r ${cuponAplicado ? 'from-green-400 to-emerald-500' : 'from-purple-400 to-pink-500'} bg-clip-text text-transparent transition-all duration-300`}>
-                                            ${totalPrice.toFixed(2)}
-                                        </span>
-                                    </div>
-                                    {cuponAplicado && totalPrice === 0 && (
-                                        <p className="text-sm text-green-400 mt-2 text-center animate-pulse">
-                                            🎉 ¡Entrada gratis con tu cupón!
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Botón de Pago */}
-                            <button
-                                onClick={handleInitiatePayment}
-                                disabled={selectedAsientos.length === 0 || processingPurchase}
-                                className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:shadow-none"
-                            >
-                                {processingPurchase ? (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Generando entradas...
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                        </svg>
-                                        {selectedAsientos.length === 0 ? 'Selecciona Asientos' : 'Proceder al Pago'}
-                                    </span>
-                                )}
-                            </button>
-
-                            {/* Información Adicional */}
-                            <div className="mt-6 p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                                <div className="flex gap-2">
-                                    <svg className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <div className="text-xs text-gray-400">
-                                        <p className="font-semibold text-purple-400 mb-1">Pago seguro</p>
-                                        <p>Tus datos están protegidos con encriptación SSL de última generación.</p>
-                                    </div>
+                                <div className="flex justify-between items-center text-xl font-bold text-white mt-4">
+                                    <span>Total</span>
+                                    <span>${totalPrice.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
@@ -357,8 +495,8 @@ export default function CheckoutPage() {
             {/* Modal de Pago */}
             {showPaymentForm && auth.isAuthenticated && (
                 <PaymentForm
-                    monto={totalPrice}
-                    ordenId={ordenId}
+                    monto={totalPrice} // Pasamos el total completo (Entradas + Servicios)
+                    ordenId={ordenId} // El ID de la orden de ENTRADAS
                     usuarioId={auth.user?.profile.sub || ''}
                     onSuccess={handlePaymentSuccess}
                     onCancel={() => setShowPaymentForm(false)}
@@ -367,18 +505,9 @@ export default function CheckoutPage() {
             )}
 
             <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(31, 41, 55, 0.5);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #8b5cf6, #ec4899);
-          border-radius: 10px;
-        }
-      `}</style>
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+            `}</style>
         </div>
     );
 }

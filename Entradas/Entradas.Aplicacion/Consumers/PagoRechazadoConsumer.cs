@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Entradas.Dominio.Interfaces;
 using Pagos.Aplicacion.Eventos;
 using Entradas.Dominio.Enums;
+using Entradas.Dominio.Eventos;
 
 namespace Entradas.Aplicacion.Consumers;
 
@@ -33,11 +34,22 @@ public class PagoRechazadoConsumer : IConsumer<PagoRechazadoEvento>
         {
             var entrada = await _repositorio.ObtenerPorIdAsync(mensaje.OrdenId, context.CancellationToken);
 
-            if (entrada != null && entrada.Estado == EstadoEntrada.PendientePago)
+            if (entrada != null && (entrada.Estado == EstadoEntrada.PendientePago || entrada.Estado == EstadoEntrada.Reservada))
             {
                 _logger.LogInformation("Cancelando entrada {EntradaId} por rechazo de pago", entrada.Id);
                 entrada.Cancelar();
                 await _repositorio.GuardarAsync(entrada, context.CancellationToken);
+
+                // Notificar que la reserva se canceló para liberar el asiento inmediatamente
+                await context.Publish(new ReservaCanceladaEvento(
+                    entrada.Id,
+                    entrada.AsientoId,
+                    entrada.EventoId,
+                    entrada.UsuarioId,
+                    DateTime.UtcNow
+                ));
+                
+                _logger.LogInformation("Entrada {EntradaId} cancelada y asiento liberado por rechazo de pago", entrada.Id);
             }
         }
         catch (Exception ex)

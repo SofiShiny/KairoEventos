@@ -50,5 +50,10 @@ export const encuestasService = {
     responder: async (command: ResponderEncuestaCommand): Promise<string> => {
         const response = await api.post(`${BASE_URL}/encuestas/responder`, command);
         return response.data;
+    },
+
+    getRespuestas: async (encuestaId: string): Promise<any[]> => {
+        const response = await api.get(`${BASE_URL}/encuestas/${encuestaId}/respuestas`);
+        return response.data;
     }
 };

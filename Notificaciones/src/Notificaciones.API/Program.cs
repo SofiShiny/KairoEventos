@@ -85,8 +85,9 @@ builder.Services.AddSignalR(options =>
 // ===== MassTransit (RabbitMQ) =====
 builder.Services.AddMassTransit(x =>
 {
-    // Registrar el Consumer
+    // Registrar los Consumers
     x.AddConsumer<PagoAprobadoConsumer>();
+    x.AddConsumer<PagoRechazadoConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -100,10 +101,15 @@ builder.Services.AddMassTransit(x =>
             h.Password(rabbitPass);
         });
 
-        // Configurar el endpoint para el Consumer
+        // Configurar los endpoints para los Consumers
         cfg.ReceiveEndpoint("notificaciones-pago-aprobado", e =>
         {
             e.ConfigureConsumer<PagoAprobadoConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notificaciones-pago-rechazado", e =>
+        {
+            e.ConfigureConsumer<PagoRechazadoConsumer>(context);
         });
     });
 });

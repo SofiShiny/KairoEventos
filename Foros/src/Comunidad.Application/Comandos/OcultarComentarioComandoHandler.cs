@@ -20,7 +20,15 @@ public class OcultarComentarioComandoHandler : IRequestHandler<OcultarComentario
             throw new InvalidOperationException($"El comentario con ID {request.ComentarioId} no existe");
         }
 
-        comentario.Ocultar();
+        if (request.RespuestaId.HasValue)
+        {
+            comentario.OcultarRespuesta(request.RespuestaId.Value);
+        }
+        else
+        {
+            comentario.Ocultar();
+        }
+        
         await _comentarioRepository.ActualizarAsync(comentario);
 
         return Unit.Value;

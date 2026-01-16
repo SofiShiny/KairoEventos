@@ -23,7 +23,7 @@ function AppContent() {
             <Toaster position="top-right" />
 
             {/* Indicador de conexión SignalR - Siempre visible para diagnóstico */}
-            <div className="fixed bottom-4 left-4 z-[9999]">
+            <div className="fixed bottom-4 right-4 z-[9999]">
                 <div className={`px-4 py-2 rounded-xl shadow-lg text-sm font-bold flex items-center gap-2 ${isConnected
                     ? 'bg-emerald-500 text-white'
                     : 'bg-rose-500 text-white'

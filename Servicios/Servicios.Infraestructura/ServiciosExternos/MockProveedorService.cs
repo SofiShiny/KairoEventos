@@ -32,4 +32,8 @@ public class MockProveedorService : IProveedorExternoService
 
         return resultados;
     }
+    public Task<IEnumerable<Servicios.Dominio.Entidades.ServicioGlobal>> ObtenerServiciosCateringAsync()
+    {
+        return Task.FromResult<IEnumerable<Servicios.Dominio.Entidades.ServicioGlobal>>(new List<Servicios.Dominio.Entidades.ServicioGlobal>());
+    }
 }

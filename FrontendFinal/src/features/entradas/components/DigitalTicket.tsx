@@ -1,7 +1,12 @@
-import { Calendar, MapPin, Ticket, User, QrCode, Video, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Ticket, User, QrCode, Video, ExternalLink, XCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { entradasService } from '../services/entradas.service';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Link } from 'react-router-dom';
+import { MessageSquare, ClipboardCheck, Star } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -19,9 +24,11 @@ interface DigitalTicketProps {
     esVirtual?: boolean;
     eventoId: string;
     eventoEstado?: string;
+    id: string;
+    usuarioId: string;
+    onCancel?: (id: string) => void;
+    serviciosExtras?: { nombre: string; estado: string; precio: number }[];
 }
-
-import { MessageSquare, ClipboardCheck } from 'lucide-react';
 
 export const DigitalTicket = ({
     titulo,
@@ -34,22 +41,33 @@ export const DigitalTicket = ({
     nombreUsuario,
     esVirtual,
     eventoId,
-    eventoEstado
+    eventoEstado,
+    id,
+    usuarioId,
+    onCancel,
+    serviciosExtras = []
 }: DigitalTicketProps) => {
+    const [isCancelling, setIsCancelling] = useState(false);
     // Asegurarse de que estado sea string antes de llamar a toLowerCase
     const estadoStr = String(estado || 'Pendiente');
     const isPagado = estadoStr.toLowerCase().includes('pagada') || estadoStr.toLowerCase().includes('pagado');
 
-    const isCompletado = eventoEstado === 'Completado' || new Date(fecha) < new Date();
+    const eventDate = new Date(fecha);
+    const today = new Date();
+    // No considerar completado si es el mismo día, a menos que el estado lo diga explícitamente
+    const isCompletado = eventoEstado === 'Completado' || eventoEstado === 'Finalizado' ||
+        (new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate() + 1) < today);
+
+    const inversionTotal = monto + serviciosExtras.reduce((acc, current) => acc + current.precio, 0);
 
     return (
-        <div className="relative flex flex-col md:flex-row w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl transition-transform hover:scale-[1.01]">
+        <div className="relative flex flex-col md:flex-row w-full max-w-4xl bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl transition-transform hover:scale-[1.01]">
             {/* Decoración lateral (Círculos de ticket) */}
             <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-5 h-5 bg-black rounded-full z-10 hidden md:block" />
             <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 w-5 h-5 bg-black rounded-full z-10 hidden md:block" />
 
             {/* Izquierda: Imagen */}
-            <div className="relative w-full md:w-48 h-48 md:h-auto overflow-hidden">
+            <div className="relative w-full md:w-40 h-40 md:h-auto overflow-hidden flex-shrink-0">
                 {imagenUrl ? (
                     <img
                         src={imagenUrl}
@@ -82,28 +100,83 @@ export const DigitalTicket = ({
                         </div>
                         <div className="flex items-center gap-2 text-neutral-400 text-sm">
                             <MapPin className="w-4 h-4 text-purple-400" />
-                            <span>Kairo Arena - {asiento}</span>
+                            <span>{esVirtual ? 'Plataforma Online' : (asiento ? `Kairo Arena - ${asiento}` : 'Kairo Arena')}</span>
                         </div>
+
+                        {/* Servicios Extras */}
+                        {serviciosExtras.length > 0 && (
+                            <div className="mt-4 pt-3 border-t border-dashed border-neutral-700/50">
+                                <p className="text-[10px] uppercase text-purple-400 font-bold tracking-widest mb-2 flex items-center gap-1">
+                                    <Star className="w-3 h-3" /> Servicios Adicionales
+                                </p>
+                                <div className="space-y-1">
+                                    {serviciosExtras.map((serv, idx) => (
+                                        <div key={idx} className="flex justify-between items-center text-xs">
+                                            <span className="text-white font-medium">{serv.nombre}</span>
+                                            <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                                                {serv.estado === 'Confirmado' ? 'CONFIRMADO' : 'PENDIENTE'}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                <div className="mt-6 flex items-end justify-between">
-                    <div>
-                        <p className="text-[10px] uppercase text-neutral-500 font-bold tracking-widest">Inversión</p>
-                        <p className="text-2xl font-black text-white">${(monto || 0).toFixed(2)}</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-[10px] uppercase text-neutral-500 font-bold tracking-widest">Titular</p>
-                        <div className="flex items-center gap-1 text-neutral-300">
-                            <User className="w-3 h-3" />
-                            <span className="text-xs font-semibold">{nombreUsuario}</span>
+                {/* Footer Inversión y Cancelar (Dentro del centro para mantener layout) */}
+                <div>
+                    <div className="mt-6 pt-4 border-t border-neutral-800/50 flex items-center justify-between gap-4">
+                        <div className="flex-shrink-0">
+                            <p className="text-[9px] uppercase text-neutral-500 font-bold tracking-widest mb-1">Inversión Total</p>
+                            <p className="text-xl font-black text-white">${inversionTotal.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right flex-1 min-w-0">
+                            <p className="text-[9px] uppercase text-neutral-500 font-bold tracking-widest mb-1">Titular</p>
+                            <div className="flex items-center justify-end gap-1 text-neutral-300">
+                                <User className="w-3 h-3 flex-shrink-0" />
+                                <span className="text-xs font-semibold truncate">{nombreUsuario}</span>
+                            </div>
                         </div>
                     </div>
+
+                    {/* Botón de Cancelación */}
+                    {isPagado && !isCompletado && !isCancelling && (
+                        <div className="mt-4 pt-4 border-t border-neutral-800/30">
+                            <button
+                                onClick={async () => {
+                                    if (window.confirm('¿Estás seguro de que deseas cancelar esta entrada? Se procesará un reembolso simulado.')) {
+                                        setIsCancelling(true);
+                                        try {
+                                            await entradasService.cancelarEntrada(id, usuarioId);
+                                            toast.success('Entrada cancelada exitosamente');
+                                            if (onCancel) onCancel(id);
+                                        } catch (error: any) {
+                                            toast.error(error.response?.data?.message || 'Error al cancelar entrada');
+                                        } finally {
+                                            setIsCancelling(false);
+                                        }
+                                    }
+                                }}
+                                className="text-[10px] font-bold text-red-500 hover:text-red-400 transition-colors flex items-center gap-1 uppercase tracking-wider"
+                            >
+                                <XCircle className="w-3 h-3" />
+                                Cancelar Entrada
+                            </button>
+                        </div>
+                    )}
+                    {isCancelling && (
+                        <div className="mt-4 pt-4 border-t border-neutral-800/30">
+                            <p className="text-[10px] font-bold text-neutral-500 animate-pulse uppercase tracking-wider">
+                                Procesando cancelación...
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Derecha: QR */}
-            <div className="w-full md:w-48 bg-neutral-800/50 p-6 flex flex-col items-center justify-center gap-4">
+            <div className="w-full md:w-44 bg-neutral-800/30 p-4 flex flex-col items-center justify-center gap-2 flex-shrink-0 border-b md:border-b-0 md:border-r border-dashed border-neutral-700">
                 <div className="bg-white p-3 rounded-xl shadow-lg">
                     {/* Generación de QR real usando qrcode.react */}
                     <div className="w-40 h-40 bg-white flex items-center justify-center">
@@ -121,22 +194,26 @@ export const DigitalTicket = ({
                         )}
                     </div>
                 </div>
-                <p className="text-[10px] font-mono text-neutral-500 break-all text-center">
-                    {codigo ? codigo.toUpperCase() : 'SIN CÓDIGO'}
+                <p className="text-[10px] font-mono text-neutral-500 text-center opacity-50">
+                    {codigo ? codigo.slice(-12).toUpperCase() : 'SIN CÓDIGO'}
                 </p>
             </div>
 
             {/* Acceso Streaming para Eventos Virtuales */}
             {isPagado && esVirtual && !isCompletado && (
-                <div className="absolute top-4 right-4 md:relative md:top-0 md:right-0 md:w-full md:bg-blue-600/10 md:p-4 md:border-t md:border-blue-500/20 flex flex-col items-center justify-center">
-                    <a
-                        href={`/streaming/${eventoId}`}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-blue-600/20 active:scale-95 group"
+                <div className="w-full md:w-64 flex flex-col items-center justify-center p-6 bg-blue-600/5 flex-shrink-0">
+                    <Link
+                        to={`/streaming/${eventoId}`}
+                        className="w-full flex items-center justify-center gap-3 px-4 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-[11px] font-black transition-all shadow-xl shadow-blue-600/20 active:scale-95 group uppercase tracking-widest"
                     >
                         <Video className="w-4 h-4" />
-                        ACCESO STREAMING
-                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
+                        ENTRAR
+                        <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                    <div className="mt-4 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                        <p className="text-[9px] text-emerald-400 font-bold uppercase tracking-[0.2em]">Disponible Ahora</p>
+                    </div>
                 </div>
             )}
 

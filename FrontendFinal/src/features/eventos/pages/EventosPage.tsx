@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import { getUserRoles } from '../../../lib/auth-utils';
 import { useEventos } from '../hooks/useEventos';
 import { EventCard } from '../components/EventCard';
+import RecomendacionesModal from '../../recomendaciones/components/RecomendacionesModal';
 import { Sparkles } from 'lucide-react';
 import { useT } from '../../../i18n';
 
@@ -12,6 +13,7 @@ export const EventosPage = () => {
     const auth = useAuth();
     const navigate = useNavigate();
     const t = useT();
+    const [showRecommendations, setShowRecommendations] = useState(false);
 
     useEffect(() => {
         // Redirigir a admin si el usuario tiene los roles adecuados
@@ -42,6 +44,13 @@ export const EventosPage = () => {
                     <p className="text-neutral-500 text-xl max-w-2xl font-medium leading-relaxed">
                         {t.home.heroDescription}
                     </p>
+                    <button
+                        onClick={() => setShowRecommendations(true)}
+                        className="mt-8 px-8 py-4 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-black uppercase tracking-widest text-xs rounded-xl shadow-[0_10px_40px_-10px_rgba(139,92,246,0.5)] transition-all flex items-center gap-3 group"
+                    >
+                        <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                        Recomendar evento
+                    </button>
                 </header>
 
                 {isLoading && (
@@ -85,6 +94,7 @@ export const EventosPage = () => {
                     </div>
                 )}
             </div>
+            {showRecommendations && <RecomendacionesModal onClose={() => setShowRecommendations(false)} />}
         </div>
     );
 };

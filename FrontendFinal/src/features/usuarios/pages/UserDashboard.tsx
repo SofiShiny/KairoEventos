@@ -5,12 +5,15 @@ import { Ticket, Search, User as UserIcon, Settings, LogOut, ChevronRight, Activ
 import { entradasService, Entrada } from '../../entradas/services/entradas.service';
 import { DigitalTicket } from '../../entradas/components/DigitalTicket';
 import { eventosService } from '../../eventos/services/eventos.service';
+import { serviciosService } from '../../servicios/services/servicios.service';
 
 export const UserDashboard = () => {
     const auth = useAuth();
     const navigate = useNavigate();
     const [entradas, setEntradas] = useState<Entrada[]>([]);
     const [eventStatusMap, setEventStatusMap] = useState<Record<string, string>>({});
+    const [reservasServicios, setReservasServicios] = useState<any[]>([]);
+    const [catalogoServicios, setCatalogoServicios] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     const user = auth.user?.profile;
@@ -25,12 +28,16 @@ export const UserDashboard = () => {
     const loadEntradas = async () => {
         try {
             setLoading(true);
-            const [entradasData, eventosData] = await Promise.all([
+            const [entradasData, eventosData, reservasData, catalogoData] = await Promise.all([
                 entradasService.getMisEntradas(usuarioId!),
-                eventosService.getEventos()
+                eventosService.getEventos(),
+                serviciosService.getMisReservas(usuarioId!),
+                serviciosService.getServiciosPorEvento('global') // Fetch global catalog
             ]);
 
             setEntradas(entradasData);
+            setReservasServicios(reservasData);
+            setCatalogoServicios(catalogoData);
 
             // Crear mapa de estados de eventos
             const statusMap: Record<string, string> = {};
@@ -91,7 +98,7 @@ export const UserDashboard = () => {
                                 Miembro desde 2024
                             </span>
                             <span className="px-3 py-1 bg-blue-500/10 rounded-full text-xs font-bold text-blue-400 border border-blue-500/20">
-                                {entradas.length} Entradas Compradas
+                                {entradas.filter(e => e.estado === 'Pagada' || e.estado === 'Usada').length} Entradas Compradas
                             </span>
                         </div>
                     </div>
@@ -182,7 +189,7 @@ export const UserDashboard = () => {
                             Próximos Eventos
                         </h2>
                         <span className="text-sm font-bold text-neutral-400 px-3 py-1 bg-neutral-900 rounded-lg">
-                            {entradas.length} Total
+                            {entradas.filter(e => e.estado !== 'Cancelada').length} Total
                         </span>
                     </div>
 
@@ -192,7 +199,7 @@ export const UserDashboard = () => {
                                 <div key={i} className="h-48 w-full bg-neutral-900 animate-pulse rounded-3xl border border-neutral-800" />
                             ))}
                         </div>
-                    ) : entradas.length === 0 ? (
+                    ) : entradas.filter(e => e.estado !== 'Cancelada').length === 0 ? (
                         <div className="text-center py-20 bg-neutral-900/30 rounded-3xl border border-dashed border-neutral-800">
                             <Ticket className="w-16 h-16 text-neutral-700 mx-auto mb-4" />
                             <h3 className="text-xl font-bold text-white mb-2">No tienes entradas aún</h3>
@@ -208,22 +215,41 @@ export const UserDashboard = () => {
                         </div>
                     ) : (
                         <div className="grid gap-8">
-                            {entradas.map((entrada) => (
-                                <DigitalTicket
-                                    key={entrada.id}
-                                    titulo={entrada.eventoNombre}
-                                    fecha={entrada.fechaEvento || entrada.fechaCompra}
-                                    asiento={entrada.asientoInfo}
-                                    estado={entrada.estado}
-                                    imagenUrl={entrada.imagenEventoUrl}
-                                    monto={entrada.precio}
-                                    codigo={entrada.codigoQr}
-                                    nombreUsuario={(user as any)?.preferred_username || 'Usuario'}
-                                    esVirtual={entrada.esVirtual}
-                                    eventoId={entrada.eventoId}
-                                    eventoEstado={eventStatusMap[entrada.eventoId]}
-                                />
-                            ))}
+                            {entradas
+                                .filter(e => e.estado !== 'Cancelada')
+                                .map((entrada) => {
+                                    const serviciosDeEstaEntrada = reservasServicios
+                                        .filter(r => r.eventoId === entrada.eventoId)
+                                        .map(r => {
+                                            const info = catalogoServicios.find(s => s.id === r.servicioGlobalId);
+                                            return {
+                                                nombre: info ? info.nombre : 'Servicio Extra',
+                                                estado: r.estado === 1 ? 'Confirmado' : 'Pendiente',
+                                                precio: info ? info.precio : 0
+                                            };
+                                        });
+
+                                    return (
+                                        <DigitalTicket
+                                            key={entrada.id}
+                                            id={entrada.id}
+                                            usuarioId={usuarioId!}
+                                            onCancel={loadEntradas}
+                                            titulo={entrada.eventoNombre}
+                                            fecha={entrada.fechaEvento || entrada.fechaCompra}
+                                            asiento={entrada.asientoInfo}
+                                            estado={entrada.estado}
+                                            imagenUrl={entrada.imagenEventoUrl}
+                                            monto={entrada.precio}
+                                            codigo={entrada.codigoQr}
+                                            nombreUsuario={(user as any)?.preferred_username || 'Usuario'}
+                                            esVirtual={entrada.esVirtual}
+                                            eventoId={entrada.eventoId}
+                                            eventoEstado={eventStatusMap[entrada.eventoId]}
+                                            serviciosExtras={serviciosDeEstaEntrada}
+                                        />
+                                    );
+                                })}
                         </div>
                     )}
                 </div>

@@ -9,6 +9,9 @@ internal static class EventoDtoMapper
 {
   public static EventoDto Map(Evento e)
   {
+  // DEBUG: Log del valor de la entidad antes del mapeo
+  Console.WriteLine($"[MAPPER] Mapeando evento {e.Id}: EsVirtual={e.EsVirtual}, PrecioBase={e.PrecioBase}");
+  
   // Se asume que e.Ubicacion no es null debido a validaciones previas
   var u = e.Ubicacion;
   var dto = new EventoDto
@@ -46,6 +49,8 @@ internal static class EventoDtoMapper
   }).ToList()
   : null
   };
+  
+  Console.WriteLine($"[MAPPER] DTO creado: EsVirtual={dto.EsVirtual}, PrecioBase={dto.PrecioBase}");
   return dto;
   }
 }

@@ -10,6 +10,7 @@ export const es = {
         admin: 'Administración',
         logout: 'Cerrar Sesión',
         login: 'Iniciar Sesión',
+        register: 'Registrar',
         connected: 'Conectado'
     },
 

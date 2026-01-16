@@ -24,7 +24,7 @@ public class EntradasController : ControllerBase
 
     [HttpPost]
     public async Task<ActionResult<ApiResponse<object>>> CrearEntrada(
-        [FromBody] CrearEntradaRequestDto request,
+        [FromBody] Entradas.API.DTOs.CrearEntradaRequestDto request,
         CancellationToken cancellationToken = default)
     {
         try
@@ -55,10 +55,10 @@ public class EntradasController : ControllerBase
             foreach (var asientoId in asientosAProcesar)
             {
                 var comando = new CrearEntradaCommand(
-                    request.EventoId,
-                    request.UsuarioId,
-                    asientoId,
-                    request.Cupones,
+                    EventoId: request.EventoId,
+                    UsuarioId: request.UsuarioId,
+                    AsientoId: asientoId,
+                    Cupones: request.Cupones,
                     NombreUsuario: request.NombreUsuario,
                     Email: request.Email);
 
@@ -163,6 +163,30 @@ public class EntradasController : ControllerBase
         var query = new ObtenerTodasLasEntradasQuery(organizadorId);
         var entradas = await _mediator.Send(query, cancellationToken);
         return Ok(ApiResponse<IEnumerable<EntradaDto>>.Ok(entradas));
+    }
+
+    [HttpPut("{id:guid}/cancelar")]
+    public async Task<ActionResult<ApiResponse<bool>>> CancelarEntrada(Guid id, [FromQuery] Guid? usuarioId, CancellationToken cancellationToken = default)
+    {
+        if (!usuarioId.HasValue && Request.Headers.TryGetValue("X-User-Id", out var userIdStr))
+        {
+            if (Guid.TryParse(userIdStr, out var uId)) usuarioId = uId;
+        }
+
+        if (!usuarioId.HasValue)
+        {
+            return BadRequest(ApiResponse<bool>.Error("UsuarioId es requerido para cancelar."));
+        }
+
+        var comando = new CancelarEntradaCommand(id, usuarioId.Value);
+        var resultado = await _mediator.Send(comando, cancellationToken);
+        
+        if (!resultado)
+        {
+            return BadRequest(ApiResponse<bool>.Error("No se pudo cancelar la entrada. Verifique que sea el propietario y que no haya sido usada/cancelada previamente."));
+        }
+        
+        return Ok(ApiResponse<bool>.Ok(true, "Entrada cancelada exitosamente. El reembolso se procesará automáticamente (Simulación)."));
     }
 
     [HttpGet("health")]

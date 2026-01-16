@@ -19,14 +19,25 @@ export default function StreamingPage() {
     const loadStreaming = async () => {
         try {
             setLoading(true);
-            const data = await streamingService.getTransmision(id!);
+            setError('');
+
+            // Intentar obtener la transmisión existente
+            let data = await streamingService.getTransmision(id!);
+
+            // Si no existe, intentar crearla/obtenerla mediante POST
+            if (!data) {
+                console.log('Transmisión no encontrada, intentando generar una nueva...');
+                data = await streamingService.crearObtenerTransmision(id!);
+            }
+
             if (data) {
                 setTransmision(data);
             } else {
-                setError('No se encontró información de la transmisión para este evento.');
+                setError('No se pudo establecer el canal de streaming. Por favor, verifica que tu entrada sea válida.');
             }
         } catch (err: any) {
-            setError('Error al conectar con el servidor de streaming.');
+            console.error('Error en carga de streaming:', err);
+            setError('Error crítico al conectar con el centro de transmisiones.');
         } finally {
             setLoading(false);
         }
@@ -168,12 +179,6 @@ export default function StreamingPage() {
                             </ul>
                         </div>
 
-                        <div className="p-8 border border-dashed border-slate-800 rounded-[2.5rem] text-center">
-                            <p className="text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4">¿Algún problema?</p>
-                            <button className="text-white font-bold hover:text-blue-500 transition-colors text-sm">
-                                CONTACTAR SOPORTE VIP
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

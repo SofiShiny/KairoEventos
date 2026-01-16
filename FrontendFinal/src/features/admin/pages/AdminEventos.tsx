@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Plus,
     Search,
@@ -16,7 +17,12 @@ import {
     Rocket,
     BarChart3,
     LayoutGrid,
-    Tag
+    Tag,
+    Video,
+    X,
+    ExternalLink,
+    Copy,
+    MessageSquare
 } from 'lucide-react';
 import { useAuth } from 'react-oidc-context';
 import { adminEventosService } from '../services/admin.eventos.service';
@@ -29,8 +35,11 @@ import AdminCuponesManager from '../components/AdminCuponesManager';
 import AdminEncuestasManager from '../components/AdminEncuestasManager';
 
 import { useT } from '../../../i18n';
+import { streamingService, Transmision } from '../../streaming/services/streaming.service';
+import { toast } from 'react-hot-toast';
 
 export default function AdminEventos() {
+    const navigate = useNavigate();
     const auth = useAuth();
     const t = useT();
     const [eventos, setEventos] = useState<Evento[]>([]);
@@ -47,6 +56,11 @@ export default function AdminEventos() {
     const [showSeatConfig, setShowSeatConfig] = useState(false);
     const [showCuponesManager, setShowCuponesManager] = useState(false);
     const [showEncuestasManager, setShowEncuestasManager] = useState(false);
+    const [viewingStreaming, setViewingStreaming] = useState<{ evento: Evento, info: Transmision } | null>(null);
+    const [checkingStreaming, setCheckingStreaming] = useState(false);
+    const [isEditingStreamingUrl, setIsEditingStreamingUrl] = useState(false);
+    const [editableStreamingUrl, setEditableStreamingUrl] = useState('');
+    const [savingStreamingUrl, setSavingStreamingUrl] = useState(false);
 
     useEffect(() => {
         cargarEventos();
@@ -129,6 +143,58 @@ export default function AdminEventos() {
     const handleFormSuccess = () => {
         setIsModalOpen(false);
         cargarEventos();
+    };
+
+    const handleViewStreaming = async (evento: Evento) => {
+        try {
+            setCheckingStreaming(true);
+            // Primero intentar obtener la transmisión existente
+            let info = await streamingService.getTransmision(evento.id);
+
+            // Si no existe, crear una nueva transmisión automáticamente
+            if (!info) {
+                info = await streamingService.crearObtenerTransmision(evento.id);
+            }
+
+            if (info) {
+                setViewingStreaming({ evento, info });
+                setEditableStreamingUrl(info.urlAcceso);
+                setIsEditingStreamingUrl(false);
+                toast.success('Información de transmisión cargada');
+            } else {
+                toast.error('No se pudo cargar la información de streaming.');
+            }
+        } catch (error) {
+            console.error('Error al obtener/crear transmisión:', error);
+            toast.error('Error al obtener la información de streaming');
+        } finally {
+            setCheckingStreaming(false);
+        }
+    };
+
+    const handleUpdateStreamingUrl = async () => {
+        if (!viewingStreaming || !editableStreamingUrl) return;
+
+        try {
+            setSavingStreamingUrl(true);
+            const updated = await streamingService.actualizarUrl(viewingStreaming.evento.id, editableStreamingUrl);
+            if (updated) {
+                setViewingStreaming({ ...viewingStreaming, info: updated });
+                setIsEditingStreamingUrl(false);
+                toast.success('Link de transmisión actualizado correctamente');
+            } else {
+                toast.error('No se pudo actualizar el link');
+            }
+        } catch (error) {
+            toast.error('Error al actualizar el link');
+        } finally {
+            setSavingStreamingUrl(false);
+        }
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success('Link copiado al portapapeles');
     };
 
     const formatFecha = (fecha: string) => {
@@ -316,6 +382,27 @@ export default function AdminEventos() {
                                                 >
                                                     <BarChart3 className="w-4 h-4" />
                                                 </button>
+                                                <button
+                                                    onClick={() => navigate(`/foros/${evento.id}`)}
+                                                    className="p-2 bg-slate-800 text-slate-300 hover:text-white hover:bg-indigo-500 rounded-lg transition-all"
+                                                    title="Moderar Foro"
+                                                >
+                                                    <MessageSquare className="w-4 h-4" />
+                                                </button>
+                                                {evento.esVirtual && (
+                                                    <button
+                                                        onClick={() => handleViewStreaming(evento)}
+                                                        disabled={checkingStreaming}
+                                                        className="p-2 bg-slate-800 text-blue-400 hover:text-white hover:bg-blue-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        title="Ver Link de Streaming"
+                                                    >
+                                                        {checkingStreaming ? (
+                                                            <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                                                        ) : (
+                                                            <Video className="w-4 h-4" />
+                                                        )}
+                                                    </button>
+                                                )}
                                                 {evento.estado !== 'Publicado' && (
                                                     <button
                                                         onClick={() => handlePublish(evento.id)}
@@ -386,7 +473,6 @@ export default function AdminEventos() {
             {showCuponesManager && selectedEvento && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-neutral-900 rounded-2xl border border-neutral-800 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-                        {/* Header del Modal */}
                         <div className="sticky top-0 bg-neutral-900 border-b border-neutral-800 p-6 flex items-center justify-between z-10">
                             <div>
                                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -404,13 +490,9 @@ export default function AdminEventos() {
                                 }}
                                 className="p-2 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white"
                             >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="w-6 h-6" />
                             </button>
                         </div>
-
-                        {/* Contenido del Modal */}
                         <div className="p-6">
                             <AdminCuponesManager eventoId={selectedEvento.id} />
                         </div>
@@ -422,7 +504,6 @@ export default function AdminEventos() {
             {showEncuestasManager && selectedEvento && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-neutral-900 rounded-2xl border border-neutral-800 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                        {/* Header del Modal */}
                         <div className="sticky top-0 bg-neutral-900 border-b border-neutral-800 p-6 flex items-center justify-between z-10">
                             <div>
                                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -440,15 +521,114 @@ export default function AdminEventos() {
                                 }}
                                 className="p-2 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white"
                             >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <AdminEncuestasManager eventoId={selectedEvento.id} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de Información de Streaming */}
+            {viewingStreaming && (
+                <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[70] p-4 animate-in fade-in duration-300">
+                    <div className="bg-[#1a1e26] border border-blue-500/30 rounded-[3rem] w-full max-w-xl overflow-hidden shadow-2xl shadow-blue-500/10">
+                        <div className="p-8 border-b border-white/5 flex items-center justify-between bg-blue-600/5">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center">
+                                    <Video className="text-white w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">Acceso de Transmisión</h3>
+                                    <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Configuración para Administradores</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setViewingStreaming(null)} className="p-2 hover:bg-white/5 rounded-xl text-slate-500">
+                                <X className="w-6 h-6" />
                             </button>
                         </div>
 
-                        {/* Contenido del Modal */}
-                        <div className="p-6">
-                            <AdminEncuestasManager eventoId={selectedEvento.id} />
+                        <div className="p-10 space-y-8">
+                            <div>
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-3">Evento Asociado</label>
+                                <p className="text-lg font-bold text-white uppercase tracking-tight">{viewingStreaming.evento.titulo}</p>
+                            </div>
+
+                            <div className="p-6 bg-black/40 border border-white/5 rounded-2xl space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Plataforma</span>
+                                    <span className="px-3 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase rounded-lg border border-blue-500/20">
+                                        {viewingStreaming.info.plataforma}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Estado</span>
+                                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                                        {viewingStreaming.info.estado}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] block">URL de Acceso Directo</label>
+                                    <button
+                                        onClick={() => setIsEditingStreamingUrl(!isEditingStreamingUrl)}
+                                        className="text-[10px] font-black text-blue-400 uppercase tracking-widest hover:text-blue-300 transition-colors"
+                                    >
+                                        {isEditingStreamingUrl ? 'Cancelar' : 'Editar Link'}
+                                    </button>
+                                </div>
+
+                                {isEditingStreamingUrl ? (
+                                    <div className="flex flex-col gap-3">
+                                        <input
+                                            type="text"
+                                            value={editableStreamingUrl}
+                                            onChange={(e) => setEditableStreamingUrl(e.target.value)}
+                                            className="w-full bg-[#0f1115] border border-blue-500/30 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:border-blue-500"
+                                            placeholder="Pega aquí tu link real de Google Meet o Zoom"
+                                        />
+                                        <button
+                                            onClick={handleUpdateStreamingUrl}
+                                            disabled={savingStreamingUrl}
+                                            className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest disabled:opacity-50"
+                                        >
+                                            {savingStreamingUrl ? 'Guardando...' : 'Guardar Nuevo Link'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <div className="flex-1 bg-[#0f1115] border border-white/5 rounded-2xl px-6 py-4 text-blue-300 font-mono text-xs overflow-hidden truncate">
+                                            {viewingStreaming.info.urlAcceso}
+                                        </div>
+                                        <button
+                                            onClick={() => copyToClipboard(viewingStreaming.info.urlAcceso)}
+                                            className="p-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl transition-all active:scale-90"
+                                        >
+                                            <Copy className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="pt-4 flex flex-col gap-3">
+                                <a
+                                    href={viewingStreaming.info.urlAcceso}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="w-full flex items-center justify-center gap-3 bg-white text-black py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-slate-200 transition-all shadow-xl shadow-white/5"
+                                >
+                                    <ExternalLink className="w-4 h-4" />
+                                    ENTRAR COMO MODERADOR
+                                </a>
+                                <p className="text-[9px] text-slate-600 text-center font-bold uppercase tracking-wider">
+                                    Recuerda iniciar sesión con la cuenta de organizador en {viewingStreaming.info.plataforma}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
