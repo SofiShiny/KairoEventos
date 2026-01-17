@@ -7,6 +7,7 @@ public interface IRepositorioReportesLectura
     // Ventas
     Task<ReporteVentasDiarias?> ObtenerVentasDiariasAsync(DateTime fecha);
     Task ActualizarVentasDiariasAsync(ReporteVentasDiarias reporte);
+    Task IncrementarVentasDiariasAsync(DateTime fecha, decimal monto, int cantidad);
     Task<List<ReporteVentasDiarias>> ObtenerVentasPorRangoAsync(DateTime fechaInicio, DateTime fechaFin);
     
     // Métricas Diarias

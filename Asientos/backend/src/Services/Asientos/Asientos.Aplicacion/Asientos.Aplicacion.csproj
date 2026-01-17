@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.Core" Version="1.8.22" />
     <ProjectReference Include="..\Asientos.Dominio\Asientos.Dominio.csproj" />
     <PackageReference Include="MediatR" Version="11.1.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.3" />

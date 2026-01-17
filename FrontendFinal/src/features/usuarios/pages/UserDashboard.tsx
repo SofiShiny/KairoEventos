@@ -215,41 +215,84 @@ export const UserDashboard = () => {
                         </div>
                     ) : (
                         <div className="grid gap-8">
-                            {entradas
-                                .filter(e => e.estado !== 'Cancelada')
-                                .map((entrada) => {
-                                    const serviciosDeEstaEntrada = reservasServicios
-                                        .filter(r => r.eventoId === entrada.eventoId)
-                                        .map(r => {
-                                            const info = catalogoServicios.find(s => s.id === r.servicioGlobalId);
-                                            return {
-                                                nombre: info ? info.nombre : 'Servicio Extra',
-                                                estado: r.estado === 1 ? 'Confirmado' : 'Pendiente',
-                                                precio: info ? info.precio : 0
-                                            };
-                                        });
+                            {(() => {
+                                const claimedServiceIds = new Set<string>();
 
-                                    return (
-                                        <DigitalTicket
-                                            key={entrada.id}
-                                            id={entrada.id}
-                                            usuarioId={usuarioId!}
-                                            onCancel={loadEntradas}
-                                            titulo={entrada.eventoNombre}
-                                            fecha={entrada.fechaEvento || entrada.fechaCompra}
-                                            asiento={entrada.asientoInfo}
-                                            estado={entrada.estado}
-                                            imagenUrl={entrada.imagenEventoUrl}
-                                            monto={entrada.precio}
-                                            codigo={entrada.codigoQr}
-                                            nombreUsuario={(user as any)?.preferred_username || 'Usuario'}
-                                            esVirtual={entrada.esVirtual}
-                                            eventoId={entrada.eventoId}
-                                            eventoEstado={eventStatusMap[entrada.eventoId]}
-                                            serviciosExtras={serviciosDeEstaEntrada}
-                                        />
-                                    );
-                                })}
+                                return entradas
+                                    .filter(e => e.estado !== 'Cancelada')
+                                    .map((entrada) => {
+                                        // 1. Filtrar servicios para esta entrada (Estrategia Temporal + ID)
+                                        const serviciosDeEstaEntrada = reservasServicios
+                                            .filter(r => {
+                                                if (claimedServiceIds.has(r.id)) return false; // Ya asignado
+
+                                                const resOrdenId = (r.ordenEntradaId || r.OrdenEntradaId)?.toString().toLowerCase();
+                                                const entId = entrada.id?.toString().toLowerCase();
+
+                                                // A. Coincidencia EXACTA (Prioridad Máxima)
+                                                if (resOrdenId && entId && resOrdenId === entId) {
+                                                    claimedServiceIds.add(r.id);
+                                                    return true;
+                                                }
+
+                                                // B. Heurística Temporal (Fallback Inteligente)
+                                                // Si no hay ID (orphan), verificamos si se compraron "juntos" (mismo evento + diferencia < 5 mins)
+                                                if (r.eventoId === entrada.eventoId) {
+                                                    const fechaEntrada = new Date(entrada.fechaCompra);
+                                                    const fechaReserva = new Date(r.fechaCreacion || r.FechaCreacion);
+
+                                                    if (!isNaN(fechaEntrada.getTime()) && !isNaN(fechaReserva.getTime())) {
+                                                        const diffMs = Math.abs(fechaEntrada.getTime() - fechaReserva.getTime());
+                                                        const MAX_DIFF_MINUTES = 5 * 60 * 1000; // 5 minutos de margen
+
+                                                        if (diffMs < MAX_DIFF_MINUTES) {
+                                                            claimedServiceIds.add(r.id);
+                                                            return true;
+                                                        }
+                                                    }
+                                                }
+
+                                                return false;
+                                            })
+                                            .map(r => {
+                                                const info = catalogoServicios.find(s => s.id === r.servicioGlobalId);
+
+                                                // Mostrar nombre específico si es posible
+                                                let nombreMostrar = info?.nombre || 'Servicio Extra';
+
+                                                if (info?.proveedores?.length === 1) {
+                                                    nombreMostrar = info.proveedores[0].nombreProveedor;
+                                                }
+
+                                                return {
+                                                    nombre: nombreMostrar,
+                                                    estado: r.estado === 1 ? 'Confirmado' : 'Pendiente',
+                                                    precio: info ? Number(info.precio) : 0
+                                                };
+                                            });
+
+                                        return (
+                                            <DigitalTicket
+                                                key={entrada.id}
+                                                id={entrada.id}
+                                                usuarioId={usuarioId!}
+                                                onCancel={loadEntradas}
+                                                titulo={entrada.eventoNombre}
+                                                fecha={entrada.fechaEvento || entrada.fechaCompra}
+                                                asiento={entrada.asientoInfo}
+                                                estado={entrada.estado}
+                                                imagenUrl={entrada.imagenEventoUrl}
+                                                monto={entrada.precio}
+                                                codigo={entrada.codigoQr}
+                                                nombreUsuario={(user as any)?.preferred_username || 'Usuario'}
+                                                esVirtual={entrada.esVirtual}
+                                                eventoId={entrada.eventoId}
+                                                eventoEstado={eventStatusMap[entrada.eventoId]}
+                                                serviciosExtras={serviciosDeEstaEntrada}
+                                            />
+                                        );
+                                    });
+                            })()}
                         </div>
                     )}
                 </div>
@@ -257,3 +300,5 @@ export const UserDashboard = () => {
         </div>
     );
 };
+
+export default UserDashboard;

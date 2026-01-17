@@ -15,7 +15,8 @@ public class ObtenerMapaAsientosQueryHandler : IRequestHandler<ObtenerMapaAsient
         if (mapa == null) return null;
         
         var asientos = mapa.Asientos
-            .Select(a => new AsientoDto(a.Id, a.Fila, a.Numero, a.Categoria.Nombre, a.Categoria.PrecioBase ?? 0, a.Reservado))
+            .Select(a => new AsientoDto(a.Id, a.Fila, a.Numero, a.Categoria.Nombre, a.Categoria.PrecioBase ?? 0, 
+                a.Pagado ? "Ocupado" : (a.Reservado ? "Reservado" : "Disponible")))
             .OrderBy(x => x.Fila)
             .ThenBy(x => x.Numero)
             .ToList();

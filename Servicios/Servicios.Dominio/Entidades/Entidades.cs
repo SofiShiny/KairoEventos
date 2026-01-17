@@ -16,7 +16,8 @@ public class ServicioGlobal
     public bool Activo { get; private set; }
     
     // Nueva relación con proveedores
-    public List<ProveedorServicio> Proveedores { get; private set; } = new();
+    private readonly List<ProveedorServicio> _proveedores = new();
+    public IReadOnlyCollection<ProveedorServicio> Proveedores => _proveedores.AsReadOnly();
 
     // Constructor para EF
     private ServicioGlobal() { }
@@ -32,9 +33,11 @@ public class ServicioGlobal
     public void Desactivar() => Activo = false;
     public void Activar() => Activo = true;
 
+    public void ActualizarPrecio(decimal nuevoPrecio) => Precio = nuevoPrecio;
+
     public void AgregarProveedor(ProveedorServicio proveedor)
     {
-        Proveedores.Add(proveedor);
+        _proveedores.Add(proveedor);
     }
 }
 
@@ -64,6 +67,11 @@ public class ProveedorServicio
     {
         EstaDisponible = disponible;
     }
+
+    public void ActualizarPrecio(decimal nuevoPrecio)
+    {
+        Precio = nuevoPrecio;
+    }
 }
 
 public class ReservaServicio
@@ -72,18 +80,20 @@ public class ReservaServicio
     public Guid UsuarioId { get; private set; }
     public Guid EventoId { get; private set; }
     public Guid ServicioGlobalId { get; private set; }
+    public Guid? OrdenEntradaId { get; private set; } // Nuevo campo para correlación
     public EstadoReserva Estado { get; private set; }
     public DateTime FechaCreacion { get; private set; }
 
     // Constructor para EF
     private ReservaServicio() { }
 
-    public ReservaServicio(Guid usuarioId, Guid eventoId, Guid servicioGlobalId)
+    public ReservaServicio(Guid usuarioId, Guid eventoId, Guid servicioGlobalId, Guid? ordenEntradaId = null)
     {
         Id = Guid.NewGuid();
         UsuarioId = usuarioId;
         EventoId = eventoId;
         ServicioGlobalId = servicioGlobalId;
+        OrdenEntradaId = ordenEntradaId;
         Estado = EstadoReserva.PendientePago;
         FechaCreacion = DateTime.UtcNow;
     }

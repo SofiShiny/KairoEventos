@@ -52,9 +52,23 @@ public class ServiciosController : ControllerBase
     }
 
     [HttpGet("mis-reservas/{usuarioId:guid}")]
-    public async Task<ActionResult<IEnumerable<ReservaServicio>>> GetMisReservas(Guid usuarioId)
+    public async Task<ActionResult> GetMisReservas(Guid usuarioId)
     {
         var reservas = await _repositorio.ObtenerReservasPorUsuarioAsync(usuarioId);
-        return Ok(reservas);
+        
+        // Proyección explícita para asegurar que OrdenEntradaId se serialice
+        // (System.Text.Json a veces ignora propiedades con private set por defecto)
+        var resultado = reservas.Select(r => new 
+        {
+            r.Id,
+            r.UsuarioId,
+            r.EventoId,
+            r.ServicioGlobalId,
+            r.OrdenEntradaId,
+            r.Estado,
+            r.FechaCreacion
+        });
+
+        return Ok(resultado);
     }
 }

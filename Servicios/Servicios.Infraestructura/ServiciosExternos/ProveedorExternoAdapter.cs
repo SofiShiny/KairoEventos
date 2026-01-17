@@ -16,55 +16,56 @@ public class ProveedorExternoAdapter : IProveedorExternoService
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
-    public async Task<Dictionary<string, bool>> ConsultarEstadoProveedoresAsync(List<string> externalIds)
-    {
-        // Implementación simplificada para cumplir con la interfaz
-        // En un escenario real, esto consultaría la disponibilidad en tiempo real
-        return await Task.FromResult(new Dictionary<string, bool>());
-    }
-
-    public async Task<IEnumerable<ServicioGlobal>> ObtenerServiciosCateringAsync()
+    public async Task<IEnumerable<ServicioExternoDto>> ObtenerServiciosPorTipoAsync(string tipo)
     {
         try
         {
-            // El BaseAddress (http://localhost:5005/) se configurará en InyeccionDependencias
-            var response = await _httpClient.GetAsync("api/servicios/catering");
+            var response = await _httpClient.GetAsync($"api/servicios/{tipo}");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             
-            // Deserializamos usando la estructura detectada: {"servicios": [ ... ]}
             var root = JsonSerializer.Deserialize<ServiciosExternosResponse>(json, options);
 
-            if (root?.Servicios == null) return Enumerable.Empty<ServicioGlobal>();
-
-            // Mapeamos DTO externo -> Entidad de Dominio (Clean Architecture)
-            return root.Servicios.Select(dto => new ServicioGlobal(
-                Guid.NewGuid(), // Generamos un ID interno
-                dto.Nombre,
-                dto.Precio
-            )).ToList();
+            return root?.Servicios ?? Enumerable.Empty<ServicioExternoDto>();
         }
         catch (Exception)
         {
-            // En caso de error de conexión, retornamos lista vacía para no detener el worker
-            // Aquí se debería loguear el error idealmente
-            return Enumerable.Empty<ServicioGlobal>();
+            return Enumerable.Empty<ServicioExternoDto>();
         }
     }
 
-    // DTOs privados para no contaminar el dominio con estructuras externas
-    private class ServiciosExternosResponse
+    public async Task<IEnumerable<ServicioExternoDto>> ObtenerTodosLosServiciosAsync()
     {
-        public List<ServicioExternoDto> Servicios { get; set; }
+        try
+        {
+            var response = await _httpClient.GetAsync("api/servicios");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            
+            return JsonSerializer.Deserialize<List<ServicioExternoDto>>(json, options) ?? Enumerable.Empty<ServicioExternoDto>();
+        }
+        catch (Exception)
+        {
+            return Enumerable.Empty<ServicioExternoDto>();
+        }
     }
 
-    private class ServicioExternoDto
+    public async Task ActualizarServicioAsync(string idExterno, decimal precio, bool disponible)
     {
-        public string IdServicioExterno { get; set; }
-        public string Nombre { get; set; }
-        public decimal Precio { get; set; }
-        public string Moneda { get; set; }
+        var request = new { IdServicioExterno = idExterno, Precio = precio, Disponible = disponible };
+        var json = JsonSerializer.Serialize(request);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync("api/servicios/update", content);
+        response.EnsureSuccessStatusCode();
+    }
+
+    private class ServiciosExternosResponse
+    {
+        public List<ServicioExternoDto> Servicios { get; set; } = new();
     }
 }

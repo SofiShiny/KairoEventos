@@ -95,6 +95,11 @@ public static class ServiceConfiguration
             options.EnableAnnotations();
             options.CustomSchemaIds(type => type.FullName);
         });
+
+        // Real-Time Services
+        builder.Services.AddSignalR();
+        builder.Services.AddScoped<Reportes.Aplicacion.Interfaces.INotificadorDashboard, Reportes.API.Servicios.SignalRNotificadorDashboard>();
+        builder.Services.AddScoped<Reportes.Aplicacion.Jobs.MetricasTiempoRealJob>();
         
         return builder;
     }

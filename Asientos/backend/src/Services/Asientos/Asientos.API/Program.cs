@@ -6,6 +6,10 @@ using MassTransit;
 using Asientos.Aplicacion.Consumers;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Hangfire;
+using Hangfire;
+using Hangfire.PostgreSql;
+using Hangfire.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,11 +49,28 @@ builder.Services.AddScoped<IRepositorioMapaAsientos, MapaAsientosRepository>();
 // MediatR
 builder.Services.AddMediatR(typeof(Asientos.Aplicacion.Handlers.CrearMapaAsientosComandoHandler).Assembly);
 
+// Hangfire - Job Scheduling
+var hangfireConn = builder.Configuration.GetConnectionString("DefaultConnection") 
+                    ?? "Host=localhost;Database=asientos_db;Username=asientos_user;Password=asientos_pass";
+
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(hangfireConn, new Hangfire.PostgreSql.PostgreSqlStorageOptions 
+    {
+        // Optimizaciones para Postgres
+        QueuePollInterval = TimeSpan.FromSeconds(15) 
+    }));
+
+builder.Services.AddHangfireServer();
+
 // MassTransit con RabbitMQ
 var rabbitMqHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<ReservaCanceladaConsumer>();
+    x.AddConsumer<EntradaPagadaConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -108,6 +129,19 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<Asientos.Aplicacion.Hubs.AsientosHub>("/hub/asientos");
 
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new AllowAllDashboardAuthorizationFilter() }
+});
+
 app.MapGet("/health", () => Results.Ok(new { status = "UP", rabbitmq = rabbitMqHost }));
 
 app.Run();
+
+public class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
+{
+    public bool Authorize(DashboardContext context)
+    {
+        return true;
+    }
+}

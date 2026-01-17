@@ -21,6 +21,7 @@ import { ReportesVentasPage } from './features/reportes/pages/ReportesVentasPage
 import { SupervisionPage } from './features/supervision/pages/SupervisionPage';
 import { LogsPage } from './features/logs/pages/LogsPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import AdminServiciosPage from './features/admin/pages/AdminServiciosPage';
 
 const Placeholder = ({ title }: { title: string }) => (
     <div className="flex flex-col items-center justify-center p-8 min-h-[60vh]">
@@ -38,6 +39,7 @@ const Placeholder = ({ title }: { title: string }) => (
         </div>
     </div>
 );
+
 
 export const router = createBrowserRouter([
     {
@@ -79,6 +81,13 @@ export const router = createBrowserRouter([
                 path: 'usuarios', element: (
                     <ProtectedRoute allowedRoles={['admin']}>
                         <AdminUsuarios />
+                    </ProtectedRoute>
+                )
+            },
+            {
+                path: 'servicios', element: (
+                    <ProtectedRoute allowedRoles={['admin']}>
+                        <AdminServiciosPage />
                     </ProtectedRoute>
                 )
             },

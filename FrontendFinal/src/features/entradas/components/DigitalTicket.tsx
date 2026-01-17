@@ -58,7 +58,8 @@ export const DigitalTicket = ({
     const isCompletado = eventoEstado === 'Completado' || eventoEstado === 'Finalizado' ||
         (new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate() + 1) < today);
 
-    const inversionTotal = monto + serviciosExtras.reduce((acc, current) => acc + current.precio, 0);
+    const totalExtras = serviciosExtras.reduce((acc, current) => acc + (Number(current.precio) || 0), 0);
+    const inversionTotal = (Number(monto) || 0) + totalExtras;
 
     return (
         <div className="relative flex flex-col md:flex-row w-full max-w-4xl bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl transition-transform hover:scale-[1.01]">
@@ -107,15 +108,23 @@ export const DigitalTicket = ({
                         {serviciosExtras.length > 0 && (
                             <div className="mt-4 pt-3 border-t border-dashed border-neutral-700/50">
                                 <p className="text-[10px] uppercase text-purple-400 font-bold tracking-widest mb-2 flex items-center gap-1">
-                                    <Star className="w-3 h-3" /> Servicios Adicionales
+                                    <Star className="w-3 h-3" /> Incluye
                                 </p>
-                                <div className="space-y-1">
+                                <div className="flex flex-wrap gap-2">
                                     {serviciosExtras.map((serv, idx) => (
-                                        <div key={idx} className="flex justify-between items-center text-xs">
-                                            <span className="text-white font-medium">{serv.nombre}</span>
-                                            <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                                                {serv.estado === 'Confirmado' ? 'CONFIRMADO' : 'PENDIENTE'}
-                                            </span>
+                                        <div
+                                            key={idx}
+                                            className={cn(
+                                                "px-2 py-1 rounded-md border text-[10px] font-bold uppercase flex items-center gap-1.5",
+                                                serv.estado === 'Confirmado'
+                                                    ? "bg-neutral-800 border-neutral-700 text-white"
+                                                    : "bg-amber-900/20 border-amber-900/50 text-amber-500"
+                                            )}
+                                        >
+                                            {serv.nombre}
+                                            {serv.estado !== 'Confirmado' && (
+                                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pendiente" />
+                                            )}
                                         </div>
                                     ))}
                                 </div>

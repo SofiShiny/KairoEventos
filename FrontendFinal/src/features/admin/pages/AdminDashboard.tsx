@@ -7,6 +7,8 @@ import { adminReportesService, DashboardMetrics } from '../services/admin.report
 import { StatCard } from '../components/dashboard/StatCard';
 import { VentasChart } from '../components/dashboard/VentasChart';
 import { OcupacionPieChart } from '../components/dashboard/OcupacionPieChart';
+import { useReportesSignalR, MetricasDashboard as SignalRMetrics } from '../../../hooks/useReportesSignalR';
+import { toast } from 'react-hot-toast';
 import { useT } from '../../../i18n';
 
 export default function AdminDashboard() {
@@ -15,7 +17,36 @@ export default function AdminDashboard() {
     const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const onMetricasReceived = React.useCallback((newMetrics: SignalRMetrics) => {
+        setMetrics(prev => {
+            if (!prev) return null; // Si aún no ha cargado la data inicial, esperamos
+            return {
+                ...prev,
+                acumulado: {
+                    ...prev.acumulado,
+                    totalVentas: newMetrics.totalVentasDia, // Mapping simple para demo
+                    totalEntradas: newMetrics.entradasVendidas
+                    // totalEventos: newMetrics.eventosActivos
+                }
+            };
+        });
+
+        toast.success(t.dashboard.description ? "Métricas actualizadas en tiempo real" : "Metrics updated", {
+            id: 'dashboard-update', // Evitar duplicados
+            icon: '⚡',
+            style: {
+                background: '#0f172a',
+                color: '#fff',
+                border: '1px solid #3b82f6'
+            },
+            duration: 2000
+        });
+    }, [t]);
+
+    const { isConnected } = useReportesSignalR({ onMetricasReceived });
+
     useEffect(() => {
+        // ...
         const fetchMetrics = async () => {
             try {
                 const data = await adminReportesService.getDashboardMetrics();
@@ -65,6 +96,10 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <div className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-2 ${isConnected ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-red-500/10 border-red-500/30 text-red-400'}`}>
+                        <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+                        {isConnected ? 'En Vivo' : 'Desconectado'}
+                    </div>
                     <div className="px-4 py-2 bg-[#16191f] border border-slate-800 rounded-xl text-xs font-bold text-slate-300">
                         {t.dashboard.last7Days}
                     </div>
@@ -124,24 +159,42 @@ export default function AdminDashboard() {
                     <p className="text-sm text-slate-500 mb-8">{t.dashboard.inventoryStatus}</p>
 
                     <div className="relative z-10">
-                        <OcupacionPieChart data={metrics?.ocupacion || []} />
+                        {(() => {
+                            // Filtramos datos de ejemplo o basura conocida
+                            const validOcupacion = metrics?.ocupacion.filter(e => e.nombre !== 'Concierto Demo') || [];
+
+                            if (validOcupacion.length === 0) {
+                                return (
+                                    <div className="flex flex-col items-center justify-center h-[300px] text-slate-500">
+                                        <p>No hay datos de ocupación disponibles.</p>
+                                        <p className="text-xs mt-2 opacity-50">Los datos se generarán con las nuevas ventas.</p>
+                                    </div>
+                                );
+                            }
+
+                            return <OcupacionPieChart data={validOcupacion} />;
+                        })()}
                     </div>
 
                     <div className="mt-8 space-y-4 relative z-10">
-                        {metrics?.ocupacion.slice(0, 3).map((evento, idx) => (
-                            <div key={idx} className="flex flex-col gap-2">
-                                <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                    <span>{evento.nombre}</span>
-                                    <span>{Math.round((evento.vendidas / (evento.vendidas + evento.disponibles || 1)) * 100)}%</span>
+                        {(() => {
+                            const validOcupacion = metrics?.ocupacion.filter(e => e.nombre !== 'Concierto Demo') || [];
+
+                            return validOcupacion.slice(0, 3).map((evento, idx) => (
+                                <div key={idx} className="flex flex-col gap-2">
+                                    <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                        <span>{evento.nombre}</span>
+                                        <span>{Math.round((evento.vendidas / (evento.vendidas + evento.disponibles || 1)) * 100)}%</span>
+                                    </div>
+                                    <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-pink-500 rounded-full"
+                                            style={{ width: `${(evento.vendidas / (evento.vendidas + evento.disponibles || 1)) * 100}%` }}
+                                        ></div>
+                                    </div>
                                 </div>
-                                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-pink-500 rounded-full"
-                                        style={{ width: `${(evento.vendidas / (evento.vendidas + evento.disponibles || 1)) * 100}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        ))}
+                            ));
+                        })()}
                     </div>
                 </div>
             </div>

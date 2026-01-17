@@ -9,6 +9,7 @@ import { entradasService } from '../services/entradas.service';
 import { serviciosService, ServicioComplementario } from '../../servicios/services/servicios.service';
 import ServiceCard from '../../servicios/components/ServiceCard';
 import { useAsientosSignalR } from '../../../hooks/useAsientosSignalR';
+import { useServiciosSignalR } from '../../../hooks/useServiciosSignalR';
 import { toast } from 'react-hot-toast';
 import { Video, ChevronRight, ShoppingBag, ArrowLeft, Check } from 'lucide-react';
 import { eventosService } from '../../eventos/services/eventos.service';
@@ -76,10 +77,43 @@ export default function CheckoutPage() {
         ));
     }, []);
 
+    // SignalR Callback para Servicios
+    const onServiceUpdate = useCallback((notif: any) => {
+        if (!notif.idServicioExterno) return;
+
+        console.log('🔄 Actualizando estado de servicios localmente...', notif);
+
+        setServicios(prevServicios => prevServicios.map(servicio => ({
+            ...servicio,
+            proveedores: servicio.proveedores?.map(p => {
+                // Comparamos por el ID externo que viene del backend
+                if (p.externalId === notif.idServicioExterno || p.id === notif.idServicioExterno) {
+                    return {
+                        ...p,
+                        precio: notif.precio,
+                        estaDisponible: notif.disponible
+                    };
+                }
+                return p;
+            })
+        })));
+
+        // Si el servicio se agotó y el usuario lo tenía seleccionado, avisamos
+        if (!notif.disponible && selectedServicios[notif.idServicioExterno] > 0) {
+            toast.error(`Lo sentimos, el servicio '${notif.nombre}' se acaba de agotar.`);
+            // Opcionalmente podrías quitarlo de la selección automáticamente:
+            // setSelectedServicios(prev => ({ ...prev, [notif.idServicioExterno]: 0 }));
+        }
+    }, [selectedServicios]);
+
     useAsientosSignalR({
         eventoId: eventoId || '',
         onAsientoReservado,
         onAsientoLiberado
+    });
+
+    useServiciosSignalR({
+        onNotification: onServiceUpdate
     });
 
     const loadInitialData = async () => {
@@ -130,16 +164,18 @@ export default function CheckoutPage() {
         ? (evento.precioBase || 0)
         : selectedAsientos.reduce((sum, asiento) => sum + asiento.precio, 0);
 
-    const precioServicios = servicios.reduce((sum, s) => {
-        const qty = selectedServicios[s.id] || 0;
-        return sum + (s.precio * qty);
+    const precioServicios = servicios.reduce((sum, service) => {
+        const providers = (service.proveedores && service.proveedores.length > 0) ? service.proveedores : [];
+        const serviceSum = providers.reduce((pSum, p) => {
+            const qty = selectedServicios[p.id] || 0;
+            return pSum + (p.precio * qty);
+        }, 0);
+        return sum + serviceSum;
     }, 0);
 
     const subtotal = precioAsientos + precioServicios;
 
     // Si hay cupón, recalculamos. Nota: El cupón suele aplicar al total.
-    // Si la API de validar cupón retorna 'nuevoTotal', usamos eso.
-    // Si no, aplicamos porcentaje simple. Aquí asumimos el flujo existente de CouponInput.
     const totalPrice = cuponAplicado ? cuponAplicado.nuevoTotal : subtotal;
 
     // Validación de Pasos
@@ -189,9 +225,35 @@ export default function CheckoutPage() {
             }
 
             setOrdenId(ordenIdVal);
+
+            // 2. Pre-reservar Servicios Extras (Antes del pago)
+            const providersWithSelection = Object.entries(selectedServicios).filter(([_, qty]) => qty > 0);
+            if (providersWithSelection.length > 0) {
+                const reservasPromesas = [];
+                for (const [providerId, qty] of providersWithSelection) {
+                    const servicioPadre = servicios.find(s => s.proveedores?.some(p => p.id === providerId));
+                    if (!servicioPadre) continue;
+
+                    for (let i = 0; i < qty; i++) {
+                        reservasPromesas.push(serviciosService.reservarServicio({
+                            usuarioId: auth.user?.profile.sub || '',
+                            eventoId: eventoId!,
+                            servicioGlobalId: servicioPadre.id,
+                            ordenEntradaId: ordenIdVal
+                        }));
+                    }
+                }
+
+                if (reservasPromesas.length > 0) {
+                    const loadingToast = toast.loading('Reservando servicios seleccionados...');
+                    await Promise.all(reservasPromesas);
+                    toast.success('Servicios reservados. Proceda al pago.', { id: loadingToast });
+                }
+            }
+
             setShowPaymentForm(true);
         } catch (err: any) {
-            console.error('Error al crear orden:', err);
+            console.error('Error al iniciar compra:', err);
             toast.error('Error al iniciar compra: ' + (err.response?.data?.detail || err.message));
         } finally {
             setProcessingPurchase(false);
@@ -201,49 +263,15 @@ export default function CheckoutPage() {
     const handlePaymentSuccess = async (transaccionId: string) => {
         console.log('[PAGO] Éxitoso, ID de Transacción:', transaccionId);
         setShowPaymentForm(false);
-        const loadingToast = toast.loading('Pago exitoso. Contratando servicios extra...');
 
-        try {
-            // 2. Contratar Servicios Extras (Post-Pago de Entradas)
-            // Recorremos los servicios seleccionados y llamamos a reservar para cada unidad
-            const servicesToReserve = Object.entries(selectedServicios).filter(([_, qty]) => qty > 0);
+        toast.success('¡Todo listo! Entradas y servicios confirmados.', {
+            duration: 6000,
+            icon: '🎉'
+        });
 
-            // Promise.all para concurrencia
-            const reservasPromesas = [];
-            for (const [srvId, qty] of servicesToReserve) {
-                // Si la cantidad es > 1, debemos decidir si hacemos N llamadas o si la API soporta cantidad.
-                // Basado en el backend, es 1 llamada por reserva. Haremos un loop simple.
-                for (let i = 0; i < qty; i++) {
-                    reservasPromesas.push(serviciosService.reservarServicio({
-                        usuarioId: auth.user?.profile.sub || '',
-                        eventoId: eventoId!,
-                        servicioGlobalId: srvId
-                    }));
-                }
-            }
-
-            await Promise.all(reservasPromesas);
-
-            toast.dismiss(loadingToast);
-            toast.success(`¡Todo listo! Entradas y ${servicesToReserve.length > 0 ? 'servicios extras' : ''} confirmados.`, {
-                duration: 6000,
-                icon: '🎉'
-            });
-
-            setTimeout(() => {
-                navigate('/entradas');
-            }, 2500);
-
-        } catch (srvError) {
-            console.error('Error reservando servicios:', srvError);
-            toast.dismiss(loadingToast);
-            // Aunque falle el servicio, la entrada ya se pagó. Advertimos al usuario.
-            toast.error('Tu entrada está lista pero hubo un error registrando algunos servicios extras. Contacta soporte.', { duration: 8000 });
-
-            setTimeout(() => {
-                navigate('/entradas');
-            }, 30000);
-        }
+        setTimeout(() => {
+            navigate('/entradas');
+        }, 2500);
     };
 
     if (loading) {
@@ -342,8 +370,8 @@ export default function CheckoutPage() {
                                                 <ServiceCard
                                                     key={servicio.id}
                                                     servicio={servicio}
-                                                    cantidad={selectedServicios[servicio.id] || 0}
-                                                    onChangeCantidad={(qty) => handleServiceQuantityChange(servicio.id, qty)}
+                                                    selectedOptions={selectedServicios}
+                                                    onOptionChange={(provider, qty) => handleServiceQuantityChange(provider.id, qty)}
                                                 />
                                             ))}
                                         </div>
@@ -445,15 +473,20 @@ export default function CheckoutPage() {
                             </div>
 
                             {/* Desglose Servicios */}
-                            {Object.keys(selectedServicios).length > 0 && (
+                            {Object.values(selectedServicios).some(qty => qty > 0) && (
                                 <div className="mb-4 pt-4 border-t border-gray-800">
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Extras</p>
-                                    {servicios.filter(s => selectedServicios[s.id] > 0).map(s => (
-                                        <div key={s.id} className="flex justify-between text-sm mb-1 text-gray-300">
-                                            <span>{selectedServicios[s.id]}x {s.nombre}</span>
-                                            <span>${(s.precio * selectedServicios[s.id]).toFixed(2)}</span>
-                                        </div>
-                                    ))}
+                                    {servicios.map(service => {
+                                        const providers = service.proveedores || [];
+                                        return providers
+                                            .filter(p => selectedServicios[p.id] > 0)
+                                            .map(p => (
+                                                <div key={p.id} className="flex justify-between text-sm mb-1 text-gray-300">
+                                                    <span>{selectedServicios[p.id]}x {p.nombreProveedor}</span>
+                                                    <span>${(p.precio * selectedServicios[p.id]).toFixed(2)}</span>
+                                                </div>
+                                            ));
+                                    })}
                                 </div>
                             )}
 

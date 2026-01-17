@@ -5,12 +5,14 @@ import { Toaster } from 'react-hot-toast';
 import { router } from './router';
 import { oidcConfig } from './lib/auth-config';
 import { useSignalR } from './hooks/useSignalR';
+import { useServiciosSignalR } from './hooks/useServiciosSignalR';
 import { I18nProvider, useT } from './i18n';
 
 // Componente interno que usa el hook de SignalR
 function AppContent() {
     const t = useT();
     const { isConnected, connectionError } = useSignalR();
+    useServiciosSignalR(); // Hook para servicios complementarios
 
     // Forzar logs de estado
     useEffect(() => {

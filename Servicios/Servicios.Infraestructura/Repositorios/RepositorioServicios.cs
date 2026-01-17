@@ -17,12 +17,30 @@ public class RepositorioServicios : IRepositorioServicios
     public async Task<ServicioGlobal?> ObtenerServicioPorIdAsync(Guid id) => 
         await _context.ServiciosGlobales.FindAsync(id);
 
+    public async Task<ServicioGlobal?> ObtenerServicioConProveedoresAsync(Guid id) =>
+        await _context.ServiciosGlobales.Include(s => s.Proveedores).FirstOrDefaultAsync(s => s.Id == id);
+
+    public async Task<ServicioGlobal?> ObtenerServicioPorNombreAsync(string nombre) =>
+        await _context.ServiciosGlobales.Include(s => s.Proveedores)
+            .FirstOrDefaultAsync(s => s.Nombre.ToLower().Contains(nombre.ToLower()));
+
     public async Task<IEnumerable<ServicioGlobal>> ObtenerCatalogoAsync() => 
-        await _context.ServiciosGlobales.Where(s => s.Activo).ToListAsync();
+        await _context.ServiciosGlobales.Include(s => s.Proveedores).Where(s => s.Activo).ToListAsync();
 
     public async Task AgregarServicioAsync(ServicioGlobal servicio)
     {
         await _context.ServiciosGlobales.AddAsync(servicio);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task ActualizarServicioAsync(ServicioGlobal servicio)
+    {
+        _context.ServiciosGlobales.Update(servicio);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task SaveAsync()
+    {
         await _context.SaveChangesAsync();
     }
 
@@ -43,4 +61,7 @@ public class RepositorioServicios : IRepositorioServicios
 
     public async Task<IEnumerable<ReservaServicio>> ObtenerReservasPorUsuarioAsync(Guid usuarioId) => 
         await _context.ReservasServicios.Where(r => r.UsuarioId == usuarioId).ToListAsync();
+
+    public async Task<IEnumerable<ReservaServicio>> ObtenerReservasPorOrdenEntradaAsync(Guid ordenEntradaId) =>
+        await _context.ReservasServicios.Where(r => r.OrdenEntradaId == ordenEntradaId).ToListAsync();
 }

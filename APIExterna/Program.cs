@@ -1,49 +1,66 @@
-using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
-using WireMock.Server;
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
 
 var app = builder.Build();
 
-var wireMockServer = WireMockServer.Start(5091); 
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseCors("AllowAll");
 
-wireMockServer.Given(Request.Create().WithPath("/api/servicios/transporte").UsingGet())
-        .RespondWith(Response.Create() .WithStatusCode(200) .WithHeader("Content-Type", "application/json")
-            .WithBody(@"{ ""servicios"": 
-                    [ { ""IdServicioExterno"": ""1"", ""Nombre"": ""Bus"", ""Precio"": 10.5 , ""Moneda"": ""USD"" }, 
-                      { ""IdServicioExterno"": ""2"", ""Nombre"": ""Taxi"", ""Precio"": 20.0 , ""Moneda"": ""USD"" }, 
-                      { ""IdServicioExterno"": ""3"", ""Nombre"": ""Van"", ""Precio"": 15.0 , ""Moneda"": ""USD"" } ] }"));
+// Repositorio en memoria "volátil"
+var db = new ExternalServiciosDb();
 
-wireMockServer.Given(Request.Create().WithPath("/api/servicios/merchandising").UsingGet())
-    .RespondWith(Response.Create()
-        .WithStatusCode(200)
-        .WithHeader("Content-Type", "application/json")
-        .WithBody(@"{ ""servicios"": 
-                [ { ""IdServicioExterno"": ""10"", ""Nombre"": ""Camiseta"", ""Precio"": 8.5 , ""Moneda"": ""USD"" }, 
-                  { ""IdServicioExterno"": ""11"", ""Nombre"": ""Gorra"", ""Precio"":  5.0 , ""Moneda"": ""USD"" }, 
-                  { ""IdServicioExterno"": ""12"", ""Nombre"": ""Taza"", ""Precio"": 3.5 , ""Moneda"": ""USD"" } ] }"));
+app.MapGet("/api/servicios/{tipo}", (string tipo) => {
+    var filtered = db.Servicios.Where(s => s.Tipo.ToLower() == tipo.ToLower()).ToList();
+    return Results.Ok(new { servicios = filtered });
+});
 
-wireMockServer.Given(Request.Create().WithPath("/api/servicios/catering").UsingGet())
-    .RespondWith(Response.Create()
-        .WithStatusCode(200)
-        .WithHeader("Content-Type", "application/json")
-        .WithBody(@"{ ""servicios"": 
-                [ { ""IdServicioExterno"": ""20"", ""Nombre"": ""Buffet"", ""Precio"": 50.0, ""Moneda"": ""USD"" }, 
-                  { ""IdServicioExterno"": ""21"", ""Nombre"": ""Coffee Break"", ""Precio"": 25.0 , ""Moneda"": ""USD"" }, 
-                  { ""IdServicioExterno"": ""22"", ""Nombre"": ""Cena Formal"", ""Precio"": 70.0 , ""Moneda"": ""USD"" } ] }"));
+app.MapGet("/api/servicios", () => {
+    return Results.Ok(db.Servicios);
+});
 
-app.UseHttpsRedirection();
+app.MapPost("/api/servicios/update", (UpdateServicioRequest request) => {
+    var servicio = db.Servicios.FirstOrDefault(s => s.IdServicioExterno == request.IdServicioExterno);
+    if (servicio == null) return Results.NotFound();
+    
+    servicio.Precio = request.Precio;
+    servicio.Disponible = request.Disponible;
+    
+    return Results.Ok(servicio);
+});
 
-app.UseAuthorization();
+app.Run("http://localhost:5091");
 
-app.MapControllers();
+public record UpdateServicioRequest(string IdServicioExterno, decimal Precio, bool Disponible);
 
-app.Run();
+public class ExternalServicio {
+    public string IdServicioExterno { get; set; } = "";
+    public string Nombre { get; set; } = "";
+    public decimal Precio { get; set; }
+    public string Tipo { get; set; } = "";
+    public bool Disponible { get; set; }
+    public string Moneda { get; set; } = "USD";
+}
+
+public class ExternalServiciosDb {
+    public List<ExternalServicio> Servicios { get; set; } = new() {
+        new() { IdServicioExterno = "1", Nombre = "Bus", Precio = 10.5m, Tipo = "transporte", Disponible = true },
+        new() { IdServicioExterno = "2", Nombre = "Taxi", Precio = 20.0m, Tipo = "transporte", Disponible = false },
+        new() { IdServicioExterno = "3", Nombre = "Van", Precio = 15.0m, Tipo = "transporte", Disponible = true },
+        
+        new() { IdServicioExterno = "10", Nombre = "Camiseta", Precio = 8.5m, Tipo = "merchandising", Disponible = true },
+        new() { IdServicioExterno = "11", Nombre = "Gorra", Precio = 5.0m, Tipo = "merchandising", Disponible = true },
+        new() { IdServicioExterno = "12", Nombre = "Taza", Precio = 3.5m, Tipo = "merchandising", Disponible = false },
+        
+        new() { IdServicioExterno = "20", Nombre = "Buffet", Precio = 50.0m, Tipo = "catering", Disponible = true },
+        new() { IdServicioExterno = "21", Nombre = "Coffee Break", Precio = 25.0m, Tipo = "catering", Disponible = true },
+        new() { IdServicioExterno = "22", Nombre = "Cena Formal", Precio = 70.0m, Tipo = "catering", Disponible = true }
+    };
+}

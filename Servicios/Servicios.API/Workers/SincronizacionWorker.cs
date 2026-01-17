@@ -2,6 +2,8 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Servicios.Aplicacion.Eventos;
 using Servicios.Dominio.Interfaces;
+using Servicios.Dominio.Repositorios;
+using Servicios.Dominio.Entidades;
 using Servicios.Infraestructura.Persistencia;
 
 namespace Servicios.API.Workers;
@@ -10,8 +12,8 @@ public class SincronizacionWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<SincronizacionWorker> _logger;
-    // Petición cada 2 minutos como solicitado
-    private readonly TimeSpan _intervalo = TimeSpan.FromMinutes(2);
+    // Petición cada 10 segundos para pruebas rápidas
+    private readonly TimeSpan _intervalo = TimeSpan.FromSeconds(10);
 
     public SincronizacionWorker(
         IServiceProvider serviceProvider, 
@@ -42,35 +44,77 @@ public class SincronizacionWorker : BackgroundService
 
     private async Task SincronizarProveedoresAsync(CancellationToken stoppingToken)
     {
-        using var scope = _serviceProvider.CreateScope();
-        
-        // Obtenemos los servicios necesarios
-        var proveedorExternoService = scope.ServiceProvider.GetRequiredService<IProveedorExternoService>();
-        var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
-        
-        // 1. Consultar a la API Externa (Adaptada)
-        _logger.LogInformation("Consultando API Externa de Catering...");
-        var serviciosExternos = await proveedorExternoService.ObtenerServiciosCateringAsync();
-        var listaServicios = serviciosExternos.ToList();
+        string[] tipos = { "transporte", "catering", "merchandising" };
+        int totalSincronizados = 0;
 
-        if (listaServicios.Any())
+        foreach (var tipo in tipos)
         {
-            _logger.LogInformation("Se obtuvieron {Cantidad} servicios externos.", listaServicios.Count);
+            try 
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var proveedorExternoService = scope.ServiceProvider.GetRequiredService<IProveedorExternoService>();
+                var repositorio = scope.ServiceProvider.GetRequiredService<IRepositorioServicios>();
 
-            // 2. Aquí iría la lógica de persistencia/actualización en BD (omitida para brevedad del ejercicio)
-            // Ejemplo: foreach(var s in listaServicios) { ... context.AddOrUpdate(s) ... }
+                _logger.LogInformation("Consultando API Externa para: {Tipo}...", tipo);
+                var serviciosExternos = await proveedorExternoService.ObtenerServiciosPorTipoAsync(tipo);
+                var listaServicios = serviciosExternos.ToList();
 
-            // 3. Publicar evento en RabbitMQ como solicitado
+                if (!listaServicios.Any()) 
+                {
+                    _logger.LogInformation("No hay servicios externos para el tipo: {Tipo}", tipo);
+                    continue;
+                }
+
+                // Buscamos el servicio global que corresponde a este tipo (por nombre)
+                var servicioGlobal = await repositorio.ObtenerServicioPorNombreAsync(tipo);
+                if (servicioGlobal == null)
+                {
+                    _logger.LogWarning("No se encontró un ServicioGlobal para el tipo: {Tipo}", tipo);
+                    continue;
+                }
+
+                foreach (var ext in listaServicios)
+                {
+                    var proveedorExistente = servicioGlobal.Proveedores
+                        .FirstOrDefault(p => p.ExternalId == ext.IdServicioExterno);
+
+                    if (proveedorExistente != null)
+                    {
+                        proveedorExistente.SetDisponibilidad(ext.Disponible);
+                        proveedorExistente.ActualizarPrecio(ext.Precio);
+                    }
+                    else
+                    {
+                        // Usar Guid.Empty para INSERT
+                        var nuevo = new ProveedorServicio(Guid.Empty, servicioGlobal.Id, ext.Nombre, ext.Precio, ext.IdServicioExterno);
+                        nuevo.SetDisponibilidad(ext.Disponible);
+                        servicioGlobal.AgregarProveedor(nuevo);
+                    }
+                }
+
+                if (listaServicios.Count == 1)
+                {
+                    servicioGlobal.ActualizarPrecio(listaServicios[0].Precio);
+                }
+
+                await repositorio.SaveAsync();
+                totalSincronizados += listaServicios.Count;
+                _logger.LogInformation("Sincronizados {Cant} proveedores para {Tipo}", listaServicios.Count, tipo);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sincronizando tipo {Tipo}", tipo);
+            }
+        }
+
+        if (totalSincronizados > 0)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
             await publishEndpoint.Publish(new ServiciosCateringSincronizadosEvento(
-                listaServicios.Count,
+                totalSincronizados,
                 DateTime.UtcNow
             ), stoppingToken);
-            
-            _logger.LogInformation("Evento de sincronización publicado en RabbitMQ.");
-        }
-        else
-        {
-            _logger.LogWarning("La API Externa no retornó servicios o hubo un error controlado.");
         }
     }
 }

@@ -38,6 +38,7 @@ public class ServiciosDbContext : DbContext
             entity.ToTable("reservas_servicios");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Estado).HasConversion<string>();
+            entity.Property(e => e.OrdenEntradaId).HasColumnName("orden_entrada_id");
         });
     }
 }

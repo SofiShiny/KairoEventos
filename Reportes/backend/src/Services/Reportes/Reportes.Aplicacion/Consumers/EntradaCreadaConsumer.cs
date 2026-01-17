@@ -32,19 +32,8 @@ public class EntradaCreadaConsumer : IConsumer<EntradaCreadaEvento>
             var fecha = DateTime.UtcNow.Date;
 
             // 1. Actualizar Reporte de Ventas Diarias (General para el día)
-            var reporteVentas = await _repositorio.ObtenerVentasDiariasAsync(fecha)
-                ?? new ReporteVentasDiarias
-                {
-                    Fecha = fecha,
-                    TituloEvento = "Consolidado Diario", // Título genérico si es nuevo
-                    ReservasPorCategoria = new Dictionary<string, int>()
-                };
-
-            reporteVentas.TotalIngresos += evento.Monto;
-            reporteVentas.CantidadReservas++;
-            reporteVentas.UltimaActualizacion = DateTime.UtcNow;
-
-            await _repositorio.ActualizarVentasDiariasAsync(reporteVentas);
+            // 1. Actualizar Reporte de Ventas Diarias (Atomic Aggregation)
+            await _repositorio.IncrementarVentasDiariasAsync(fecha, evento.Monto, 1);
 
             // 2. Actualizar Métricas del Evento (Específico por Evento)
             var metricas = await _repositorio.ObtenerMetricasEventoAsync(evento.EventoId);

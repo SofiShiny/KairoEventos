@@ -16,15 +16,18 @@ public class PagoAprobadoConsumer : IConsumer<PagoAprobadoEvento>
     private readonly IRepositorioEntradas _repositorio;
     private readonly IGeneradorCodigoQr _generadorQr;
     private readonly ILogger<PagoAprobadoConsumer> _logger;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public PagoAprobadoConsumer(
         IRepositorioEntradas repositorio,
         IGeneradorCodigoQr generadorQr,
-        ILogger<PagoAprobadoConsumer> logger)
+        ILogger<PagoAprobadoConsumer> logger,
+        IPublishEndpoint publishEndpoint)
     {
         _repositorio = repositorio ?? throw new ArgumentNullException(nameof(repositorio));
         _generadorQr = generadorQr ?? throw new ArgumentNullException(nameof(generadorQr));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
     }
 
     public async Task Consume(ConsumeContext<PagoAprobadoEvento> context)
@@ -45,9 +48,6 @@ public class PagoAprobadoConsumer : IConsumer<PagoAprobadoEvento>
                 _logger.LogCritical(
                     "❌ ERROR CRÍTICO: No se encontraron entradas para OrdenId: {OrdenId}. TransaccionId: {TxId}", 
                     mensaje.OrdenId, mensaje.TransaccionId);
-                
-                // No lanzar excepción para evitar reintentos infinitos
-                // Este es un caso de inconsistencia de datos que debe investigarse manualmente
                 return;
             }
 
@@ -71,6 +71,7 @@ public class PagoAprobadoConsumer : IConsumer<PagoAprobadoEvento>
                             "✓ Entrada {EntradaId} ya estaba confirmada (idempotencia). Estado: {Estado}", 
                             entrada.Id, entrada.Estado);
                         yaConfirmadas++;
+                        entradasActualizadas.Add(entrada); // Agregar también para recolectar AsientoIds
                         continue;
                     }
 
@@ -102,14 +103,13 @@ public class PagoAprobadoConsumer : IConsumer<PagoAprobadoEvento>
                     _logger.LogWarning(
                         "⚠️ No se pudo confirmar entrada {EntradaId}: {Mensaje}. Se omitirá.", 
                         entrada.Id, ex.Message);
-                    // Continuar con las demás entradas
                 }
             }
 
             // 5. Persistir cambios en lote (más eficiente)
-            if (entradasActualizadas.Any())
+            if (nuevasConfirmaciones > 0)
             {
-                await _repositorio.ActualizarRangoAsync(entradasActualizadas, context.CancellationToken);
+                await _repositorio.ActualizarRangoAsync(entradasActualizadas.Where(e => e.Estado == EstadoEntrada.Pagada).ToList(), context.CancellationToken);
                 
                 _logger.LogInformation(
                     "✅ Pago confirmado exitosamente. OrdenId: {OrdenId}, TransaccionId: {TxId}, " +
@@ -128,14 +128,35 @@ public class PagoAprobadoConsumer : IConsumer<PagoAprobadoEvento>
                     "⚠️ No se pudo confirmar ninguna entrada. OrdenId: {OrdenId}, Total encontradas: {Total}",
                     mensaje.OrdenId, entradas.Count);
             }
+
+            // 6. Publicar evento de Entradas Pagadas para Asientos (Actualización estado asiento)
+            var asientoIds = entradasActualizadas
+                .Where(e => e.AsientoId.HasValue && e.Estado == EstadoEntrada.Pagada)
+                .Select(e => e.AsientoId.Value)
+                .Distinct()
+                .ToList();
+
+            if (asientoIds.Any())
+            {
+                // Asumimos que todas las entradas de una orden pertenecen al mismo evento (lo cual es típico en este flujo)
+                var primerEventoId = entradasActualizadas.FirstOrDefault()?.EventoId ?? Guid.Empty;
+
+                await _publishEndpoint.Publish(new Entradas.Dominio.Eventos.EntradaPagadaEvento
+                { 
+                    OrdenId = mensaje.OrdenId, 
+                    EventoId = primerEventoId,
+                    MontoTotal = mensaje.Monto,
+                    AsientosIds = asientoIds 
+                }, context.CancellationToken);
+
+                _logger.LogInformation("📢 Integración: Evento EntradaPagadaEvento publicado para {Count} asientos.", asientoIds.Count);
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, 
                 "❌ Error inesperado procesando PagoAprobadoEvento. OrdenId: {OrdenId}, TransaccionId: {TxId}", 
                 mensaje.OrdenId, mensaje.TransaccionId);
-            
-            // Relanzar para que MassTransit reintente
             throw;
         }
     }

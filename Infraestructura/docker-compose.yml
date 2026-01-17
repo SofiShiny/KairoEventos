@@ -163,6 +163,7 @@ services:
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=kairo_servicios;Username=postgres;Password=postgres
       - RabbitMQ__Host=rabbitmq
       - ExternalServices__EntradasApiUrl=http://entradas-api:8080
+      - ExternalServices__ProveedorCateringUrl=http://host.docker.internal:5091
     networks:
       - kairo-network
     depends_on:

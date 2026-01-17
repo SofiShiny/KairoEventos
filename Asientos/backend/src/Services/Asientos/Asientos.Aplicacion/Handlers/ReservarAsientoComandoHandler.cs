@@ -8,6 +8,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using Hangfire;
+using Asientos.Aplicacion.Jobs;
 
 namespace Asientos.Aplicacion.Handlers;
 
@@ -16,15 +18,18 @@ public class ReservarAsientoComandoHandler : IRequestHandler<ReservarAsientoComa
     private readonly IRepositorioMapaAsientos _repo;
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly IHubContext<Asientos.Aplicacion.Hubs.AsientosHub> _hubContext;
+    private readonly IBackgroundJobClient _jobClient;
 
     public ReservarAsientoComandoHandler(
         IRepositorioMapaAsientos repo, 
         IPublishEndpoint publishEndpoint,
-        IHubContext<Asientos.Aplicacion.Hubs.AsientosHub> hubContext)
+        IHubContext<Asientos.Aplicacion.Hubs.AsientosHub> hubContext,
+        IBackgroundJobClient jobClient)
     {
         _repo = repo;
         _publishEndpoint = publishEndpoint;
         _hubContext = hubContext;
+        _jobClient = jobClient;
     }
 
     public async Task<Unit> Handle(ReservarAsientoComando request, CancellationToken cancellationToken)
@@ -39,6 +44,9 @@ public class ReservarAsientoComandoHandler : IRequestHandler<ReservarAsientoComa
         // Notificar en tiempo real via SignalR
         await _hubContext.Clients.Group($"Evento_{mapa.EventoId}")
             .SendAsync("AsientoReservado", request.AsientoId, request.UsuarioId);
+
+        // Schedule Hangfire Job for expiration (15 mins)
+        _jobClient.Schedule<LiberarAsientoJob>(job => job.Ejecutar(request.MapaId, request.AsientoId), TimeSpan.FromMinutes(15));
 
         // Opcional: El evento de dominio ya fue generado en la entidad, 
         // podrías iterar mapa.EventosDominio y publicarlos.

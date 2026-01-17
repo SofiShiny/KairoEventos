@@ -50,6 +50,7 @@ public static class PipelineConfiguration
     private static WebApplication ConfigureMiddlewarePipeline(this WebApplication app)
     {
         app.UseCorrelationId();
+        app.UseRouting(); // Asegurar enrutamiento explicito antes de otros middleware
         app.UseGlobalExceptionHandler();
         
         return app;
@@ -89,6 +90,12 @@ public static class PipelineConfiguration
                 {
                     TimeZone = TimeZoneInfo.Utc
                 });
+
+            // Job para dashboard en tiempo real (cada minuto)
+            RecurringJob.AddOrUpdate<MetricasTiempoRealJob>(
+                "actualizar-metricas-dashboard",
+                job => job.ActualizarDashboardAsync(),
+                Cron.Minutely);
         }
         
         return app;
@@ -100,6 +107,7 @@ public static class PipelineConfiguration
         app.UseCors("AllowAll");
         app.UseAuthorization();
         app.MapControllers();
+        app.MapHub<Reportes.API.Hubs.ReportesHub>("/hub/reportes");
 
         // Health checks con respuesta detallada
         var enableHealthChecks = app.Configuration.GetValue<bool>("HealthChecks:Enabled", true);

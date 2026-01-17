@@ -10,7 +10,8 @@ namespace Servicios.Aplicacion.Comandos;
 public record ReservarServicioCommand(
     Guid UsuarioId, 
     Guid EventoId, 
-    Guid ServicioGlobalId
+    Guid ServicioGlobalId,
+    Guid? OrdenEntradaId = null
 ) : IRequest<Guid>;
 
 public class ReservarServicioCommandHandler : IRequestHandler<ReservarServicioCommand, Guid>
@@ -52,18 +53,21 @@ public class ReservarServicioCommandHandler : IRequestHandler<ReservarServicioCo
         }
 
         // 3. Crear la reserva en estado PendientePago
-        var reserva = new ReservaServicio(request.UsuarioId, request.EventoId, request.ServicioGlobalId);
+        var reserva = new ReservaServicio(request.UsuarioId, request.EventoId, request.ServicioGlobalId, request.OrdenEntradaId);
         await _repositorio.AgregarReservaAsync(reserva);
 
-        _logger.LogInformation("Reserva de servicio {ReservaId} creada en estado PendientePago", reserva.Id);
+        _logger.LogInformation("Reserva de servicio {ReservaId} creada en estado PendientePago (OrdenVinculada: {OrdenId})", reserva.Id, request.OrdenEntradaId);
 
-        // 4. Publicar evento para que Pasarela de Pagos procese el cobro
-        await _publishEndpoint.Publish(new SolicitudPagoServicioCreada(
-            reserva.Id,
-            request.UsuarioId,
-            servicio.Precio,
-            $"Servicio Extra: {servicio.Nombre}"
-        ), cancellationToken);
+        // 4. Si NO está vinculada a una orden de entrada, iniciamos flujo de pago individual
+        if (request.OrdenEntradaId == null)
+        {
+            await _publishEndpoint.Publish(new SolicitudPagoServicioCreada(
+                reserva.Id,
+                request.UsuarioId,
+                servicio.Precio,
+                $"Servicio Extra: {servicio.Nombre}"
+            ), cancellationToken);
+        }
 
         return reserva.Id;
     }

@@ -9,31 +9,33 @@ public class MockProveedorService : IProveedorExternoService
 {
     private readonly Random _random = new();
 
-    public async Task<Dictionary<string, bool>> ConsultarEstadoProveedoresAsync(List<string> externalIds)
+    public async Task<IEnumerable<ServicioExternoDto>> ObtenerServiciosPorTipoAsync(string tipo)
     {
-        // Simular latencia de red
-        await Task.Delay(200);
+        await Task.Delay(100); 
 
-        var resultados = new Dictionary<string, bool>();
-
-        foreach (var id in externalIds)
+        if (tipo.ToLower().Contains("transporte"))
         {
-            // Lógica por defecto: disponible
-            bool disponible = true;
-
-            // Lógica especial para Ridery: falla el 30% de las veces
-            if (id.Contains("RIDERY", StringComparison.OrdinalIgnoreCase))
+            return new List<ServicioExternoDto>
             {
-                disponible = _random.NextDouble() > 0.3;
-            }
-
-            resultados.Add(id, disponible);
+                new() { IdServicioExterno = "1", Nombre = "Bus (Mock)", Tipo = "transporte", Precio = 10.5m, Disponible = true },
+                new() { IdServicioExterno = "2", Nombre = "Taxi (Mock)", Tipo = "transporte", Precio = 20.0m, Disponible = true }
+            };
         }
 
-        return resultados;
+        return Enumerable.Empty<ServicioExternoDto>();
     }
-    public Task<IEnumerable<Servicios.Dominio.Entidades.ServicioGlobal>> ObtenerServiciosCateringAsync()
+
+    public async Task<IEnumerable<ServicioExternoDto>> ObtenerTodosLosServiciosAsync()
     {
-        return Task.FromResult<IEnumerable<Servicios.Dominio.Entidades.ServicioGlobal>>(new List<Servicios.Dominio.Entidades.ServicioGlobal>());
+        return new List<ServicioExternoDto>
+        {
+            new() { IdServicioExterno = "1", Nombre = "Bus (Mock)", Tipo = "transporte", Precio = 10.5m, Disponible = true },
+            new() { IdServicioExterno = "2", Nombre = "Taxi (Mock)", Tipo = "transporte", Precio = 20.0m, Disponible = true }
+        };
+    }
+
+    public Task ActualizarServicioAsync(string idExterno, decimal precio, bool disponible)
+    {
+        return Task.CompletedTask;
     }
 }

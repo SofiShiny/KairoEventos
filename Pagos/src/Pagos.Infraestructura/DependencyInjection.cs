@@ -50,6 +50,10 @@ public static class DependencyInjection
         });
         services.AddHangfireServer();
 
+        // Registrar Jobs para Hangfire
+        services.AddScoped<Pagos.Aplicacion.Jobs.ConciliacionJob>();
+        services.AddScoped<Pagos.Aplicacion.Jobs.ConciliacionPagosJob>();
+
         return services;
     }
 }

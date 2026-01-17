@@ -56,6 +56,33 @@ public class RepositorioReportesLecturaMongo : IRepositorioReportesLectura
         }
     }
 
+    public async Task IncrementarVentasDiariasAsync(DateTime fecha, decimal monto, int cantidad)
+    {
+        try
+        {
+            var fechaSoloFecha = fecha.Date;
+            var filter = Builders<ReporteVentasDiarias>.Filter.Eq(r => r.Fecha, fechaSoloFecha);
+            
+            var update = Builders<ReporteVentasDiarias>.Update
+                .Inc(r => r.TotalIngresos, monto)
+                .Inc(r => r.CantidadReservas, cantidad)
+                .Set(r => r.UltimaActualizacion, DateTime.UtcNow)
+                .SetOnInsert(r => r.TituloEvento, "Consolidado Diario")
+                .SetOnInsert(r => r.EventoId, Guid.Empty)
+                .SetOnInsert(r => r.ReservasPorCategoria, new Dictionary<string, int>()); // Ensure dictionary exists
+
+            var options = new UpdateOptions { IsUpsert = true };
+            
+            await _context.ReportesVentasDiarias.UpdateOneAsync(filter, update, options);
+            _logger.LogInformation("Ventas incrementadas atomicamente fecha {Fecha}: +{Monto}", fechaSoloFecha, monto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error incrementando ventas diarias atomicamente");
+            throw;
+        }
+    }
+
     public async Task<List<ReporteVentasDiarias>> ObtenerVentasPorRangoAsync(DateTime fechaInicio, DateTime fechaFin)
     {
         try

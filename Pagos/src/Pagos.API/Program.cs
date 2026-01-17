@@ -92,7 +92,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Hangfire Dashboard
-app.UseHangfireDashboard();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new MyDashboardAuthorizationFilter() }
+});
 
 // TC-052: Programar Job de Conciliación
 using (var scope = app.Services.CreateScope())
@@ -103,16 +106,21 @@ using (var scope = app.Services.CreateScope())
     recurringJobManager.AddOrUpdate<ConciliacionJob>(
         "ConciliacionDiaria", 
         job => job.EjecutarConciliacionDiariaAsync(), 
-        Cron.Daily);
+        Cron.Minutely);
 
     // Nuevo job de conciliación automática cada hora
     recurringJobManager.AddOrUpdate<ConciliacionPagosJob>(
         "ConciliacionAutomaticaPendientes", 
         job => job.ConciliarPendientesAsync(), 
-        Cron.Hourly);
+        Cron.Minutely);
 }
 
 app.Run();
 
 // Hacer la clase Program accesible para tests de integración
 public partial class Program { }
+
+public class MyDashboardAuthorizationFilter : Hangfire.Dashboard.IDashboardAuthorizationFilter
+{
+    public bool Authorize(Hangfire.Dashboard.DashboardContext context) => true;
+}

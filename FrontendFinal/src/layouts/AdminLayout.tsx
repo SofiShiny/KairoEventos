@@ -38,6 +38,7 @@ export default function AdminLayout() {
         { icon: Calendar, label: t.adminMenu.events, path: '/admin/eventos' },
         { icon: BarChart3, label: t.adminMenu.sales, path: '/admin/ventas' },
         { icon: DollarSign, label: t.adminMenu.finance, path: '/admin/finanzas' },
+        { icon: ShoppingBag, label: "Servicios", path: '/admin/servicios' },
         { icon: Activity, label: t.adminMenu.audit, path: '/admin/auditoria' },
         { icon: Monitor, label: t.adminMenu.supervision, path: '/admin/supervision' },
         { icon: FileText, label: t.adminMenu.logs, path: '/admin/logs' },

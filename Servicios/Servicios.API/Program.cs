@@ -1,7 +1,9 @@
+using Hangfire;
+using Hangfire.PostgreSql;
+using Servicios.API.Hubs;
 using Servicios.Infraestructura;
 using Microsoft.EntityFrameworkCore;
 using Servicios.Infraestructura.Persistencia;
-using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
+
+// Hangfire
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"))));
+
+builder.Services.AddHangfireServer();
+
+// Jobs
+builder.Services.AddScoped<Servicios.API.Jobs.NotificationJob>();
 
 // Agregar Capas
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Servicios.Aplicacion.Comandos.ReservarServicioCommand).Assembly));
@@ -73,6 +88,17 @@ using (var scope = app.Services.CreateScope())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+app.MapHub<ServiciosHub>("/hub/servicios");
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new MyDashboardAuthorizationFilter() }
+});
 
 app.Run();
+
+public class MyDashboardAuthorizationFilter : Hangfire.Dashboard.IDashboardAuthorizationFilter
+{
+    public bool Authorize(Hangfire.Dashboard.DashboardContext context) => true;
+}

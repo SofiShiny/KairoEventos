@@ -12,4 +12,4 @@ public record MapaAsientosDto(
 );
 
 public record CategoriaDto(string Nombre, decimal? PrecioBase, bool TienePrioridad);
-public record AsientoDto(Guid Id, int Fila, int Numero, string Categoria, decimal Precio, bool Reservado);
+public record AsientoDto(Guid Id, int Fila, int Numero, string Categoria, decimal Precio, string Estado);

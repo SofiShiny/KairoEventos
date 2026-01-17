@@ -13,4 +13,5 @@ public interface IRepositorioMapaAsientos
     Task ActualizarAsync(MapaAsientos mapa, CancellationToken ct);
     Task<Guid> AgregarAsientoAsync(MapaAsientos mapa, Asiento asiento, CancellationToken ct);
     Task<Asiento?> ObtenerAsientoPorIdAsync(Guid asientoId, CancellationToken ct);
+    Task GuardarCambiosAsync(CancellationToken ct);
 }

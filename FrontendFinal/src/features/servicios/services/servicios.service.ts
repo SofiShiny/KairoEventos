@@ -1,17 +1,26 @@
 import api from '@/lib/axios';
 
+export interface Proveedor {
+    id: string;
+    nombreProveedor: string;
+    precio: number;
+    estaDisponible: boolean;
+    externalId: string;
+}
+
 export interface ServicioComplementario {
     id: string;
     nombre: string;
     precio: number;
     activo: boolean;
-    proveedores: any[];
+    proveedores: Proveedor[];
 }
 
 export interface ReservarServicioRequest {
     usuarioId: string;
     eventoId: string;
     servicioGlobalId: string;
+    ordenEntradaId?: string;
 }
 
 export const serviciosService = {
@@ -32,5 +41,27 @@ export const serviciosService = {
     getMisReservas: async (usuarioId: string): Promise<any[]> => {
         const response = await api.get(`/servicios/mis-reservas/${usuarioId}`);
         return response.data;
+    },
+
+    // Admin Methods
+    getServiciosExternos: async (): Promise<Proveedor[]> => {
+        // Mapeamos los campos del DTO externo a nuestra interfaz Proveedor
+        const response = await api.get('/AdminServicios/externos');
+        return response.data.map((s: any) => ({
+            id: s.idServicioExterno, // Usamos el ID externo en la UI de admin
+            nombreProveedor: s.nombre,
+            precio: s.precio,
+            estaDisponible: s.disponible,
+            externalId: s.idServicioExterno,
+            tipo: s.tipo
+        }));
+    },
+
+    updateServicioExterno: async (idExterno: string, precio: number, disponible: boolean): Promise<void> => {
+        await api.post('/AdminServicios/externos/update', {
+            idExterno,
+            precio,
+            disponible
+        });
     }
 };

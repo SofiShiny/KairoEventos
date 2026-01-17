@@ -53,7 +53,8 @@ public static class MassTransitServiceCollectionExtensions
         configurator.AddConsumer<AsientoLiberadoConsumer>();
         configurator.AddConsumer<EntradaCreadaConsumer>();
         configurator.AddConsumer<UsuarioAccionRealizadaConsumer>();
-        configurator.AddConsumer<VentaRegistradaConsumer>();
+        configurator.AddConsumer<EntradaPagadaConsumer>();
+        // configurator.AddConsumer<VentaRegistradaConsumer>(); // Reemplazado por EntradaPagadaConsumer
     }
 
     /// <summary>
@@ -70,7 +71,7 @@ public static class MassTransitServiceCollectionExtensions
         services.AddScoped<AsientoLiberadoConsumer>();
         services.AddScoped<EntradaCreadaConsumer>();
         services.AddScoped<UsuarioAccionRealizadaConsumer>();
-        services.AddScoped<VentaRegistradaConsumer>();
+        services.AddScoped<EntradaPagadaConsumer>();
     }
 
     /// <summary>

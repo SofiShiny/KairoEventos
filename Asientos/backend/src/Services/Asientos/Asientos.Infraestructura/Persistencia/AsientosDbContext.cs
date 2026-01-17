@@ -31,6 +31,7 @@ public class AsientosDbContext : DbContext
    b.Property(x => x.Fila).IsRequired();
    b.Property(x => x.Numero).IsRequired();
    b.Property(x => x.Reservado).IsRequired();
+   b.Property(x => x.Pagado).IsRequired().HasDefaultValue(false);
    b.Property(x => x.UsuarioId).IsRequired(false);
    
    b.OwnsOne(x => x.Categoria, cat =>

@@ -6,8 +6,6 @@ export interface Asiento {
     numero: number;
     categoria: string;
     precio: number;
-    reservado: boolean;
-    usuarioId?: string;
     estado: 'Disponible' | 'Reservado' | 'Ocupado';
 }
 
@@ -38,9 +36,7 @@ class AsientosService {
                 numero: asiento.numero,
                 categoria: asiento.categoria,
                 precio: asiento.precio || 0,
-                reservado: asiento.reservado,
-                usuarioId: asiento.usuarioId,
-                estado: asiento.usuarioId ? 'Ocupado' : (asiento.reservado ? 'Reservado' : 'Disponible')
+                estado: asiento.estado
             }));
 
             console.log('Asientos transformados:', asientos);

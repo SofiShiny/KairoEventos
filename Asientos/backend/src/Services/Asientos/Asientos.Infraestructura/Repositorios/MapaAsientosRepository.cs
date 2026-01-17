@@ -45,4 +45,7 @@ public class MapaAsientosRepository : IRepositorioMapaAsientos
 
     public async Task<Asiento?> ObtenerAsientoPorIdAsync(Guid asientoId, CancellationToken ct) =>
         await _db.Asientos.FirstOrDefaultAsync(a => a.Id == asientoId, ct);
+
+    public async Task GuardarCambiosAsync(CancellationToken ct) => 
+        await _db.SaveChangesAsync(ct);
 }

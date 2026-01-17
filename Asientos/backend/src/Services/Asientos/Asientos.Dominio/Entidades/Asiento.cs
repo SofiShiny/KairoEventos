@@ -12,6 +12,7 @@ public class Asiento : Entidad
     public int Numero { get; private set; }
     public CategoriaAsiento Categoria { get; private set; }
     public bool Reservado { get; private set; }
+    public bool Pagado { get; private set; }
     public Guid? UsuarioId { get; private set; }
 
     // Constructor sin parámetros para EF Core
@@ -34,6 +35,7 @@ public class Asiento : Entidad
         Numero = numero;
         Categoria = categoria ?? throw new ArgumentNullException(nameof(categoria));
         Reservado = false;
+        Pagado = false;
     }
 
     // Constructor público para pruebas
@@ -45,12 +47,20 @@ public class Asiento : Entidad
         if (Reservado) throw new InvalidOperationException("Asiento ya reservado");
         Reservado = true;
         UsuarioId = usuarioId;
+        Pagado = false; // Al reservar, aún no está pagado
+    }
+
+    public void MarcarComoPagado()
+    {
+        if (!Reservado) throw new InvalidOperationException("No se puede pagar un asiento no reservado");
+        Pagado = true;
     }
 
     public void Liberar()
     {
         if (!Reservado) return; // Idempotencia
         Reservado = false;
+        Pagado = false;
         UsuarioId = null;
     }
 }
