@@ -69,7 +69,8 @@ export const ConciliacionPage = () => {
 
     const getEstadoLabel = (estado: EstadoTransaccion): string => {
         const labels: Record<EstadoTransaccion, string> = {
-            [EstadoTransaccion.Procesando]: t.finance.pending,
+            [EstadoTransaccion.Pendiente]: t.finance.pending,
+            [EstadoTransaccion.Procesando]: t.finance.pending, // Both show as pending for user
             [EstadoTransaccion.Aprobada]: t.finance.approved,
             [EstadoTransaccion.Rechazada]: t.finance.rejected,
             [EstadoTransaccion.Reembolsada]: t.finance.refunded
@@ -79,6 +80,7 @@ export const ConciliacionPage = () => {
 
     const getEstadoColor = (estado: EstadoTransaccion): string => {
         const colors: Record<EstadoTransaccion, string> = {
+            [EstadoTransaccion.Pendiente]: 'bg-neutral-500/10 text-neutral-500 border-neutral-500/20',
             [EstadoTransaccion.Procesando]: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
             [EstadoTransaccion.Aprobada]: 'bg-green-500/10 text-green-500 border-green-500/20',
             [EstadoTransaccion.Rechazada]: 'bg-red-500/10 text-red-500 border-red-500/20',

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Servicios.Dominio.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Hangfire;
+using Servicios.Dominio.Repositorios;
+using Servicios.Dominio.Entidades;
 
 namespace Servicios.API.Controllers;
 
@@ -16,6 +18,34 @@ public class AdminServiciosController : ControllerBase
     public AdminServiciosController(IProveedorExternoService proveedorExterno)
     {
         _proveedorExterno = proveedorExterno;
+    }
+
+    [HttpGet("globales")]
+    public async Task<ActionResult<IEnumerable<ServicioGlobal>>> GetServiciosGlobales([FromServices] IRepositorioServicios repo)
+    {
+        var servicios = await repo.ObtenerCatalogoAsync();
+        return Ok(servicios);
+    }
+
+    [HttpPost("globales/update")]
+    public async Task<IActionResult> UpdateServicioGlobal(
+        [FromBody] UpdateGlobalRequest request,
+        [FromServices] IRepositorioServicios repo)
+    {
+        var servicio = await repo.ObtenerServicioPorIdAsync(request.Id);
+        if (servicio == null) return NotFound();
+
+        // Actualizamos nombre y precio
+        // Como ServicioGlobal tiene un constructor y props, usamos el repositorio para actualizar
+        // o modificamos la entidad si el seguimiento de cambios está activo.
+        
+        // Asumiendo que podemos actualizar las propiedades (necesitamos verificar si tienen setters)
+        servicio.Update(request.Nombre, request.Precio);
+        
+        await repo.ActualizarServicioAsync(servicio);
+        await repo.SaveAsync();
+
+        return Ok(new { message = "Servicio global actualizado correctamente" });
     }
 
     [HttpGet("externos")]
@@ -56,3 +86,4 @@ public class AdminServiciosController : ControllerBase
 }
 
 public record UpdateExternoRequest(string IdExterno, decimal Precio, bool Disponible);
+public record UpdateGlobalRequest(Guid Id, string Nombre, decimal Precio);

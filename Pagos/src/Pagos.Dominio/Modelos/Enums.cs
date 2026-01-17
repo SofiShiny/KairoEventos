@@ -5,5 +5,6 @@ public enum EstadoTransaccion
     Pendiente,
     Procesando,
     Aprobado,
-    Rechazado
+    Rechazado,
+    Reembolsado
 }

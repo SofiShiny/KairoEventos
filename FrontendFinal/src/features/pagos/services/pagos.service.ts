@@ -1,10 +1,11 @@
 import api from '@/lib/axios';
 
 export enum EstadoTransaccion {
-    Procesando = 0,
-    Aprobada = 1,
-    Rechazada = 2,
-    Reembolsada = 3
+    Pendiente = 0,
+    Procesando = 1,
+    Aprobada = 2,
+    Rechazada = 3,
+    Reembolsada = 4
 }
 
 export interface Transaccion {

@@ -51,12 +51,13 @@ public class EntradaPagadaConsumer : IConsumer<EntradaPagadaEvento>
 
             await _repositorio.ActualizarMetricasDiariasAsync(metricas);
 
-            // 2. Actualizar Métricas Acumuladas del Evento
+            // 2. Actualizar Ventas Diarias Globales (para el gráfico del dashboard)
+            await _repositorio.IncrementarVentasDiariasAsync(fecha, mensaje.MontoTotal, mensaje.AsientosIds.Count);
+
+            // 3. Actualizar Métricas Acumuladas del Evento
             var metricasEvento = await _repositorio.ObtenerMetricasEventoAsync(eventoId);
             if (metricasEvento != null)
             {
-                // Convertir decimal a Decimal128 compatible si fuera necesario, pero C# maneja la conversión implicita suele funcionar con Driver.
-                // Aseguramos que sumamos al ingreso total.
                 metricasEvento.IngresoTotal += mensaje.MontoTotal;
                 metricasEvento.UltimaActualizacion = DateTime.UtcNow;
                 

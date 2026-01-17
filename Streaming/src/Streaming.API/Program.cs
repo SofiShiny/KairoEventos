@@ -42,6 +42,8 @@ builder.Services.AddControllers()
     });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<StreamingDbContext>("database");
 
 var app = builder.Build();
 
@@ -58,6 +60,8 @@ app.UseSwaggerUI();
 
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/live");
 
 app.Run();
 

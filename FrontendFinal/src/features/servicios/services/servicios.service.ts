@@ -26,7 +26,7 @@ export interface ReservarServicioRequest {
 export const serviciosService = {
     // El endpoint detectado es /api/servicios/catalogo
     // Nota: Aunque el nombre sugiere catálogo global, lo usaremos para listar servicios disponibles.
-    getServiciosPorEvento: async (eventoId: string): Promise<ServicioComplementario[]> => {
+    getServiciosPorEvento: async (_eventoId: string): Promise<ServicioComplementario[]> => {
         // En una implementación ideal, filtraríamos por eventoId. 
         // Dado que el endpoint es genérico, obtenemos todo el catálogo.
         const response = await api.get('/servicios/catalogo');
@@ -62,6 +62,19 @@ export const serviciosService = {
             idExterno,
             precio,
             disponible
+        });
+    },
+
+    getServiciosGlobales: async (): Promise<any[]> => {
+        const response = await api.get('/AdminServicios/globales');
+        return response.data;
+    },
+
+    updateServicioGlobal: async (id: string, nombre: string, precio: number): Promise<void> => {
+        await api.post('/AdminServicios/globales/update', {
+            id,
+            nombre,
+            precio
         });
     }
 };

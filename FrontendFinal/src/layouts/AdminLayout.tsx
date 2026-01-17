@@ -21,7 +21,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useT } from '../i18n';
-import AuthDebug from '../components/debug/AuthDebug';
+
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -203,8 +203,7 @@ export default function AdminLayout() {
                 </footer>
             </main>
 
-            {/* Debug de autenticación - temporal */}
-            <AuthDebug />
+
 
             <style>{`
                 .custom-scrollbar-sidebar::-webkit-scrollbar {

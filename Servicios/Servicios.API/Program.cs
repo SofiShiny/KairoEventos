@@ -13,6 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ServiciosDbContext>("database");
 
 // Hangfire
 builder.Services.AddHangfire(config => config
@@ -90,6 +92,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/live");
 app.MapHub<ServiciosHub>("/hub/servicios");
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {

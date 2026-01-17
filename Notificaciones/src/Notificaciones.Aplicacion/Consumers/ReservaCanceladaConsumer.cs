@@ -11,14 +11,14 @@ namespace Notificaciones.Aplicacion.Consumers;
 /// </summary>
 public class ReservaCanceladaConsumer : IConsumer<ReservaCanceladaEvento>
 {
-    private readonly INotificacionService _notificacionService;
+    private readonly INotificador _notificador;
     private readonly ILogger<ReservaCanceladaConsumer> _logger;
 
     public ReservaCanceladaConsumer(
-        INotificacionService notificacionService,
+        INotificador notificador,
         ILogger<ReservaCanceladaConsumer> logger)
     {
-        _notificacionService = notificacionService ?? throw new ArgumentNullException(nameof(notificacionService));
+        _notificador = notificador ?? throw new ArgumentNullException(nameof(notificador));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -34,17 +34,20 @@ public class ReservaCanceladaConsumer : IConsumer<ReservaCanceladaEvento>
         try
         {
             // Enviar notificación de reembolso al usuario
-            await _notificacionService.EnviarNotificacionAsync(
-                usuarioId: mensaje.UsuarioId.ToString(),
-                tipo: "entrada_cancelada",
-                titulo: "💰 Reembolso Procesado",
-                mensaje: "Tu entrada ha sido cancelada exitosamente. El reembolso se procesará en 3-5 días hábiles.",
-                datos: new
+            await _notificador.EnviarNotificacionUsuario(
+                mensaje.UsuarioId.ToString(),
+                new
                 {
-                    entradaId = mensaje.EntradaId,
-                    eventoId = mensaje.EventoId,
-                    asientoId = mensaje.AsientoId,
-                    fechaCancelacion = mensaje.FechaCancelacion
+                    tipo = "entrada_cancelada",
+                    titulo = "💰 Reembolso Procesado",
+                    mensaje = "Tu entrada ha sido cancelada exitosamente. El reembolso se procesará en 3-5 días hábiles.",
+                    datos = new
+                    {
+                        entradaId = mensaje.EntradaId,
+                        eventoId = mensaje.EventoId,
+                        asientoId = mensaje.AsientoId,
+                        fechaCancelacion = mensaje.FechaCancelacion
+                    }
                 });
 
             _logger.LogInformation(

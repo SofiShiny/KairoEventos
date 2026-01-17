@@ -19,6 +19,8 @@ QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<Pagos.Infraestructura.Persistencia.PagosDbContext>("database");
 
 // Autenticación JWT con Keycloak
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -90,6 +92,8 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/live");
 
 // Hangfire Dashboard
 app.UseHangfireDashboard("/hangfire", new DashboardOptions

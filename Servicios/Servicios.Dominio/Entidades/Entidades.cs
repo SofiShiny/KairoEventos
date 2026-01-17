@@ -35,6 +35,12 @@ public class ServicioGlobal
 
     public void ActualizarPrecio(decimal nuevoPrecio) => Precio = nuevoPrecio;
 
+    public void Update(string nombre, decimal precio)
+    {
+        Nombre = nombre;
+        Precio = precio;
+    }
+
     public void AgregarProveedor(ProveedorServicio proveedor)
     {
         _proveedores.Add(proveedor);
