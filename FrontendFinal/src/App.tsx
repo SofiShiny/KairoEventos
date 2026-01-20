@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from 'react-oidc-context';
+import { oidcConfig } from './lib/auth-config';
 import { Toaster } from 'react-hot-toast';
 import { router } from './router';
-import { oidcConfig } from './lib/auth-config';
 import { useSignalR } from './hooks/useSignalR';
 import { useServiciosSignalR } from './hooks/useServiciosSignalR';
 import { I18nProvider, useT } from './i18n';

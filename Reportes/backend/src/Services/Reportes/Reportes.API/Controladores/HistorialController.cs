@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Reportes.Dominio.ModelosLectura;
@@ -6,6 +7,7 @@ using System.Security.Claims;
 
 namespace Reportes.API.Controladores
 {
+    [Authorize]
     [ApiController]
     [Route("api/reportes/historial")]
     public class HistorialController : ControllerBase

@@ -14,7 +14,8 @@ public static class ServiceConfiguration
             .ConfigureApiServices()
             .ConfigureApplicationServices()
             .ConfigureInfrastructureServices()
-            .ConfigureExternalServices();
+            .ConfigureExternalServices()
+            .ConfigureAuthentication();
 
         return builder;
     }

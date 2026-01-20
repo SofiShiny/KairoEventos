@@ -19,6 +19,7 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
+    command: [ "postgres", "-c", "max_connections=500" ]
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./configs/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -352,6 +353,8 @@ services:
       - MongoDbSettings__ConnectionString=mongodb://mongodb:27017
       - MongoDbSettings__DatabaseName=kairo_reportes
       - RabbitMQ__Host=rabbitmq
+      - Authentication__Authority=http://keycloak:8080/realms/Kairo
+      - Authentication__Audience=kairo-api
     networks:
       - kairo-network
     depends_on:
@@ -435,8 +438,8 @@ services:
       # Email Configuration (Reemplazar con credenciales reales o usar Mailtrap/Ethereal para pruebas)
       - EmailSettings__Host=smtp.ethereal.email
       - EmailSettings__Puerto=587
-      - EmailSettings__Usuario=armando.bruen@ethereal.email
-      - EmailSettings__Password=8nHKCKp1JxAsa7MexS
+      - EmailSettings__Usuario=gwendolyn85@ethereal.email
+      - EmailSettings__Password=rUBFGz3psgqreZFuBM
       - EmailSettings__NombreEmisor=Kairo Eventos
       - EmailSettings__EmailEmisor=no-reply@kairo.com
       - EmailSettings__UsarSsl=false

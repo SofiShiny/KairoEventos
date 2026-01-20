@@ -105,6 +105,7 @@ public static class PipelineConfiguration
     {
         app.UseSerilogRequestLogging();
         app.UseCors("AllowAll");
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
         app.MapHub<Reportes.API.Hubs.ReportesHub>("/hub/reportes");

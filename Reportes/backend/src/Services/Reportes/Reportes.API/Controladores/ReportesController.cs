@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reportes.API.DTOs;
 using Reportes.Dominio.Repositorios;
 
 namespace Reportes.API.Controladores;
 
+[Authorize]
 [ApiController]
 [Route("api/reportes")]
 [Produces("application/json")]
@@ -54,6 +56,7 @@ public class ReportesController : ControllerBase
     /// <response code="200">Resumen de ventas obtenido exitosamente</response>
     /// <response code="400">Parámetros inválidos (ej: fechaInicio mayor que fechaFin)</response>
     /// <response code="500">Error interno del servidor</response>
+    [Authorize(Policy = "OrganizatorOnly")]
     [HttpGet("resumen-ventas")]
     [ProducesResponseType(typeof(ResumenVentasDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -161,6 +164,7 @@ public class ReportesController : ControllerBase
     /// <response code="200">Métricas del evento obtenidas exitosamente</response>
     /// <response code="404">Evento no encontrado o sin métricas disponibles</response>
     /// <response code="500">Error interno del servidor</response>
+    [Authorize(Policy = "OrganizatorOnly")]
     [HttpGet("metricas-evento/{eventoId}")]
     [ProducesResponseType(typeof(MetricasEventoDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -216,6 +220,7 @@ public class ReportesController : ControllerBase
     /// <param name="eventoId">ID del evento para filtrar logs</param>
     /// <response code="200">Logs obtenidos exitosamente</response>
     /// <response code="500">Error interno del servidor</response>
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("logs-auditoria")]
     [ProducesResponseType(typeof(List<LogAuditoriaDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -284,6 +289,7 @@ public class ReportesController : ControllerBase
     /// <response code="200">Información de asistencia obtenida exitosamente</response>
     /// <response code="404">Evento no encontrado o sin información de asistencia</response>
     /// <response code="500">Error interno del servidor</response>
+    [Authorize(Policy = "OrganizatorOnly")]
     [HttpGet("asistencia/{eventoId}")]
     [ProducesResponseType(typeof(AsistenciaEventoDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -370,6 +376,7 @@ public class ReportesController : ControllerBase
     /// <response code="200">Logs de auditoría obtenidos exitosamente</response>
     /// <response code="400">Parámetros inválidos (ej: página menor a 1, tamaño fuera de rango)</response>
     /// <response code="500">Error interno del servidor</response>
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("auditoria")]
     [ProducesResponseType(typeof(PaginacionDto<LogAuditoriaDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -480,6 +487,7 @@ public class ReportesController : ControllerBase
     /// <response code="200">Datos de conciliación obtenidos exitosamente</response>
     /// <response code="400">Parámetros inválidos (ej: fechaInicio mayor que fechaFin)</response>
     /// <response code="500">Error interno del servidor</response>
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("conciliacion-financiera")]
     [ProducesResponseType(typeof(ConciliacionFinancieraDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -538,6 +546,7 @@ public class ReportesController : ControllerBase
         }
     }
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet("dashboard")]
     public async Task<ActionResult> ObtenerDashboardMetrics()
     {
